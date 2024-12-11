@@ -16,6 +16,7 @@
 !/.github
 !/.solhint.json
 !/.prettierrc
+!/.coderabbit.yaml
 
 /vendor
 /esdata
