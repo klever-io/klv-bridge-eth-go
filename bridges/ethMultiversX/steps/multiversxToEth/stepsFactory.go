@@ -3,9 +3,9 @@ package multiversxtoeth
 import (
 	"fmt"
 
-	"github.com/multiversx/mx-bridge-eth-go/bridges/ethMultiversX"
-	"github.com/multiversx/mx-bridge-eth-go/bridges/ethMultiversX/steps"
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	ethmultiversx "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
+	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/steps"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 )
 

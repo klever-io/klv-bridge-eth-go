@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/stateMachine"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/stateMachine"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/stretchr/testify/assert"
 )

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/core/converters"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
+	"github.com/klever-io/klv-bridge-eth-go/core/converters"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/stretchr/testify/assert"

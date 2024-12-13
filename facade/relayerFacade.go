@@ -1,7 +1,7 @@
 package facade
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 )
 
@@ -35,7 +35,8 @@ func NewRelayerFacade(args ArgsRelayerFacade) (*relayerFacade, error) {
 
 // RestApiInterface returns the interface on which the rest API should start on, based on the flags provided.
 // The API will start on the DefaultRestInterface value unless a correct value is passed or
-//  the value is explicitly set to off, in which case it will not start at all
+//
+//	the value is explicitly set to off, in which case it will not start at all
 func (rf *relayerFacade) RestApiInterface() string {
 	return rf.apiInterface
 }

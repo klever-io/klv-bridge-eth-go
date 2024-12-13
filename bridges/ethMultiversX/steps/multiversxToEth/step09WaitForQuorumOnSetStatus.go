@@ -3,8 +3,8 @@ package multiversxtoeth
 import (
 	"context"
 
-	"github.com/multiversx/mx-bridge-eth-go/bridges/ethMultiversX/steps"
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/steps"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
 

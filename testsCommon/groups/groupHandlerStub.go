@@ -2,8 +2,8 @@ package groups
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/multiversx/mx-bridge-eth-go/api/shared"
-	"github.com/multiversx/mx-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/api/shared"
+	"github.com/klever-io/klv-bridge-eth-go/config"
 )
 
 // GroupHandlerStub -

@@ -1,0 +1,44 @@
+=============== Dec 12, 2024 (-03) ===============
+16:41:32.300317 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:41:32.310879 db@open opening
+16:41:32.310993 version@stat F·[] S·0B[] Sc·[]
+16:41:32.314110 db@janitor F·2 G·0
+16:41:32.314117 db@open done T·3.231865ms
+=============== Dec 12, 2024 (-03) ===============
+16:45:15.360014 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:45:15.360067 version@stat F·[] S·0B[] Sc·[]
+16:45:15.360076 db@open opening
+16:45:15.360095 journal@recovery F·1
+16:45:15.360168 journal@recovery recovering @1
+16:45:15.360344 version@stat F·[] S·0B[] Sc·[]
+16:45:15.370992 db@janitor F·2 G·0
+16:45:15.371004 db@open done T·10.924496ms
+=============== Dec 12, 2024 (-03) ===============
+16:45:38.452939 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:45:38.452991 version@stat F·[] S·0B[] Sc·[]
+16:45:38.452997 db@open opening
+16:45:38.453014 journal@recovery F·1
+16:45:38.453073 journal@recovery recovering @2
+16:45:38.453268 version@stat F·[] S·0B[] Sc·[]
+16:45:38.467194 db@janitor F·2 G·0
+16:45:38.467206 db@open done T·14.202421ms
+=============== Dec 12, 2024 (-03) ===============
+16:59:44.472248 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:59:44.472295 version@stat F·[] S·0B[] Sc·[]
+16:59:44.472301 db@open opening
+16:59:44.472317 journal@recovery F·1
+16:59:44.472693 journal@recovery recovering @4
+16:59:44.476561 memdb@flush created L0@6 N·19 S·637B "eth..ent,v19":"mul..ent,v2"
+16:59:44.476645 version@stat F·[1] S·637B[637B] Sc·[0.25]
+16:59:44.489240 db@janitor F·3 G·0
+16:59:44.489253 db@open done T·16.944804ms
+=============== Dec 12, 2024 (-03) ===============
+17:01:43.021595 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:01:43.021648 version@stat F·[1] S·637B[637B] Sc·[0.25]
+17:01:43.021655 db@open opening
+17:01:43.021672 journal@recovery F·1
+17:01:43.021734 journal@recovery recovering @7
+17:01:43.024544 memdb@flush created L0@9 N·49 S·1KiB "eth..ent,v69":"mul..ent,v22"
+17:01:43.024737 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+17:01:43.036771 db@janitor F·4 G·0
+17:01:43.036783 db@open done T·15.124351ms

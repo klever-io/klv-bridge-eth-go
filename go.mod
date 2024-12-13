@@ -1,4 +1,4 @@
-module github.com/multiversx/mx-bridge-eth-go
+module github.com/klever-io/klv-bridge-eth-go
 
 go 1.20
 

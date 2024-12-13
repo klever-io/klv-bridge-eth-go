@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients/multiversx"
+	"github.com/klever-io/klv-bridge-eth-go/clients/multiversx"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	apiCore "github.com/multiversx/mx-chain-core-go/data/api"

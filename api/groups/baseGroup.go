@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/multiversx/mx-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/multiversx/mx-chain-go/api/shared"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )

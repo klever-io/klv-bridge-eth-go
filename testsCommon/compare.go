@@ -1,6 +1,6 @@
 package testsCommon
 
-import "github.com/multiversx/mx-bridge-eth-go/core"
+import "github.com/klever-io/klv-bridge-eth-go/core"
 
 // EqualStringMetrics returns true if the provided metrics contain same values and keys
 func EqualStringMetrics(metric1 core.StringMetrics, metric2 core.StringMetrics) bool {

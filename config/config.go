@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/clients/chain"
+	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
 	"github.com/multiversx/mx-chain-go/config"
 	p2pConfig "github.com/multiversx/mx-chain-go/p2p/config"
 )

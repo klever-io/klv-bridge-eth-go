@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum"
-	"github.com/multiversx/mx-bridge-eth-go/core/batchProcessor"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
+	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )

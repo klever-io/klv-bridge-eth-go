@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/core"

@@ -1,7 +1,7 @@
 package testsCommon
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/config"
 )
 
 // CreateTestMultiversXGasMap will create a testing gas map for MultiversX client

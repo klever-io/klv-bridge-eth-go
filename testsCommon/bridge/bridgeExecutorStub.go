@@ -9,8 +9,8 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/core/batchProcessor"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
 
@@ -64,7 +64,7 @@ type BridgeExecutorStub struct {
 func NewBridgeExecutorStub() *BridgeExecutorStub {
 	return &BridgeExecutorStub{
 		functionCalledCounter: make(map[string]int),
-		fullPath:              "github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge.(*BridgeExecutorStub).",
+		fullPath:              "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge.(*BridgeExecutorStub).",
 	}
 }
 

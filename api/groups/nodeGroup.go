@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/multiversx/mx-bridge-eth-go/api/shared"
+	"github.com/klever-io/klv-bridge-eth-go/api/shared"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-go/api/errors"
 	chainAPIShared "github.com/multiversx/mx-chain-go/api/shared"

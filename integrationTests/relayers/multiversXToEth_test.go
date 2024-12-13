@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/factory"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/mock"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/factory"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/mock"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

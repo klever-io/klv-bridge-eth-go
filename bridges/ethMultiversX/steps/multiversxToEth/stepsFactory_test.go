@@ -3,8 +3,8 @@ package multiversxtoeth
 import (
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/bridges/ethMultiversX"
-	bridgeTests "github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge"
+	ethmultiversx "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
+	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

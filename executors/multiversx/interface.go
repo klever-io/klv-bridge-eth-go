@@ -3,7 +3,7 @@ package multiversx
 import (
 	"context"
 
-	"github.com/multiversx/mx-bridge-eth-go/parsers"
+	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	"github.com/multiversx/mx-sdk-go/core"

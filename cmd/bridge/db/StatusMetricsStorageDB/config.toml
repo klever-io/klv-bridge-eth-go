@@ -1,0 +1,8 @@
+BatchDelaySeconds = 2
+FilePath = ""
+MaxBatchSize = 100
+MaxOpenFiles = 10
+NumShards = 0
+ShardIDProviderType = ""
+Type = "LvlDBSerial"
+UseTmpAsFilePath = false

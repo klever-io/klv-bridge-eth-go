@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	mockFacade "github.com/multiversx/mx-bridge-eth-go/testsCommon/facade"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	mockFacade "github.com/klever-io/klv-bridge-eth-go/testsCommon/facade"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/marshal"
 	apiErrors "github.com/multiversx/mx-chain-go/api/errors"

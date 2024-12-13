@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/errors"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/builders"

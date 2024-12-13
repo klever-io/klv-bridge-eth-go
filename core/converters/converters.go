@@ -10,7 +10,7 @@ import (
 )
 
 const hexPrefix = "0x"
-const hrp = "erd"
+const hrp = "klv"
 
 type addressConverter struct {
 	converter core.PubkeyConverter

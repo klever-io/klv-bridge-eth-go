@@ -1,6 +1,6 @@
 package testsCommon
 
-import "github.com/multiversx/mx-bridge-eth-go/parsers"
+import "github.com/klever-io/klv-bridge-eth-go/parsers"
 
 // MultiversxCodecStub -
 type MultiversxCodecStub struct {

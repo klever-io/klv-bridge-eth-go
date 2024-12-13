@@ -5,7 +5,7 @@ import (
 	"errors"
 	"math/big"
 
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 )
 
 var errNotImplemented = errors.New("not implemented")

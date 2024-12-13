@@ -8,8 +8,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/mock"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/relayers/slowTests/framework"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/mock"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/stretchr/testify/require"
 )
