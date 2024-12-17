@@ -240,7 +240,7 @@ func startRelay(ctx *cli.Context, version string) error {
 		return err
 	}
 
-	args := factory.ArgsEthereumToMultiversXBridge{
+	args := factory.ArgsEthereumToKleverBridge{
 		Configs:                       configs,
 		Messenger:                     messenger,
 		StatusStorer:                  statusStorer,
@@ -254,7 +254,7 @@ func startRelay(ctx *cli.Context, version string) error {
 		MultiversXClientStatusHandler: multiversXClientStatusHandler,
 	}
 
-	ethToMultiversXComponents, err := factory.NewEthMultiversXBridgeComponents(args)
+	ethToMultiversXComponents, err := factory.NewEthKleverBridgeComponents(args)
 	if err != nil {
 		return err
 	}

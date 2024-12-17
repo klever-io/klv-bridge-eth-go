@@ -13,8 +13,10 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/api"
+	"github.com/multiversx/mx-chain-core-go/data/vm"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
@@ -51,7 +53,7 @@ type ClientArgs struct {
 
 // client represents the MultiversX Client implementation
 type client struct {
-	*mxClientDataGetter
+	*klvClientDataGetter
 	txHandler                    txHandler
 	tokensMapper                 TokensMapper
 	relayerPublicKey             crypto.PublicKey
@@ -69,8 +71,23 @@ type client struct {
 	mut                      sync.RWMutex
 }
 
+func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
+	return &interactors.ProxyStub{
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			return &data.VmValuesResponseData{
+				Data: &vm.VMOutputApi{
+					ReturnCode: okCodeAfterExecution,
+					ReturnData: returningBytes,
+				},
+			}, nil
+		},
+	}
+}
+
 // NewClient returns a new MultiversX Client instance
 func NewClient(args ClientArgs) (*client, error) {
+	args.Proxy = createMockProxyKLV(nil)
+
 	err := checkArgs(args)
 	if err != nil {
 		return nil, err
@@ -93,14 +110,14 @@ func NewClient(args ClientArgs) (*client, error) {
 
 	relayerAddress := data.NewAddressFromBytes(publicKeyBytes)
 
-	argsMXClientDataGetter := ArgsMXClientDataGetter{
+	argsKLVClientDataGetter := ArgsKLVClientDataGetter{
 		MultisigContractAddress: args.MultisigContractAddress,
 		SafeContractAddress:     args.SafeContractAddress,
 		RelayerAddress:          relayerAddress,
 		Proxy:                   args.Proxy,
 		Log:                     bridgeCore.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXDataGetterLogId), multiversXDataGetterLogId),
 	}
-	getter, err := NewMXClientDataGetter(argsMXClientDataGetter)
+	getter, err := NewKLVClientDataGetter(argsKLVClientDataGetter)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +147,7 @@ func NewClient(args ClientArgs) (*client, error) {
 			singleSigner:            &singlesig.Ed25519Signer{},
 			roleProvider:            args.RoleProvider,
 		},
-		mxClientDataGetter:           getter,
+		klvClientDataGetter:          getter,
 		relayerPublicKey:             publicKey,
 		relayerAddress:               relayerAddress,
 		multisigContractAddress:      args.MultisigContractAddress,

@@ -42,3 +42,60 @@
 17:01:43.024737 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
 17:01:43.036771 db@janitor F·4 G·0
 17:01:43.036783 db@open done T·15.124351ms
+=============== Dec 16, 2024 (-03) ===============
+21:58:22.220323 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:58:22.220451 version@stat F·[2] S·2KiB[2KiB] Sc·[0.50]
+21:58:22.220465 db@open opening
+21:58:22.220522 journal@recovery F·1
+21:58:22.220601 journal@recovery recovering @10
+21:58:22.223723 memdb@flush created L0@12 N·33 S·1KiB "eth..ent,v103":"mul..ent,v72"
+21:58:22.224353 version@stat F·[3] S·3KiB[3KiB] Sc·[0.75]
+21:58:22.234314 db@janitor F·5 G·0
+21:58:22.234341 db@open done T·13.867886ms
+=============== Dec 16, 2024 (-03) ===============
+22:01:18.124863 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+22:01:18.124979 version@stat F·[3] S·3KiB[3KiB] Sc·[0.75]
+22:01:18.124993 db@open opening
+22:01:18.125050 journal@recovery F·1
+22:01:18.125119 journal@recovery recovering @13
+22:01:18.128141 memdb@flush created L0@15 N·17 S·748B "Eth..rsX,v120":"mul..ent,v106"
+22:01:18.128572 version@stat F·[4] S·3KiB[3KiB] Sc·[1.00]
+22:01:18.137075 db@janitor F·6 G·0
+22:01:18.137102 db@open done T·12.096108ms
+22:01:18.137238 table@compaction L0·4 -> L1·0 S·3KiB Q·122
+22:01:18.141472 table@build created L1@18 N·3 S·449B "Eth..rsX,v120":"mul..ent,v115"
+22:01:18.141509 version@stat F·[0 1] S·449B[0B 449B] Sc·[0.00 0.00]
+22:01:18.144760 table@compaction committed F-3 S-3KiB Ke·0 D·115 T·7.496527ms
+22:01:18.144815 table@remove removed @12
+22:01:18.144832 table@remove removed @9
+22:01:18.144852 table@remove removed @6
+=============== Dec 16, 2024 (-03) ===============
+22:03:07.585796 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+22:03:07.585990 version@stat F·[0 1] S·449B[0B 449B] Sc·[0.00 0.00]
+22:03:07.586011 db@open opening
+22:03:07.586094 journal@recovery F·1
+22:03:07.586202 journal@recovery recovering @16
+22:03:07.589119 memdb@flush created L0@19 N·1 S·370B "eth..ent,v123":"eth..ent,v123"
+22:03:07.589560 version@stat F·[1 1] S·819B[370B 449B] Sc·[0.25 0.00]
+22:03:07.599911 db@janitor F·5 G·1
+22:03:07.599928 db@janitor removing table-15
+22:03:07.599964 db@open done T·13.946266ms
+=============== Dec 16, 2024 (-03) ===============
+22:05:36.127983 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+22:05:36.128104 version@stat F·[1 1] S·819B[370B 449B] Sc·[0.25 0.00]
+22:05:36.128119 db@open opening
+22:05:36.128187 journal@recovery F·1
+22:05:36.128708 journal@recovery recovering @20
+22:05:36.129121 version@stat F·[1 1] S·819B[370B 449B] Sc·[0.25 0.00]
+22:05:36.137918 db@janitor F·4 G·0
+22:05:36.137935 db@open done T·9.809551ms
+=============== Dec 16, 2024 (-03) ===============
+22:11:29.095974 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+22:11:29.096113 version@stat F·[1 1] S·819B[370B 449B] Sc·[0.25 0.00]
+22:11:29.096128 db@open opening
+22:11:29.096187 journal@recovery F·1
+22:11:29.096260 journal@recovery recovering @22
+22:11:29.099022 memdb@flush created L0@24 N·23 S·912B "Eth..rsX,v137":"mul..ent,v126"
+22:11:29.099361 version@stat F·[2 1] S·1KiB[1KiB 449B] Sc·[0.50 0.00]
+22:11:29.113257 db@janitor F·5 G·0
+22:11:29.113274 db@open done T·17.141105ms
