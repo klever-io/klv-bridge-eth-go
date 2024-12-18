@@ -126,13 +126,13 @@ func executeQuery(cfg config.MigrationToolConfig) error {
 
 func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*internalComponents, error) {
 	argsProxy := blockchain.ArgsProxy{
-		ProxyURL:            cfg.MultiversX.NetworkAddress,
+		ProxyURL:            cfg.Klever.NetworkAddress,
 		SameScState:         false,
 		ShouldBeSynced:      false,
-		FinalityCheck:       cfg.MultiversX.Proxy.FinalityCheck,
-		AllowedDeltaToFinal: cfg.MultiversX.Proxy.MaxNoncesDelta,
-		CacheExpirationTime: time.Second * time.Duration(cfg.MultiversX.Proxy.CacherExpirationSeconds),
-		EntityType:          sdkCore.RestAPIEntityType(cfg.MultiversX.Proxy.RestAPIEntityType),
+		FinalityCheck:       cfg.Klever.Proxy.FinalityCheck,
+		AllowedDeltaToFinal: cfg.Klever.Proxy.MaxNoncesDelta,
+		CacheExpirationTime: time.Second * time.Duration(cfg.Klever.Proxy.CacherExpirationSeconds),
+		EntityType:          sdkCore.RestAPIEntityType(cfg.Klever.Proxy.RestAPIEntityType),
 	}
 	proxy, err := blockchain.NewProxy(argsProxy)
 	if err != nil {
@@ -140,12 +140,12 @@ func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*
 	}
 
 	dummyAddress := data.NewAddressFromBytes(bytes.Repeat([]byte{0x1}, 32))
-	multisigAddress, err := data.NewAddressFromBech32String(cfg.MultiversX.MultisigContractAddress)
+	multisigAddress, err := data.NewAddressFromBech32String(cfg.Klever.MultisigContractAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	safeAddress, err := data.NewAddressFromBech32String(cfg.MultiversX.SafeContractAddress)
+	safeAddress, err := data.NewAddressFromBech32String(cfg.Klever.SafeContractAddress)
 	if err != nil {
 		return nil, err
 	}

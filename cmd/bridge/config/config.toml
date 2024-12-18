@@ -1,7 +1,7 @@
 [Eth]
     Chain = "Ethereum"
     NetworkAddress = "http://127.0.0.1:8545" # a network address
-    MultisigContractAddress = "0x6330f6C906bD73749D98b00cB403dbFBc394dA23" # the eth address for the bridge contract
+    MultisigContractAddress = "0xa9CE4a2C78a0d8dBf9B6b6E6B5E816879ACc71da" # the eth address for the bridge contract
     SafeContractAddress = "0x755765f943Bc82faA6135e01fE08B116947D38e8"
     PrivateKeyFile = "keys/ethereum.sk" # the path to the file containing the relayer eth private key
     GasLimitBase = 350000
@@ -21,16 +21,16 @@
         # GasPriceSelector available options: "SafeGasPrice", "ProposeGasPrice", "FastGasPrice"
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
-[MultiversX]
+[Klever]
     NetworkAddress = "http://localhost:8080" # the network address
-    MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
-    SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
     PrivateKeyFile = "keys/walletKey.pem" # the path to the pem file containing the relayer multiversx wallet
     IntervalToResendTxsInSeconds = 60 # the time in seconds between nonce reads
     MaxRetriesOnQuorumReached = 3
     MaxRetriesOnWasTransferProposed = 3
     ClientAvailabilityAllowDelta = 10
-    [MultiversX.Proxy]
+    [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 
         # valid options for ProxyRestAPIEntityType are "observer" and "proxy". Any other value will trigger an error.
@@ -38,7 +38,7 @@
         RestAPIEntityType = "observer"
         FinalityCheck = true
         MaxNoncesDelta = 7 # the number of maximum blocks allowed to be "in front" of what the metachain has notarized
-    [MultiversX.GasMap]
+    [Klever.GasMap]
         Sign = 8000000
         ProposeTransferBase = 11000000
         ProposeTransferForEach = 5500000

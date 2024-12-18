@@ -13,10 +13,8 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
-	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/api"
-	"github.com/multiversx/mx-chain-core-go/data/vm"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
@@ -71,23 +69,8 @@ type client struct {
 	mut                      sync.RWMutex
 }
 
-func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
-	return &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
-			return &data.VmValuesResponseData{
-				Data: &vm.VMOutputApi{
-					ReturnCode: okCodeAfterExecution,
-					ReturnData: returningBytes,
-				},
-			}, nil
-		},
-	}
-}
-
 // NewClient returns a new MultiversX Client instance
 func NewClient(args ClientArgs) (*client, error) {
-	args.Proxy = createMockProxyKLV(nil)
-
 	err := checkArgs(args)
 	if err != nil {
 		return nil, err

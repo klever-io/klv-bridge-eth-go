@@ -89,7 +89,7 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 			EventsBlockRangeFrom:               -5,
 			EventsBlockRangeTo:                 50,
 		},
-		MultiversX: config.MultiversXConfig{
+		Klever: config.KleverConfig{
 			NetworkAddress:                  "mock",
 			MultisigContractAddress:         "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:             "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",

@@ -32,6 +32,9 @@ import (
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
+	"github.com/multiversx/mx-chain-crypto-go/signing"
+	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
+	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	chainConfig "github.com/multiversx/mx-chain-go/config"
 	antifloodFactory "github.com/multiversx/mx-chain-go/process/throttle/antiflood/factory"
 	logger "github.com/multiversx/mx-chain-logger-go"
@@ -41,29 +44,29 @@ import (
 	"github.com/multiversx/mx-sdk-go/interactors"
 )
 
-// const (
-// 	minTimeForBootstrap     = time.Millisecond * 100
-// 	minTimeBeforeRepeatJoin = time.Second * 30
-// 	pollingDurationOnError  = time.Second * 5
-// )
+const (
+	minTimeForBootstrap     = time.Millisecond * 100
+	minTimeBeforeRepeatJoin = time.Second * 30
+	pollingDurationOnError  = time.Second * 5
+)
 
-// var suite = ed25519.NewEd25519()
-// var keyGen = signing.NewKeyGenerator(suite)
-// var singleSigner = &singlesig.Ed25519Signer{}
+var suite = ed25519.NewEd25519()
+var keyGen = signing.NewKeyGenerator(suite)
+var singleSigner = &singlesig.Ed25519Signer{}
 
-// ArgsEthereumToMultiversXBridge is the arguments DTO used for creating an Ethereum to MultiversX bridge
+// ArgsEthereumToKleverBridge is the arguments DTO used for creating an Ethereum to Klever bridge
 type ArgsEthereumToKleverBridge struct {
-	Configs                       config.Configs
-	Messenger                     p2p.NetMessenger
-	StatusStorer                  core.Storer
-	Proxy                         klever.Proxy
-	MultiversXClientStatusHandler core.StatusHandler
-	Erc20ContractsHolder          ethereum.Erc20ContractsHolder
-	ClientWrapper                 ethereum.ClientWrapper
-	TimeForBootstrap              time.Duration
-	TimeBeforeRepeatJoin          time.Duration
-	MetricsHolder                 core.MetricsHolder
-	AppStatusHandler              chainCore.AppStatusHandler
+	Configs                   config.Configs
+	Messenger                 p2p.NetMessenger
+	StatusStorer              core.Storer
+	Proxy                     klever.Proxy
+	KleverClientStatusHandler core.StatusHandler
+	Erc20ContractsHolder      ethereum.Erc20ContractsHolder
+	ClientWrapper             ethereum.ClientWrapper
+	TimeForBootstrap          time.Duration
+	TimeBeforeRepeatJoin      time.Duration
+	MetricsHolder             core.MetricsHolder
+	AppStatusHandler          chainCore.AppStatusHandler
 }
 
 type ethKleverBridgeComponents struct {
@@ -140,7 +143,7 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 
 	components.addClosableComponent(components.timer)
 
-	err = components.createMultiversXKeysAndAddresses(args.Configs.GeneralConfig.MultiversX)
+	err = components.createMultiversXKeysAndAddresses(args.Configs.GeneralConfig.Klever)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +234,7 @@ func checkArgsEthereumToKleverBridge(args ArgsEthereumToKleverBridge) error {
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createMultiversXKeysAndAddresses(chainConfigs config.MultiversXConfig) error {
+func (components *ethKleverBridgeComponents) createMultiversXKeysAndAddresses(chainConfigs config.KleverConfig) error {
 	wallet := interactors.NewWallet()
 	multiversXPrivateKeyBytes, err := wallet.LoadPrivateKeyFromPemFile(chainConfigs.PrivateKeyFile)
 	if err != nil {
@@ -278,7 +281,7 @@ func (components *ethKleverBridgeComponents) createDataGetter() error {
 }
 
 func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEthereumToKleverBridge) error {
-	chainConfigs := args.Configs.GeneralConfig.MultiversX
+	chainConfigs := args.Configs.GeneralConfig.Klever
 	tokensMapper, err := mappers.NewMultiversXToErc20Mapper(components.mxDataGetter)
 	if err != nil {
 		return err
@@ -295,7 +298,7 @@ func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEth
 		IntervalToResendTxsInSeconds: chainConfigs.IntervalToResendTxsInSeconds,
 		TokensMapper:                 tokensMapper,
 		RoleProvider:                 components.multiversXRoleProvider,
-		StatusHandler:                args.MultiversXClientStatusHandler,
+		StatusHandler:                args.KleverClientStatusHandler,
 		ClientAvailabilityAllowDelta: chainConfigs.ClientAvailabilityAllowDelta,
 	}
 
@@ -526,8 +529,8 @@ func (components *ethKleverBridgeComponents) createEthereumToMultiversXBridge(ar
 		SignaturesHolder:             disabled.NewDisabledSignaturesHolder(),
 		BalanceValidator:             balanceValidator,
 		MaxQuorumRetriesOnEthereum:   args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
-		MaxQuorumRetriesOnMultiversX: args.Configs.GeneralConfig.MultiversX.MaxRetriesOnQuorumReached,
-		MaxRestriesOnWasProposed:     args.Configs.GeneralConfig.MultiversX.MaxRetriesOnWasTransferProposed,
+		MaxQuorumRetriesOnMultiversX: args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
+		MaxRestriesOnWasProposed:     args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
 	bridge, err := ethmultiversx.NewBridgeExecutor(argsBridgeExecutor)
@@ -594,8 +597,8 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(ar
 		SignaturesHolder:             components.ethToMultiversXSignaturesHolder,
 		BalanceValidator:             balanceValidator,
 		MaxQuorumRetriesOnEthereum:   args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
-		MaxQuorumRetriesOnMultiversX: args.Configs.GeneralConfig.MultiversX.MaxRetriesOnQuorumReached,
-		MaxRestriesOnWasProposed:     args.Configs.GeneralConfig.MultiversX.MaxRetriesOnWasTransferProposed,
+		MaxQuorumRetriesOnMultiversX: args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
+		MaxRestriesOnWasProposed:     args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
 	bridge, err := ethmultiversx.NewBridgeExecutor(argsBridgeExecutor)

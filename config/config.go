@@ -16,7 +16,7 @@ type Configs struct {
 // Config general configuration struct
 type Config struct {
 	Eth               EthereumConfig
-	MultiversX        MultiversXConfig
+	Klever            KleverConfig
 	P2P               ConfigP2P
 	StateMachine      map[string]ConfigStateMachine
 	Relayer           ConfigRelayer
@@ -139,8 +139,8 @@ type RoleProviderConfig struct {
 	PollingIntervalInMillis uint64
 }
 
-// MultiversXConfig represents the MultiversX Config parameters
-type MultiversXConfig struct {
+// KleverConfig represents the Klever Config parameters
+type KleverConfig struct {
 	NetworkAddress                  string
 	MultisigContractAddress         string
 	SafeContractAddress             string
@@ -220,7 +220,7 @@ type TransactionChecksConfig struct {
 
 // MigrationToolConfig is the migration tool config struct
 type MigrationToolConfig struct {
-	Eth        EthereumConfig
-	MultiversX MultiversXConfig
-	Logs       LogsConfig
+	Eth    EthereumConfig
+	Klever KleverConfig
+	Logs   LogsConfig
 }

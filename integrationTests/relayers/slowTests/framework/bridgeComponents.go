@@ -60,7 +60,7 @@ func NewBridgeComponents(
 	for i := 0; i < numRelayers; i++ {
 		generalConfigs := testsRelayers.CreateBridgeComponentsConfig(i, workingDir, gasStationURL)
 		generalConfigs.Eth.PrivateKeyFile = fmt.Sprintf(relayerETHKeyPathFormat, i)
-		argsBridgeComponents := factory.ArgsEthereumToMultiversXBridge{
+		argsBridgeComponents := factory.ArgsEthereumToKleverBridge{
 			Configs: config.Configs{
 				GeneralConfig:   generalConfigs,
 				ApiRoutesConfig: config.ApiRoutesConfig{},
@@ -68,22 +68,22 @@ func NewBridgeComponents(
 					RestApiInterface: bridgeCore.WebServerOffString,
 				},
 			},
-			Proxy:                         chainSimulator.Proxy(),
-			ClientWrapper:                 ethereumChain,
-			Messenger:                     messengers[i],
-			StatusStorer:                  testsCommon.NewStorerMock(),
-			TimeForBootstrap:              time.Second * 5,
-			TimeBeforeRepeatJoin:          time.Second * 30,
-			MetricsHolder:                 status.NewMetricsHolder(),
-			AppStatusHandler:              &statusHandler.AppStatusHandlerStub{},
-			MultiversXClientStatusHandler: &testsCommon.StatusHandlerStub{},
+			Proxy:                     chainSimulator.Proxy(),
+			ClientWrapper:             ethereumChain,
+			Messenger:                 messengers[i],
+			StatusStorer:              testsCommon.NewStorerMock(),
+			TimeForBootstrap:          time.Second * 5,
+			TimeBeforeRepeatJoin:      time.Second * 30,
+			MetricsHolder:             status.NewMetricsHolder(),
+			AppStatusHandler:          &statusHandler.AppStatusHandlerStub{},
+			KleverClientStatusHandler: &testsCommon.StatusHandlerStub{},
 		}
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = ethSafeContractAddress
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
-		argsBridgeComponents.Configs.GeneralConfig.MultiversX.NetworkAddress = chainSimulator.GetNetworkAddress()
-		argsBridgeComponents.Configs.GeneralConfig.MultiversX.SafeContractAddress = mvxSafeAddress.Bech32()
-		argsBridgeComponents.Configs.GeneralConfig.MultiversX.MultisigContractAddress = mvxMultisigAddress.Bech32()
-		argsBridgeComponents.Configs.GeneralConfig.MultiversX.GasMap = config.MultiversXGasMapConfig{
+		argsBridgeComponents.Configs.GeneralConfig.Klever.NetworkAddress = chainSimulator.GetNetworkAddress()
+		argsBridgeComponents.Configs.GeneralConfig.Klever.SafeContractAddress = mvxSafeAddress.Bech32()
+		argsBridgeComponents.Configs.GeneralConfig.Klever.MultisigContractAddress = mvxMultisigAddress.Bech32()
+		argsBridgeComponents.Configs.GeneralConfig.Klever.GasMap = config.MultiversXGasMapConfig{
 			Sign:                   8000000,
 			ProposeTransferBase:    11000000,
 			ProposeTransferForEach: 5500000,
@@ -94,7 +94,7 @@ func NewBridgeComponents(
 			ScCallPerByte:          100000,
 			ScCallPerformForEach:   10000000,
 		}
-		relayer, err := factory.NewEthMultiversXBridgeComponents(argsBridgeComponents)
+		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(bridge, err)
 
 		go func() {

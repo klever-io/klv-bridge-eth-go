@@ -68,8 +68,6 @@ type klvClientDataGetter struct {
 
 // NewklvClientDataGetter creates a new instance of the dataGetter type
 func NewKLVClientDataGetter(args ArgsKLVClientDataGetter) (*klvClientDataGetter, error) {
-	args.Proxy = createMockProxyKLV(nil)
-
 	if check.IfNil(args.Log) {
 		return nil, errNilLogger
 	}

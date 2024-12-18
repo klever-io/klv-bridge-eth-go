@@ -39,7 +39,7 @@ func TestConfigs(t *testing.T) {
 			EventsBlockRangeFrom:         -100,
 			EventsBlockRangeTo:           400,
 		},
-		MultiversX: MultiversXConfig{
+		Klever: KleverConfig{
 			NetworkAddress:               "https://devnet-gateway.multiversx.com",
 			MultisigContractAddress:      "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:          "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
@@ -498,7 +498,7 @@ func TestMigrationToolConfig(t *testing.T) {
 				GasPriceMultiplier:         1000000000,
 			},
 		},
-		MultiversX: MultiversXConfig{
+		Klever: KleverConfig{
 			NetworkAddress:          "https://devnet-gateway.multiversx.com",
 			MultisigContractAddress: "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:     "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
