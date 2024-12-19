@@ -4,13 +4,11 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"github.com/multiversx/mx-chain-core-go/core"
-	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
+	"github.com/klever-io/klever-go/core"
+	"github.com/klever-io/klever-go/crypto/pubkeyConverter"
 )
 
 const hexPrefix = "0x"
-const hrp = "klv"
 
 type addressConverter struct {
 	converter core.PubkeyConverter
@@ -20,7 +18,7 @@ type addressConverter struct {
 func NewAddressConverter() (*addressConverter, error) {
 	var err error
 	ac := &addressConverter{}
-	ac.converter, err = pubkeyConverter.NewBech32PubkeyConverter(sdkCore.AddressBytesLen, hrp)
+	ac.converter, err = pubkeyConverter.NewBech32PubkeyConverter(core.PubKeyLen)
 	if err != nil {
 		return nil, err
 	}
@@ -39,15 +37,14 @@ func (ac *addressConverter) ToHexStringWithPrefix(addressBytes []byte) string {
 }
 
 // ToBech32String will convert the addressBytes to the bech32 representation
-func (ac *addressConverter) ToBech32String(addressBytes []byte) (string, error) {
+func (ac *addressConverter) ToBech32String(addressBytes []byte) string {
 	return ac.converter.Encode(addressBytes)
 }
 
+// TODO: in klever case, encode doesn't return an error, so this isn't used, need to check more
 // ToBech32StringSilent will try to convert the addressBytes to the bech32 representation
 func (ac *addressConverter) ToBech32StringSilent(addressBytes []byte) string {
-	bech32Address, _ := ac.converter.Encode(addressBytes)
-
-	return bech32Address
+	return ac.converter.Encode(addressBytes)
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

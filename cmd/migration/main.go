@@ -15,7 +15,7 @@ import (
 	ethereumClient "github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
-	"github.com/klever-io/klv-bridge-eth-go/clients/multiversx"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/cmd/migration/disabled"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
@@ -150,14 +150,14 @@ func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*
 		return nil, err
 	}
 
-	argsMXClientDataGetter := multiversx.ArgsMXClientDataGetter{
+	argsMXClientDataGetter := klever.ArgsKLVClientDataGetter{
 		MultisigContractAddress: multisigAddress,
 		SafeContractAddress:     safeAddress,
 		RelayerAddress:          dummyAddress,
 		Proxy:                   proxy,
 		Log:                     log,
 	}
-	mxDataGetter, err := multiversx.NewMXClientDataGetter(argsMXClientDataGetter)
+	mxDataGetter, err := klever.NewKLVClientDataGetter(argsMXClientDataGetter)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ type Timer interface {
 type AddressConverter interface {
 	ToHexString(addressBytes []byte) string
 	ToHexStringWithPrefix(addressBytes []byte) string
-	ToBech32String(addressBytes []byte) (string, error)
+	ToBech32String(addressBytes []byte) string
 	ToBech32StringSilent(addressBytes []byte) string
 	IsInterfaceNil() bool
 }

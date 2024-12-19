@@ -78,7 +78,7 @@ type ethKleverBridgeComponents struct {
 	evmCompatibleChain                chain.Chain
 	multiversXMultisigContractAddress sdkCore.AddressHandler
 	multiversXSafeContractAddress     sdkCore.AddressHandler
-	multiversXRelayerPrivateKey       crypto.PrivateKey
+	kleverRelayerPrivateKey           crypto.PrivateKey
 	multiversXRelayerAddress          sdkCore.AddressHandler
 	ethereumRelayerAddress            common.Address
 	mxDataGetter                      dataGetter
@@ -143,7 +143,7 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 
 	components.addClosableComponent(components.timer)
 
-	err = components.createMultiversXKeysAndAddresses(args.Configs.GeneralConfig.Klever)
+	err = components.createKleverKeysAndAddresses(args.Configs.GeneralConfig.Klever)
 	if err != nil {
 		return nil, err
 	}
@@ -234,28 +234,30 @@ func checkArgsEthereumToKleverBridge(args ArgsEthereumToKleverBridge) error {
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createMultiversXKeysAndAddresses(chainConfigs config.KleverConfig) error {
+func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainConfigs config.KleverConfig) error {
 	wallet := interactors.NewWallet()
-	multiversXPrivateKeyBytes, err := wallet.LoadPrivateKeyFromPemFile(chainConfigs.PrivateKeyFile)
+	kleverPrivateKeyBytes, err := wallet.LoadPrivateKeyFromPemFile(chainConfigs.PrivateKeyFile)
 	if err != nil {
 		return err
 	}
 
-	components.multiversXRelayerPrivateKey, err = keyGen.PrivateKeyFromByteArray(multiversXPrivateKeyBytes)
+	components.kleverRelayerPrivateKey, err = keyGen.PrivateKeyFromByteArray(kleverPrivateKeyBytes)
 	if err != nil {
 		return err
 	}
 
-	components.multiversXRelayerAddress, err = wallet.GetAddressFromPrivateKey(multiversXPrivateKeyBytes)
+	components.multiversXRelayerAddress, err = wallet.GetAddressFromPrivateKey(kleverPrivateKeyBytes)
 	if err != nil {
 		return err
 	}
 
+	// TODO: change decoder to use klever from string to hex
 	components.multiversXMultisigContractAddress, err = data.NewAddressFromBech32String(chainConfigs.MultisigContractAddress)
 	if err != nil {
 		return fmt.Errorf("%w for chainConfigs.MultisigContractAddress", err)
 	}
 
+	// TODO: change decoder to use klever from string to hex
 	components.multiversXSafeContractAddress, err = data.NewAddressFromBech32String(chainConfigs.SafeContractAddress)
 	if err != nil {
 		return fmt.Errorf("%w for chainConfigs.SafeContractAddress", err)
@@ -292,7 +294,7 @@ func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEth
 		GasMapConfig:                 chainConfigs.GasMap,
 		Proxy:                        args.Proxy,
 		Log:                          core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXClientLogId), multiversXClientLogId),
-		RelayerPrivateKey:            components.multiversXRelayerPrivateKey,
+		RelayerPrivateKey:            components.kleverRelayerPrivateKey,
 		MultisigContractAddress:      components.multiversXMultisigContractAddress,
 		SafeContractAddress:          components.multiversXSafeContractAddress,
 		IntervalToResendTxsInSeconds: chainConfigs.IntervalToResendTxsInSeconds,
@@ -353,7 +355,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 		SignatureProcessor:     components.ethereumRoleProvider,
 		KeyGen:                 keyGen,
 		SingleSigner:           singleSigner,
-		PrivateKey:             components.multiversXRelayerPrivateKey,
+		PrivateKey:             components.kleverRelayerPrivateKey,
 		Name:                   ethToMultiversXName,
 		AntifloodComponents:    antifloodComponents,
 	}
