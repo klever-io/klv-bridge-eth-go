@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -47,18 +47,18 @@ const (
 
 // ArgsklvClientDataGetter is the arguments DTO used in the NewklvClientDataGetter constructor
 type ArgsKLVClientDataGetter struct {
-	MultisigContractAddress core.AddressHandler
-	SafeContractAddress     core.AddressHandler
-	RelayerAddress          core.AddressHandler
+	MultisigContractAddress address.Address
+	SafeContractAddress     address.Address
+	RelayerAddress          address.Address
 	Proxy                   Proxy
 	Log                     logger.Logger
 }
 
 type klvClientDataGetter struct {
-	multisigContractAddress       core.AddressHandler
-	safeContractAddress           core.AddressHandler
+	multisigContractAddress       address.Address
+	safeContractAddress           address.Address
 	bech32MultisigContractAddress string
-	relayerAddress                core.AddressHandler
+	relayerAddress                address.Address
 	proxy                         Proxy
 	log                           logger.Logger
 	mutNodeStatus                 sync.Mutex
@@ -83,10 +83,7 @@ func NewKLVClientDataGetter(args ArgsKLVClientDataGetter) (*klvClientDataGetter,
 	if check.IfNil(args.SafeContractAddress) {
 		return nil, fmt.Errorf("%w for the SafeContractAddress argument", errNilAddressHandler)
 	}
-	bech32Address, err := args.MultisigContractAddress.AddressAsBech32String()
-	if err != nil {
-		return nil, fmt.Errorf("%w for %x", err, args.MultisigContractAddress.AddressBytes())
-	}
+	bech32Address := args.MultisigContractAddress.Bech32()
 
 	return &klvClientDataGetter{
 		multisigContractAddress:       args.MultisigContractAddress,

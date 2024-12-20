@@ -8,12 +8,12 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -63,7 +63,7 @@ func (mock *MultiversXChainMock) SendTransaction(_ context.Context, transaction 
 	}
 
 	addrAsBech32 := transaction.Sender
-	addressHandler, err := data.NewAddressFromBech32String(addrAsBech32)
+	addressHandler, err := address.NewAddress(addrAsBech32)
 	if err != nil {
 		panic(fmt.Sprintf("%v while creating address handler for string %s", err, addrAsBech32))
 	}
@@ -119,7 +119,7 @@ func (mock *MultiversXChainMock) ExecuteVMQuery(_ context.Context, vmRequest *da
 }
 
 // GetAccount -
-func (mock *MultiversXChainMock) GetAccount(_ context.Context, address sdkCore.AddressHandler) (*data.Account, error) {
+func (mock *MultiversXChainMock) GetAccount(_ context.Context, address address.Address) (*data.Account, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -137,11 +137,11 @@ func (mock *MultiversXChainMock) ProcessTransactionStatus(_ context.Context, _ s
 }
 
 // AddRelayer -
-func (mock *MultiversXChainMock) AddRelayer(address sdkCore.AddressHandler) {
+func (mock *MultiversXChainMock) AddRelayer(address address.Address) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
-	mock.relayers = append(mock.relayers, address.AddressBytes())
+	mock.relayers = append(mock.relayers, address.Bytes())
 }
 
 // SetLastExecutedEthBatchID -
@@ -217,7 +217,7 @@ func (mock *MultiversXChainMock) AddDepositToCurrentBatch(deposit MultiversXDepo
 }
 
 // GetESDTTokenData -
-func (mock *MultiversXChainMock) GetESDTTokenData(_ context.Context, _ sdkCore.AddressHandler, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
+func (mock *MultiversXChainMock) GetESDTTokenData(_ context.Context, _ address.Address, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 

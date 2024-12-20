@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -14,7 +15,6 @@ import (
 	"github.com/multiversx/mx-chain-go/p2p"
 	"github.com/multiversx/mx-chain-go/process/throttle/antiflood/factory"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 )
 
 const (
@@ -146,13 +146,14 @@ func (b *broadcaster) ProcessReceivedMessage(message p2p.MessageP2P, fromConnect
 		return err
 	}
 
-	addr := data.NewAddressFromBytes(msg.PublicKeyBytes)
+	// TODO: verify if check error is needed, since before change to klever-go-sdk wasn't checking this error
+	addr, _ := address.NewAddressFromBytes(msg.PublicKeyBytes)
 	hexPkBytes := hex.EncodeToString(msg.PublicKeyBytes)
 	if !b.multiversRoleProvider.IsWhitelisted(addr) {
 		return fmt.Errorf("%w for peer: %s", ErrPeerNotWhitelisted, hexPkBytes)
 	}
 
-	address, _ := addr.AddressAsBech32String()
+	address := addr.Bech32()
 	b.log.Trace("got message", "topic", message.Topic(),
 		"msg.Payload", msg.Payload, "msg.Nonce", msg.Nonce, "msg.PublicKey", address)
 

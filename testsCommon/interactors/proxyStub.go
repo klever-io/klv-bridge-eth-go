@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -16,10 +16,10 @@ type ProxyStub struct {
 	SendTransactionCalled               func(ctx context.Context, transaction *transaction.FrontendTransaction) (string, error)
 	SendTransactionsCalled              func(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error)
 	ExecuteVMQueryCalled                func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error)
-	GetAccountCalled                    func(ctx context.Context, address core.AddressHandler) (*data.Account, error)
+	GetAccountCalled                    func(ctx context.Context, address address.Address) (*data.Account, error)
 	GetNetworkStatusCalled              func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddressCalled             func(ctx context.Context, bech32Address string) (uint32, error)
-	GetESDTTokenDataCalled              func(ctx context.Context, address core.AddressHandler, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
+	GetESDTTokenDataCalled              func(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
 	GetTransactionInfoWithResultsCalled func(_ context.Context, _ string) (*data.TransactionInfo, error)
 	ProcessTransactionStatusCalled      func(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
 }
@@ -61,7 +61,7 @@ func (eps *ProxyStub) ExecuteVMQuery(ctx context.Context, vmRequest *data.VmValu
 }
 
 // GetAccount -
-func (eps *ProxyStub) GetAccount(ctx context.Context, address core.AddressHandler) (*data.Account, error) {
+func (eps *ProxyStub) GetAccount(ctx context.Context, address address.Address) (*data.Account, error) {
 	if eps.GetAccountCalled != nil {
 		return eps.GetAccountCalled(ctx, address)
 	}
@@ -88,7 +88,7 @@ func (eps *ProxyStub) GetShardOfAddress(ctx context.Context, bech32Address strin
 }
 
 // GetESDTTokenData -
-func (eps *ProxyStub) GetESDTTokenData(ctx context.Context, address core.AddressHandler, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
+func (eps *ProxyStub) GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
 	if eps.GetESDTTokenDataCalled != nil {
 		return eps.GetESDTTokenDataCalled(ctx, address, tokenIdentifier, queryOptions)
 	}

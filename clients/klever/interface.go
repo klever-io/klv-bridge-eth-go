@@ -3,10 +3,10 @@ package klever
 import (
 	"context"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -16,10 +16,10 @@ type Proxy interface {
 	SendTransaction(ctx context.Context, tx *transaction.FrontendTransaction) (string, error)
 	SendTransactions(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error)
 	ExecuteVMQuery(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error)
-	GetAccount(ctx context.Context, address core.AddressHandler) (*data.Account, error)
+	GetAccount(ctx context.Context, address address.Address) (*data.Account, error)
 	GetNetworkStatus(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddress(ctx context.Context, bech32Address string) (uint32, error)
-	GetESDTTokenData(ctx context.Context, address core.AddressHandler, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
+	GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
 	GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error)
 	ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
 	IsInterfaceNil() bool
@@ -27,7 +27,7 @@ type Proxy interface {
 
 // NonceTransactionsHandler represents the interface able to handle the current nonce and the transactions resend mechanism
 type NonceTransactionsHandler interface {
-	ApplyNonceAndGasPrice(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error
+	ApplyNonceAndGasPrice(ctx context.Context, address address.Address, tx *transaction.FrontendTransaction) error
 	SendTransaction(ctx context.Context, tx *transaction.FrontendTransaction) (string, error)
 	Close() error
 }
@@ -44,6 +44,6 @@ type txHandler interface {
 }
 
 type roleProvider interface {
-	IsWhitelisted(address core.AddressHandler) bool
+	IsWhitelisted(address address.Address) bool
 	IsInterfaceNil() bool
 }

@@ -330,14 +330,14 @@ func TestClient_GetBatch(t *testing.T) {
 			},
 		}
 
-		bech32Recipient1Address, _ := recipient1.AddressAsBech32String()
-		bech32Recipient2Address, _ := recipient2.AddressAsBech32String()
+		bech32Recipient1Address := recipient1.Bech32()
+		bech32Recipient2Address := recipient2.Bech32()
 		expectedBatch := &bridgeCore.TransferBatch{
 			ID: 112243,
 			Deposits: []*bridgeCore.DepositTransfer{
 				{
 					Nonce:                 10,
-					ToBytes:               recipient1.AddressBytes(),
+					ToBytes:               recipient1.Bytes(),
 					DisplayableTo:         bech32Recipient1Address,
 					FromBytes:             from1[:],
 					DisplayableFrom:       hex.EncodeToString(from1[:]),
@@ -348,7 +348,7 @@ func TestClient_GetBatch(t *testing.T) {
 				},
 				{
 					Nonce:                 30,
-					ToBytes:               recipient2.AddressBytes(),
+					ToBytes:               recipient2.Bytes(),
 					DisplayableTo:         bech32Recipient2Address,
 					FromBytes:             from2[:],
 					DisplayableFrom:       hex.EncodeToString(from2[:]),
@@ -404,14 +404,14 @@ func TestClient_GetBatch(t *testing.T) {
 			},
 		}
 
-		bech32Recipient1Address, _ := recipient1.AddressAsBech32String()
-		bech32Recipient2Address, _ := recipient2.AddressAsBech32String()
+		bech32Recipient1Address := recipient1.Bech32()
+		bech32Recipient2Address := recipient2.Bech32()
 		expectedBatch := &bridgeCore.TransferBatch{
 			ID: 112243,
 			Deposits: []*bridgeCore.DepositTransfer{
 				{
 					Nonce:                 10,
-					ToBytes:               recipient1.AddressBytes(),
+					ToBytes:               recipient1.Bytes(),
 					DisplayableTo:         bech32Recipient1Address,
 					FromBytes:             from1[:],
 					DisplayableFrom:       hex.EncodeToString(from1[:]),
@@ -422,7 +422,7 @@ func TestClient_GetBatch(t *testing.T) {
 				},
 				{
 					Nonce:                 30,
-					ToBytes:               recipient2.AddressBytes(),
+					ToBytes:               recipient2.Bytes(),
 					DisplayableTo:         bech32Recipient2Address,
 					FromBytes:             from2[:],
 					DisplayableFrom:       hex.EncodeToString(from2[:]),

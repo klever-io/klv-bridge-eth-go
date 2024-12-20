@@ -6,6 +6,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	cryptoMock "github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
@@ -14,7 +15,6 @@ import (
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,15 +30,16 @@ func createTransactionHandlerWithMockComponents() *transactionHandler {
 	sk, _ := testKeyGen.PrivateKeyFromByteArray(skBytes)
 	pk := sk.GeneratePublic()
 	pkBytes, _ := pk.ToByteArray()
+	relayerAddress, _ := address.NewAddressFromBytes(pkBytes)
 
 	return &transactionHandler{
 		proxy:                   &interactors.ProxyStub{},
-		relayerAddress:          data.NewAddressFromBytes(pkBytes),
+		relayerAddress:          relayerAddress,
 		multisigAddressAsBech32: testMultisigAddress,
 		nonceTxHandler:          &bridgeTests.NonceTransactionsHandlerStub{},
 		relayerPrivateKey:       sk,
 		singleSigner:            testSigner,
-		roleProvider:            &roleproviders.MultiversXRoleProviderStub{},
+		roleProvider:            &roleproviders.KleverRoleProviderStub{},
 	}
 }
 
@@ -65,7 +66,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		expectedErr := errors.New("expected error in get nonce")
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.FrontendTransaction) error {
 				return expectedErr
 			},
 		}
@@ -100,8 +101,8 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		wasWhiteListedCalled := false
 		wasSendTransactionCalled := false
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
-		txHandlerInstance.roleProvider = &roleproviders.MultiversXRoleProviderStub{
-			IsWhitelistedCalled: func(address core.AddressHandler) bool {
+		txHandlerInstance.roleProvider = &roleproviders.KleverRoleProviderStub{
+			IsWhitelistedCalled: func(address address.Address) bool {
 				wasWhiteListedCalled = true
 				return false
 			},
@@ -140,7 +141,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		}
 
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.FrontendTransaction) error {
 				if getBech32Address(address) == relayerAddress {
 					tx.Nonce = nonce
 					tx.GasPrice = minGasPrice

@@ -154,7 +154,7 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
-		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
+		multiversXChainMock.AddRelayer(relayer.KleverRelayerAddress())
 		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
 
 		go func() {
@@ -175,14 +175,14 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 	require.Equal(t, 2, len(transfer.Transfers))
 	assert.Equal(t, batchNonceOnEthereum+1, transfer.BatchId.Uint64())
 
-	assert.Equal(t, destination1.AddressBytes(), transfer.Transfers[0].To)
+	assert.Equal(t, destination1.Bytes(), transfer.Transfers[0].To)
 	assert.Equal(t, hex.EncodeToString([]byte(ticker1)), transfer.Transfers[0].Token)
 	assert.Equal(t, value1, transfer.Transfers[0].Amount)
 	assert.Equal(t, depositor1, common.BytesToAddress(transfer.Transfers[0].From))
 	assert.Equal(t, txNonceOnEthereum+1, transfer.Transfers[0].Nonce.Uint64())
 	assert.Equal(t, []byte{bridgeCore.MissingDataProtocolMarker}, transfer.Transfers[0].Data)
 
-	assert.Equal(t, destination2.AddressBytes(), transfer.Transfers[1].To)
+	assert.Equal(t, destination2.Bytes(), transfer.Transfers[1].To)
 	assert.Equal(t, hex.EncodeToString([]byte(ticker2)), transfer.Transfers[1].Token)
 	assert.Equal(t, value2, transfer.Transfers[1].Amount)
 	assert.Equal(t, depositor2, common.BytesToAddress(transfer.Transfers[1].From))
@@ -350,7 +350,7 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
-		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
+		multiversXChainMock.AddRelayer(relayer.KleverRelayerAddress())
 		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
 
 		go func() {
@@ -371,21 +371,21 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 	require.Equal(t, 3, len(transfer.Transfers))
 	assert.Equal(t, batchNonceOnEthereum+1, transfer.BatchId.Uint64())
 
-	assert.Equal(t, destination1.AddressBytes(), transfer.Transfers[0].To)
+	assert.Equal(t, destination1.Bytes(), transfer.Transfers[0].To)
 	assert.Equal(t, hex.EncodeToString([]byte(ticker1)), transfer.Transfers[0].Token)
 	assert.Equal(t, value1, transfer.Transfers[0].Amount)
 	assert.Equal(t, depositor1, common.BytesToAddress(transfer.Transfers[0].From))
 	assert.Equal(t, txNonceOnEthereum+1, transfer.Transfers[0].Nonce.Uint64())
 	assert.Equal(t, []byte{bridgeCore.MissingDataProtocolMarker}, transfer.Transfers[0].Data)
 
-	assert.Equal(t, destination2.AddressBytes(), transfer.Transfers[1].To)
+	assert.Equal(t, destination2.Bytes(), transfer.Transfers[1].To)
 	assert.Equal(t, hex.EncodeToString([]byte(ticker2)), transfer.Transfers[1].Token)
 	assert.Equal(t, value2, transfer.Transfers[1].Amount)
 	assert.Equal(t, depositor2, common.BytesToAddress(transfer.Transfers[1].From))
 	assert.Equal(t, txNonceOnEthereum+2, transfer.Transfers[1].Nonce.Uint64())
 	assert.Equal(t, []byte{bridgeCore.MissingDataProtocolMarker}, transfer.Transfers[1].Data)
 
-	assert.Equal(t, destination3Sc.AddressBytes(), transfer.Transfers[2].To)
+	assert.Equal(t, destination3Sc.Bytes(), transfer.Transfers[2].To)
 	assert.Equal(t, hex.EncodeToString([]byte(ticker3)), transfer.Transfers[2].Token)
 	assert.Equal(t, value3, transfer.Transfers[2].Amount)
 	assert.Equal(t, depositor3, common.BytesToAddress(transfer.Transfers[2].From))

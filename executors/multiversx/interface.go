@@ -3,6 +3,7 @@ package multiversx
 import (
 	"context"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
@@ -19,7 +20,7 @@ type Proxy interface {
 	GetAccount(ctx context.Context, address core.AddressHandler) (*data.Account, error)
 	GetNetworkStatus(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddress(ctx context.Context, bech32Address string) (uint32, error)
-	GetESDTTokenData(ctx context.Context, address core.AddressHandler, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
+	GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
 	GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error)
 	ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
 	IsInterfaceNil() bool

@@ -12,6 +12,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/klever-io/klever-go-sdk/core/address"
 	ethereumClient "github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
@@ -26,7 +27,6 @@ import (
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/blockchain"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/urfave/cli"
 )
 
@@ -139,13 +139,17 @@ func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*
 		return nil, err
 	}
 
-	dummyAddress := data.NewAddressFromBytes(bytes.Repeat([]byte{0x1}, 32))
-	multisigAddress, err := data.NewAddressFromBech32String(cfg.Klever.MultisigContractAddress)
+	dummyAddress, err := address.NewAddressFromBytes(bytes.Repeat([]byte{0x1}, 32))
 	if err != nil {
 		return nil, err
 	}
 
-	safeAddress, err := data.NewAddressFromBech32String(cfg.Klever.SafeContractAddress)
+	multisigAddress, err := address.NewAddress(cfg.Klever.MultisigContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	safeAddress, err := address.NewAddress(cfg.Klever.SafeContractAddress)
 	if err != nil {
 		return nil, err
 	}

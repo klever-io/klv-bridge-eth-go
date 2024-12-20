@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -21,7 +21,7 @@ type httpClientWrapper interface {
 
 // Relayer defines the behavior a bridge relayer must implement
 type Relayer interface {
-	MultiversXRelayerAddress() sdkCore.AddressHandler
+	KleverRelayerAddress() address.Address
 	EthereumRelayerAddress() common.Address
 	Start() error
 	Close() error

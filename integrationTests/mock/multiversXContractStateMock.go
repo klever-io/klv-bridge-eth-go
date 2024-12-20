@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -43,7 +43,7 @@ type MultiversXPendingBatch struct {
 
 // MultiversXDeposit -
 type MultiversXDeposit struct {
-	From         sdkCore.AddressHandler
+	From         address.Address
 	To           common.Address
 	Ticker       string
 	Amount       *big.Int
@@ -444,7 +444,7 @@ func (mock *multiversXContractStateMock) responseWithPendingBatch() *data.VmValu
 	for _, deposit := range mock.pendingBatch.MultiversXDeposits {
 		args = append(args, make([]byte, 0)) // mocked block nonce
 		args = append(args, big.NewInt(0).SetUint64(deposit.DepositNonce).Bytes())
-		args = append(args, deposit.From.AddressBytes())
+		args = append(args, deposit.From.Bytes())
 		args = append(args, deposit.To.Bytes())
 		args = append(args, []byte(deposit.Ticker))
 		args = append(args, deposit.Amount.Bytes())

@@ -5,15 +5,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
 )
 
 type transactionHandler struct {
 	proxy                   Proxy
-	relayerAddress          core.AddressHandler
+	relayerAddress          address.Address
 	multisigAddressAsBech32 string
 	nonceTxHandler          NonceTransactionsHandler
 	relayerPrivateKey       crypto.PrivateKey
@@ -45,10 +45,7 @@ func (txHandler *transactionHandler) signTransaction(ctx context.Context, builde
 		return nil, err
 	}
 
-	bech32Address, err := txHandler.relayerAddress.AddressAsBech32String()
-	if err != nil {
-		return nil, err
-	}
+	bech32Address := txHandler.relayerAddress.Bech32()
 
 	tx := &transaction.FrontendTransaction{
 		ChainID:  networkConfig.ChainID,

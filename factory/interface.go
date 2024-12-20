@@ -3,8 +3,8 @@ package factory
 import (
 	"context"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/core"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 )
 
 type dataGetter interface {
@@ -17,7 +17,7 @@ type dataGetter interface {
 // MultiversXRoleProvider defines the operations for the MultiversX role provider
 type MultiversXRoleProvider interface {
 	Execute(ctx context.Context) error
-	IsWhitelisted(address sdkCore.AddressHandler) bool
+	IsWhitelisted(address address.Address) bool
 	SortedPublicKeys() [][]byte
 	IsInterfaceNil() bool
 }

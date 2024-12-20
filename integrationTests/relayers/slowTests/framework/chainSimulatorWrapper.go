@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
@@ -308,7 +309,7 @@ func (instance *chainSimulatorWrapper) GetBlockchainTimeStamp(ctx context.Contex
 }
 
 func (instance *chainSimulatorWrapper) getNonce(ctx context.Context, bech32Address string) (uint64, error) {
-	address, err := data.NewAddressFromBech32String(bech32Address)
+	address, err := address.NewAddress(bech32Address)
 	if err != nil {
 		return 0, err
 	}

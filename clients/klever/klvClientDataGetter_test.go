@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeErrors "github.com/klever-io/klv-bridge-eth-go/errors"
@@ -19,7 +20,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/data/vm"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,17 +38,15 @@ func createMockArgsKLVClientDataGetter() ArgsKLVClientDataGetter {
 		Proxy: &interactors.ProxyStub{},
 	}
 
-	args.MultisigContractAddress, _ = data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
-	args.SafeContractAddress, _ = data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
-	args.RelayerAddress, _ = data.NewAddressFromBech32String("erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede")
+	args.MultisigContractAddress, _ = address.NewAddress("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
+	args.SafeContractAddress, _ = address.NewAddress("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
+	args.RelayerAddress, _ = address.NewAddress("erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede")
 
 	return args
 }
 
-func getBech32Address(addressHandler core.AddressHandler) string {
-	bech32Address, _ := addressHandler.AddressAsBech32String()
-
-	return bech32Address
+func getBech32Address(addressHandler address.Address) string {
+	return addressHandler.Bech32()
 }
 
 func createMockProxy(returningBytes [][]byte) *interactors.ProxyStub {
@@ -1206,7 +1204,7 @@ func TestMXClientDataGetter_WasSigned(t *testing.T) {
 			assert.Equal(t, signedFuncName, vmRequest.FuncName)
 
 			expectedArgs := []string{
-				hex.EncodeToString(args.RelayerAddress.AddressBytes()),
+				hex.EncodeToString(args.RelayerAddress.Bytes()),
 				hex.EncodeToString(actionID.Bytes()),
 			}
 			assert.Equal(t, expectedArgs, vmRequest.Args)

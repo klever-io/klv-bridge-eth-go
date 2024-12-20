@@ -4,14 +4,13 @@ import (
 	"encoding/hex"
 	"testing"
 
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/stretchr/testify/require"
 )
 
 // MvxAddress holds the different forms a MultiversX address might have
 type MvxAddress struct {
-	sdkCore.AddressHandler
+	address.Address
 	bytes  []byte
 	bech32 string
 	hex    string
@@ -19,13 +18,14 @@ type MvxAddress struct {
 
 // NewMvxAddressFromBytes return a new instance of MvxAddress from bytes
 func NewMvxAddressFromBytes(tb testing.TB, bytes []byte) *MvxAddress {
+	addr, err := address.NewAddressFromBytes(bytes)
+	require.Nil(tb, err)
 	address := &MvxAddress{
-		bytes:          make([]byte, len(bytes)),
-		hex:            hex.EncodeToString(bytes),
-		AddressHandler: data.NewAddressFromBytes(bytes),
+		bytes:   make([]byte, len(bytes)),
+		hex:     hex.EncodeToString(bytes),
+		Address: addr,
 	}
 
-	var err error
 	copy(address.bytes, bytes)
 	address.bech32, err = addressPubkeyConverter.Encode(bytes)
 	require.Nil(tb, err)
@@ -35,14 +35,14 @@ func NewMvxAddressFromBytes(tb testing.TB, bytes []byte) *MvxAddress {
 
 // NewMvxAddressFromBech32 return a new instance of MvxAddress from the bech32 string
 func NewMvxAddressFromBech32(tb testing.TB, bech32 string) *MvxAddress {
-	addressHandler, err := data.NewAddressFromBech32String(bech32)
+	addressHandler, err := address.NewAddress(bech32)
 	require.Nil(tb, err)
 
 	return &MvxAddress{
-		bytes:          addressHandler.AddressBytes(),
-		hex:            hex.EncodeToString(addressHandler.AddressBytes()),
-		bech32:         bech32,
-		AddressHandler: addressHandler,
+		bytes:   addressHandler.Bytes(),
+		hex:     hex.EncodeToString(addressHandler.Bytes()),
+		bech32:  bech32,
+		Address: addressHandler,
 	}
 }
 

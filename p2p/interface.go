@@ -3,9 +3,9 @@ package p2p
 import (
 	"time"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-go/p2p"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 )
 
 // NetMessenger is the definition of an entity able to receive and send messages
@@ -26,7 +26,7 @@ type NetMessenger interface {
 
 // MultiversXRoleProvider defines the operations for an MultiversX role provider
 type MultiversXRoleProvider interface {
-	IsWhitelisted(address sdkCore.AddressHandler) bool
+	IsWhitelisted(address address.Address) bool
 	IsInterfaceNil() bool
 }
 

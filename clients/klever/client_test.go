@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
@@ -33,8 +34,8 @@ var pausedBytes = []byte{1}
 
 func createMockClientArgs() ClientArgs {
 	privateKey, _ := testKeyGen.PrivateKeyFromByteArray(bytes.Repeat([]byte{1}, 32))
-	multisigContractAddress, _ := data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
-	safeContractAddress, _ := data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
+	multisigContractAddress, _ := address.NewAddress("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
+	safeContractAddress, _ := address.NewAddress("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
 
 	return ClientArgs{
 		GasMapConfig: config.MultiversXGasMapConfig{
@@ -59,7 +60,7 @@ func createMockClientArgs() ClientArgs {
 				return append([]byte("converted "), sourceBytes...), nil
 			},
 		},
-		RoleProvider:                 &roleproviders.MultiversXRoleProviderStub{},
+		RoleProvider:                 &roleproviders.KleverRoleProviderStub{},
 		StatusHandler:                &testsCommon.StatusHandlerStub{},
 		ClientAvailabilityAllowDelta: 5,
 	}
