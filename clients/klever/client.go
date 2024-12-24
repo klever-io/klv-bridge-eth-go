@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/klever-io/klever-go-sdk/builders"
 	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/config"
@@ -19,7 +20,6 @@ import (
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/builders"
 	"github.com/multiversx/mx-sdk-go/interactors/nonceHandlerV2"
 )
 

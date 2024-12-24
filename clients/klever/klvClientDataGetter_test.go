@@ -10,7 +10,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klever-io/klever-go-sdk/builders"
 	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeErrors "github.com/klever-io/klv-bridge-eth-go/errors"
@@ -19,7 +21,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/builders"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
@@ -51,7 +52,7 @@ func getBech32Address(addressHandler address.Address) string {
 
 func createMockProxy(returningBytes [][]byte) *interactors.ProxyStub {
 	return &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
 					ReturnCode: okCodeAfterExecution,
@@ -183,12 +184,12 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		expectedErr := errors.New("expected error")
 		dg.proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
 
-		result, err := dg.ExecuteQueryReturningBytes(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBytes(context.Background(), &provider.VmValueRequest{})
 		assert.Nil(t, result)
 		assert.Equal(t, expectedErr, err)
 	})
@@ -199,7 +200,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 
 		expectedErr := bridgeErrors.NewQueryResponseError(returnCode, returnMessage, calledFunction, getBech32Address(dg.multisigContractAddress), calledArgs...)
 		dg.proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnData:      nil,
@@ -216,12 +217,12 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 			},
 		}
 
-		request := &data.VmValueRequest{
+		request := &provider.VmValueRequest{
 			Address:    getBech32Address(dg.multisigContractAddress),
 			FuncName:   calledFunction,
 			CallerAddr: getBech32Address(dg.relayerAddress),
 			CallValue:  "0",
-			Args:       calledArgs,
+			Arguments:  calledArgs,
 		}
 
 		result, err := dg.ExecuteQueryReturningBytes(context.Background(), request)
@@ -235,7 +236,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 
 		retData := [][]byte{[]byte("response 1"), []byte("response 2")}
 		dg.proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnData:      retData,
@@ -252,12 +253,12 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 			},
 		}
 
-		request := &data.VmValueRequest{
+		request := &provider.VmValueRequest{
 			Address:    getBech32Address(dg.multisigContractAddress),
 			FuncName:   calledFunction,
 			CallerAddr: getBech32Address(dg.relayerAddress),
 			CallValue:  "0",
-			Args:       calledArgs,
+			Arguments:  calledArgs,
 		}
 
 		result, err := dg.ExecuteQueryReturningBytes(context.Background(), request)
@@ -285,7 +286,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy(make([][]byte, 0))
 
-		result, err := dg.ExecuteQueryReturningBool(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBool(context.Background(), &provider.VmValueRequest{})
 		assert.False(t, result)
 		assert.Nil(t, err)
 	})
@@ -295,7 +296,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy([][]byte{make([]byte, 0)})
 
-		result, err := dg.ExecuteQueryReturningBool(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBool(context.Background(), &provider.VmValueRequest{})
 		assert.False(t, result)
 		assert.Nil(t, err)
 	})
@@ -312,7 +313,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
 			"",
 		)
 
-		result, err := dg.ExecuteQueryReturningBool(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBool(context.Background(), &provider.VmValueRequest{})
 		assert.False(t, result)
 		assert.Equal(t, expectedError, err)
 	})
@@ -322,13 +323,13 @@ func TestMXClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy([][]byte{{1}})
 
-		result, err := dg.ExecuteQueryReturningBool(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBool(context.Background(), &provider.VmValueRequest{})
 		assert.True(t, result)
 		assert.Nil(t, err)
 
 		dg.proxy = createMockProxy([][]byte{{0}})
 
-		result, err = dg.ExecuteQueryReturningBool(context.Background(), &data.VmValueRequest{})
+		result, err = dg.ExecuteQueryReturningBool(context.Background(), &provider.VmValueRequest{})
 		assert.False(t, result)
 		assert.Nil(t, err)
 	})
@@ -353,7 +354,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy(make([][]byte, 0))
 
-		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &provider.VmValueRequest{})
 		assert.Zero(t, result)
 		assert.Nil(t, err)
 	})
@@ -363,7 +364,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy([][]byte{make([]byte, 0)})
 
-		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &provider.VmValueRequest{})
 		assert.Zero(t, result)
 		assert.Nil(t, err)
 	})
@@ -380,7 +381,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
 			"",
 		)
 
-		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &provider.VmValueRequest{})
 		assert.Zero(t, result)
 		assert.Equal(t, expectedError, err)
 	})
@@ -390,13 +391,13 @@ func TestMXClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy([][]byte{{1}})
 
-		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningUint64(context.Background(), &provider.VmValueRequest{})
 		assert.Equal(t, uint64(1), result)
 		assert.Nil(t, err)
 
 		dg.proxy = createMockProxy([][]byte{{0xFF, 0xFF}})
 
-		result, err = dg.ExecuteQueryReturningUint64(context.Background(), &data.VmValueRequest{})
+		result, err = dg.ExecuteQueryReturningUint64(context.Background(), &provider.VmValueRequest{})
 		assert.Equal(t, uint64(65535), result)
 		assert.Nil(t, err)
 	})
@@ -421,7 +422,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBigInt(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy(make([][]byte, 0))
 
-		result, err := dg.ExecuteQueryReturningBigInt(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBigInt(context.Background(), &provider.VmValueRequest{})
 		assert.Equal(t, big.NewInt(0), result)
 		assert.Nil(t, err)
 	})
@@ -431,7 +432,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBigInt(t *testing.T) {
 		dg, _ := NewKLVClientDataGetter(args)
 		dg.proxy = createMockProxy([][]byte{make([]byte, 0)})
 
-		result, err := dg.ExecuteQueryReturningBigInt(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBigInt(context.Background(), &provider.VmValueRequest{})
 		assert.Equal(t, big.NewInt(0), result)
 		assert.Nil(t, err)
 	})
@@ -443,13 +444,13 @@ func TestMXClientDataGetter_ExecuteQueryReturningBigInt(t *testing.T) {
 		largeNumber.SetString("18446744073709551616", 10)
 		dg.proxy = createMockProxy([][]byte{largeNumber.Bytes()})
 
-		result, err := dg.ExecuteQueryReturningBigInt(context.Background(), &data.VmValueRequest{})
+		result, err := dg.ExecuteQueryReturningBigInt(context.Background(), &provider.VmValueRequest{})
 		assert.Equal(t, largeNumber, result)
 		assert.Nil(t, err)
 
 		dg.proxy = createMockProxy([][]byte{{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}})
 
-		result, err = dg.ExecuteQueryReturningBigInt(context.Background(), &data.VmValueRequest{})
+		result, err = dg.ExecuteQueryReturningBigInt(context.Background(), &provider.VmValueRequest{})
 		largeNumber.SetString("79228162514264337593543950335", 10)
 		assert.Equal(t, largeNumber, result)
 		assert.Nil(t, err)
@@ -462,7 +463,7 @@ func TestMXClientDataGetter_GetCurrentBatchAsDataBytes(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	returningBytes := [][]byte{[]byte("buff0"), []byte("buff1"), []byte("buff2")}
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, 0, len(vmRequest.CallValue))
@@ -491,7 +492,7 @@ func TestExecuteQueryFromBuilderReturnErr(t *testing.T) {
 	expectedError := errors.New("expected error")
 	erc20Address := "erc20Address"
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
 					ReturnCode: internalError,
@@ -514,11 +515,11 @@ func TestMXClientDataGetter_GetTokenIdForErc20Address(t *testing.T) {
 	erc20Address := "erc20Address"
 	returningBytes := [][]byte{[]byte(erdAddress)}
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, 0, len(vmRequest.CallValue))
-			assert.Equal(t, []string{hex.EncodeToString([]byte(erc20Address))}, vmRequest.Args)
+			assert.Equal(t, []string{hex.EncodeToString([]byte(erc20Address))}, vmRequest.Arguments)
 			assert.Equal(t, getTokenIdForErc20AddressFuncName, vmRequest.FuncName)
 
 			return &data.VmValuesResponseData{
@@ -545,11 +546,11 @@ func TestMXClientDataGetter_GetERC20AddressForTokenId(t *testing.T) {
 	erc20Address := "erc20Address"
 	returningBytes := [][]byte{[]byte(erc20Address)}
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, 0, len(vmRequest.CallValue))
-			assert.Equal(t, []string{hex.EncodeToString([]byte(erdAddress))}, vmRequest.Args)
+			assert.Equal(t, []string{hex.EncodeToString([]byte(erdAddress))}, vmRequest.Arguments)
 			assert.Equal(t, getErc20AddressForTokenIdFuncName, vmRequest.FuncName)
 
 			return &data.VmValuesResponseData{
@@ -589,7 +590,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 		batch := createMockBatch()
 
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -614,7 +615,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -641,7 +642,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 		batch.Deposits[0].Data = bridgeTests.CallDataMock
 
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -666,7 +667,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -692,7 +693,7 @@ func TestMXClientDataGetter_WasExecuted(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	proxyCalled := false
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -700,7 +701,7 @@ func TestMXClientDataGetter_WasExecuted(t *testing.T) {
 			assert.Equal(t, wasActionExecutedFuncName, vmRequest.FuncName)
 
 			expectedArgs := []string{hex.EncodeToString(big.NewInt(112233).Bytes())}
-			assert.Equal(t, expectedArgs, vmRequest.Args)
+			assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -763,7 +764,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 		proxyCalled := false
 		batch := createMockBatch()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -788,7 +789,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -814,7 +815,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 		batch := createMockBatch()
 		batch.Deposits[0].Data = bridgeTests.CallDataMock
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -839,7 +840,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -879,7 +880,7 @@ func TestMXClientDataGetter_WasProposedSetStatus(t *testing.T) {
 		proxyCalled := false
 		batch := createMockBatch()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -893,7 +894,7 @@ func TestMXClientDataGetter_WasProposedSetStatus(t *testing.T) {
 					expectedArgs = append(expectedArgs, hex.EncodeToString([]byte{stat}))
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -923,7 +924,7 @@ func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 		args := createMockArgsKLVClientDataGetter()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -1005,7 +1006,7 @@ func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 		args := createMockArgsKLVClientDataGetter()
 		proxyCalled := false
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -1016,7 +1017,7 @@ func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 					hex.EncodeToString(big.NewInt(int64(batchID)).Bytes()),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -1057,7 +1058,7 @@ func TestMXClientDataGetter_GetActionIDForSetStatusOnPendingTransfer(t *testing.
 		proxyCalled := false
 		batch := createMockBatch()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				proxyCalled = true
 				assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 				assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -1071,7 +1072,7 @@ func TestMXClientDataGetter_GetActionIDForSetStatusOnPendingTransfer(t *testing.
 					expectedArgs = append(expectedArgs, hex.EncodeToString([]byte{stat}))
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Args)
+				assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -1098,7 +1099,7 @@ func TestMXClientDataGetter_QuorumReached(t *testing.T) {
 	proxyCalled := false
 	actionID := big.NewInt(112233)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -1106,7 +1107,7 @@ func TestMXClientDataGetter_QuorumReached(t *testing.T) {
 			assert.Equal(t, quorumReachedFuncName, vmRequest.FuncName)
 
 			expectedArgs := []string{hex.EncodeToString(actionID.Bytes())}
-			assert.Equal(t, expectedArgs, vmRequest.Args)
+			assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1132,13 +1133,13 @@ func TestMXClientDataGetter_GetLastExecutedEthBatchID(t *testing.T) {
 	proxyCalled := false
 	val := big.NewInt(45372)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getLastExecutedEthBatchIdFuncName, vmRequest.FuncName)
-			assert.Nil(t, vmRequest.Args)
+			assert.Nil(t, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1164,13 +1165,13 @@ func TestMXClientDataGetter_GetLastExecutedEthTxID(t *testing.T) {
 	proxyCalled := false
 	val := big.NewInt(45372)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getLastExecutedEthTxId, vmRequest.FuncName)
-			assert.Nil(t, vmRequest.Args)
+			assert.Nil(t, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1196,7 +1197,7 @@ func TestMXClientDataGetter_WasSigned(t *testing.T) {
 	proxyCalled := false
 	actionID := big.NewInt(112233)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -1207,7 +1208,7 @@ func TestMXClientDataGetter_WasSigned(t *testing.T) {
 				hex.EncodeToString(args.RelayerAddress.Bytes()),
 				hex.EncodeToString(actionID.Bytes()),
 			}
-			assert.Equal(t, expectedArgs, vmRequest.Args)
+			assert.Equal(t, expectedArgs, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1232,13 +1233,13 @@ func TestMXClientDataGetter_GetAllStakedRelayers(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	providedRelayers := [][]byte{[]byte("relayer1"), []byte("relayer2")}
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getAllStakedRelayersFuncName, vmRequest.FuncName)
 
-			assert.Nil(t, vmRequest.Args)
+			assert.Nil(t, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1262,12 +1263,12 @@ func TestMXClientDataGetter_GetAllKnownTokens(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	providedTokens := [][]byte{[]byte("tkn1"), []byte("tkn2")}
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getAllKnownTokens, vmRequest.FuncName)
 
-			assert.Nil(t, vmRequest.Args)
+			assert.Nil(t, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1398,13 +1399,13 @@ func TestMultiversXClientDataGetter_IsPaused(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	proxyCalled := false
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, isPausedFuncName, vmRequest.FuncName)
-			assert.Empty(t, vmRequest.Args)
+			assert.Empty(t, vmRequest.Arguments)
 
 			strResponse := "AQ=="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)
@@ -1431,13 +1432,13 @@ func TestMultiversXClientDataGetter_isMintBurnToken(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	proxyCalled := false
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, isMintBurnTokenFuncName, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
 
 			strResponse := "AQ=="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)
@@ -1464,13 +1465,13 @@ func TestMultiversXClientDataGetter_isNativeToken(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	proxyCalled := false
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, isNativeTokenFuncName, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
 
 			strResponse := "AQ=="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)
@@ -1498,13 +1499,13 @@ func TestMultiversXClientDataGetter_getTotalBalances(t *testing.T) {
 	proxyCalled := false
 	expectedAccumulatedBurnedTokens := big.NewInt(100)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getTotalBalances, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1530,13 +1531,13 @@ func TestMultiversXClientDataGetter_getMintBalances(t *testing.T) {
 	proxyCalled := false
 	expectedAccumulatedMintedTokens := big.NewInt(100)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getMintBalances, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1562,13 +1563,13 @@ func TestMultiversXClientDataGetter_getBurnBalances(t *testing.T) {
 	proxyCalled := false
 	expectedAccumulatedBurnedTokens := big.NewInt(100)
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getBurnBalances, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1593,13 +1594,13 @@ func TestMultiversXClientDataGetter_GetLastMvxBatchID(t *testing.T) {
 	args := createMockArgsKLVClientDataGetter()
 	proxyCalled := false
 	args.Proxy = &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			proxyCalled = true
 			assert.Equal(t, getBech32Address(args.SafeContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getLastBatchId, vmRequest.FuncName)
-			assert.Empty(t, vmRequest.Args)
+			assert.Empty(t, vmRequest.Arguments)
 
 			strResponse := "Dpk="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)

@@ -10,7 +10,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klever-io/klever-go-sdk/builders"
 	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
@@ -23,7 +25,6 @@ import (
 	"github.com/multiversx/mx-chain-crypto-go/signing"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/builders"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -238,7 +239,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -395,7 +396,7 @@ func TestClient_GetBatch(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -562,7 +563,7 @@ func TestClient_ProposeSetStatus(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -577,7 +578,7 @@ func TestClient_ProposeSetStatus(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
@@ -651,7 +652,7 @@ func TestClient_ProposeTransfer(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -666,7 +667,7 @@ func TestClient_ProposeTransfer(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
@@ -792,7 +793,7 @@ func TestClient_Sign(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -807,7 +808,7 @@ func TestClient_Sign(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
@@ -871,7 +872,7 @@ func TestClient_PerformAction(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -886,7 +887,7 @@ func TestClient_PerformAction(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,

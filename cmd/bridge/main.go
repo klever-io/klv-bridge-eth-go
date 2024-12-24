@@ -12,6 +12,7 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
@@ -100,7 +101,7 @@ func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
 	// declared on klever client, but for simplicity to run the bridge, redeclared here for now
 	const okCodeAfterExecution = "ok"
 	return &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
 					ReturnCode: okCodeAfterExecution,

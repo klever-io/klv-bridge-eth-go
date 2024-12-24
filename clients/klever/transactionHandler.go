@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
+	"github.com/klever-io/klever-go-sdk/builders"
 	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
-	"github.com/multiversx/mx-sdk-go/builders"
 )
 
 type transactionHandler struct {

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/klever-io/klever-go-sdk/builders"
 	"github.com/klever-io/klever-go-sdk/core/address"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	cryptoMock "github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
@@ -14,7 +15,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
-	"github.com/multiversx/mx-sdk-go/builders"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )

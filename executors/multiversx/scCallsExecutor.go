@@ -9,6 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/klever-io/klever-go-sdk/builders"
+	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
@@ -16,7 +18,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/builders"
 	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
@@ -178,7 +179,7 @@ func (executor *scCallExecutor) Execute(ctx context.Context) error {
 }
 
 func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[uint64]parsers.ProxySCCompleteCallData, error) {
-	request := &data.VmValueRequest{
+	request := &provider.VmValueRequest{
 		Address:  executor.scProxyBech32Address,
 		FuncName: getPendingTransactionsFunction,
 	}
@@ -186,7 +187,7 @@ func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[u
 	response, err := executor.proxy.ExecuteVMQuery(ctx, request)
 	if err != nil {
 		executor.log.Error("got error on VMQuery", "FuncName", request.FuncName,
-			"Args", request.Args, "SC address", request.Address, "Caller", request.CallerAddr, "error", err)
+			"Args", request.Arguments, "SC address", request.Address, "Caller", request.CallerAddr, "error", err)
 		return nil, err
 	}
 	if response.Data.ReturnCode != okCodeAfterExecution {
@@ -195,7 +196,7 @@ func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[u
 			response.Data.ReturnMessage,
 			request.FuncName,
 			request.Address,
-			request.Args...,
+			request.Arguments...,
 		)
 	}
 

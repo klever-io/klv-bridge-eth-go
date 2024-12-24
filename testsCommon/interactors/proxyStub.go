@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -15,7 +16,7 @@ type ProxyStub struct {
 	GetNetworkConfigCalled              func(ctx context.Context) (*data.NetworkConfig, error)
 	SendTransactionCalled               func(ctx context.Context, transaction *transaction.FrontendTransaction) (string, error)
 	SendTransactionsCalled              func(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error)
-	ExecuteVMQueryCalled                func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error)
+	ExecuteVMQueryCalled                func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error)
 	GetAccountCalled                    func(ctx context.Context, address address.Address) (*data.Account, error)
 	GetNetworkStatusCalled              func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddressCalled             func(ctx context.Context, bech32Address string) (uint32, error)
@@ -52,7 +53,7 @@ func (eps *ProxyStub) SendTransactions(ctx context.Context, txs []*transaction.F
 }
 
 // ExecuteVMQuery -
-func (eps *ProxyStub) ExecuteVMQuery(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+func (eps *ProxyStub) ExecuteVMQuery(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
 	if eps.ExecuteVMQueryCalled != nil {
 		return eps.ExecuteVMQueryCalled(ctx, vmRequest)
 	}
