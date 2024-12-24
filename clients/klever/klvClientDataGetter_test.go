@@ -222,7 +222,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 			FuncName:   calledFunction,
 			CallerAddr: getBech32Address(dg.relayerAddress),
 			CallValue:  "0",
-			Arguments:  calledArgs,
+			Args:       calledArgs,
 		}
 
 		result, err := dg.ExecuteQueryReturningBytes(context.Background(), request)
@@ -258,7 +258,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 			FuncName:   calledFunction,
 			CallerAddr: getBech32Address(dg.relayerAddress),
 			CallValue:  "0",
-			Arguments:  calledArgs,
+			Args:       calledArgs,
 		}
 
 		result, err := dg.ExecuteQueryReturningBytes(context.Background(), request)
@@ -519,7 +519,7 @@ func TestMXClientDataGetter_GetTokenIdForErc20Address(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, 0, len(vmRequest.CallValue))
-			assert.Equal(t, []string{hex.EncodeToString([]byte(erc20Address))}, vmRequest.Arguments)
+			assert.Equal(t, []string{hex.EncodeToString([]byte(erc20Address))}, vmRequest.Args)
 			assert.Equal(t, getTokenIdForErc20AddressFuncName, vmRequest.FuncName)
 
 			return &data.VmValuesResponseData{
@@ -550,7 +550,7 @@ func TestMXClientDataGetter_GetERC20AddressForTokenId(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, 0, len(vmRequest.CallValue))
-			assert.Equal(t, []string{hex.EncodeToString([]byte(erdAddress))}, vmRequest.Arguments)
+			assert.Equal(t, []string{hex.EncodeToString([]byte(erdAddress))}, vmRequest.Args)
 			assert.Equal(t, getErc20AddressForTokenIdFuncName, vmRequest.FuncName)
 
 			return &data.VmValuesResponseData{
@@ -615,7 +615,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -667,7 +667,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -701,7 +701,7 @@ func TestMXClientDataGetter_WasExecuted(t *testing.T) {
 			assert.Equal(t, wasActionExecutedFuncName, vmRequest.FuncName)
 
 			expectedArgs := []string{hex.EncodeToString(big.NewInt(112233).Bytes())}
-			assert.Equal(t, expectedArgs, vmRequest.Arguments)
+			assert.Equal(t, expectedArgs, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -789,7 +789,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -840,7 +840,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -894,7 +894,7 @@ func TestMXClientDataGetter_WasProposedSetStatus(t *testing.T) {
 					expectedArgs = append(expectedArgs, hex.EncodeToString([]byte{stat}))
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -1017,7 +1017,7 @@ func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 					hex.EncodeToString(big.NewInt(int64(batchID)).Bytes()),
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -1072,7 +1072,7 @@ func TestMXClientDataGetter_GetActionIDForSetStatusOnPendingTransfer(t *testing.
 					expectedArgs = append(expectedArgs, hex.EncodeToString([]byte{stat}))
 				}
 
-				assert.Equal(t, expectedArgs, vmRequest.Arguments)
+				assert.Equal(t, expectedArgs, vmRequest.Args)
 
 				return &data.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
@@ -1107,7 +1107,7 @@ func TestMXClientDataGetter_QuorumReached(t *testing.T) {
 			assert.Equal(t, quorumReachedFuncName, vmRequest.FuncName)
 
 			expectedArgs := []string{hex.EncodeToString(actionID.Bytes())}
-			assert.Equal(t, expectedArgs, vmRequest.Arguments)
+			assert.Equal(t, expectedArgs, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1139,7 +1139,7 @@ func TestMXClientDataGetter_GetLastExecutedEthBatchID(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getLastExecutedEthBatchIdFuncName, vmRequest.FuncName)
-			assert.Nil(t, vmRequest.Arguments)
+			assert.Nil(t, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1171,7 +1171,7 @@ func TestMXClientDataGetter_GetLastExecutedEthTxID(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getLastExecutedEthTxId, vmRequest.FuncName)
-			assert.Nil(t, vmRequest.Arguments)
+			assert.Nil(t, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1208,7 +1208,7 @@ func TestMXClientDataGetter_WasSigned(t *testing.T) {
 				hex.EncodeToString(args.RelayerAddress.Bytes()),
 				hex.EncodeToString(actionID.Bytes()),
 			}
-			assert.Equal(t, expectedArgs, vmRequest.Arguments)
+			assert.Equal(t, expectedArgs, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1239,7 +1239,7 @@ func TestMXClientDataGetter_GetAllStakedRelayers(t *testing.T) {
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getAllStakedRelayersFuncName, vmRequest.FuncName)
 
-			assert.Nil(t, vmRequest.Arguments)
+			assert.Nil(t, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1268,7 +1268,7 @@ func TestMXClientDataGetter_GetAllKnownTokens(t *testing.T) {
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getAllKnownTokens, vmRequest.FuncName)
 
-			assert.Nil(t, vmRequest.Arguments)
+			assert.Nil(t, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1405,7 +1405,7 @@ func TestMultiversXClientDataGetter_IsPaused(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, isPausedFuncName, vmRequest.FuncName)
-			assert.Empty(t, vmRequest.Arguments)
+			assert.Empty(t, vmRequest.Args)
 
 			strResponse := "AQ=="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)
@@ -1438,7 +1438,7 @@ func TestMultiversXClientDataGetter_isMintBurnToken(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, isMintBurnTokenFuncName, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
 
 			strResponse := "AQ=="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)
@@ -1471,7 +1471,7 @@ func TestMultiversXClientDataGetter_isNativeToken(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, isNativeTokenFuncName, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
 
 			strResponse := "AQ=="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)
@@ -1505,7 +1505,7 @@ func TestMultiversXClientDataGetter_getTotalBalances(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getTotalBalances, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1537,7 +1537,7 @@ func TestMultiversXClientDataGetter_getMintBalances(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getMintBalances, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1569,7 +1569,7 @@ func TestMultiversXClientDataGetter_getBurnBalances(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getBurnBalances, vmRequest.FuncName)
-			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Arguments)
+			assert.Equal(t, []string{"746f6b656e"}, vmRequest.Args)
 
 			return &data.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
@@ -1600,7 +1600,7 @@ func TestMultiversXClientDataGetter_GetLastMvxBatchID(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, "", vmRequest.CallValue)
 			assert.Equal(t, getLastBatchId, vmRequest.FuncName)
-			assert.Empty(t, vmRequest.Arguments)
+			assert.Empty(t, vmRequest.Args)
 
 			strResponse := "Dpk="
 			response, _ := base64.StdEncoding.DecodeString(strResponse)

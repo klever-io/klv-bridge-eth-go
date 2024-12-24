@@ -187,7 +187,7 @@ func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[u
 	response, err := executor.proxy.ExecuteVMQuery(ctx, request)
 	if err != nil {
 		executor.log.Error("got error on VMQuery", "FuncName", request.FuncName,
-			"Args", request.Arguments, "SC address", request.Address, "Caller", request.CallerAddr, "error", err)
+			"Args", request.Args, "SC address", request.Address, "Caller", request.CallerAddr, "error", err)
 		return nil, err
 	}
 	if response.Data.ReturnCode != okCodeAfterExecution {
@@ -196,7 +196,7 @@ func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[u
 			response.Data.ReturnMessage,
 			request.FuncName,
 			request.Address,
-			request.Arguments...,
+			request.Args...,
 		)
 	}
 
