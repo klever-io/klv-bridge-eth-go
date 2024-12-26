@@ -13,6 +13,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/klever-io/klever-go-sdk/provider"
+	"github.com/klever-io/klever-go/data/vm"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
@@ -26,7 +27,6 @@ import (
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/typeConverters/uint64ByteSlice"
-	"github.com/multiversx/mx-chain-core-go/data/vm"
 	"github.com/multiversx/mx-chain-core-go/marshal"
 	factoryMarshaller "github.com/multiversx/mx-chain-core-go/marshal/factory"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
@@ -42,7 +42,6 @@ import (
 	"github.com/multiversx/mx-chain-go/update/disabled"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-chain-logger-go/file"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/urfave/cli"
 )
 
@@ -97,12 +96,13 @@ func main() {
 	}
 }
 
+// TODO: Remove mock and change to real proxy connection
+// declared on klever client, but for simplicity to run the bridge, redeclared here for now
 func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
-	// declared on klever client, but for simplicity to run the bridge, redeclared here for now
 	const okCodeAfterExecution = "ok"
 	return &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error) {
-			return &data.VmValuesResponseData{
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			return &provider.VmValuesResponseData{
 				Data: &vm.VMOutputApi{
 					ReturnCode: okCodeAfterExecution,
 					ReturnData: returningBytes,

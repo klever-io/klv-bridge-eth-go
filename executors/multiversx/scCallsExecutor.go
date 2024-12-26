@@ -203,7 +203,7 @@ func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[u
 	return executor.parseResponse(response)
 }
 
-func (executor *scCallExecutor) parseResponse(response *data.VmValuesResponseData) (map[uint64]parsers.ProxySCCompleteCallData, error) {
+func (executor *scCallExecutor) parseResponse(response *provider.VmValuesResponseData) (map[uint64]parsers.ProxySCCompleteCallData, error) {
 	numResponseLines := len(response.Data.ReturnData)
 	if numResponseLines%2 != 0 {
 		return nil, fmt.Errorf("%w: expected an even number, got %d", errInvalidNumberOfResponseLines, numResponseLines)

@@ -13,6 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klever-go-sdk/provider"
+	"github.com/klever-io/klever-go/data/vm"
 	ethereumClient "github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
@@ -23,10 +25,9 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/executors/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/executors/ethereum/bridgeV2Wrappers"
 	"github.com/klever-io/klv-bridge-eth-go/executors/ethereum/bridgeV2Wrappers/contract"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/blockchain"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/urfave/cli"
 )
 
@@ -124,20 +125,38 @@ func executeQuery(cfg config.MigrationToolConfig) error {
 	return nil
 }
 
+// TODO: Remove mock and change to real proxy connection
+// declared on klever client, but for simplicity to run the bridge, redeclared here for now
+func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
+	const okCodeAfterExecution = "ok"
+	return &interactors.ProxyStub{
+		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			return &provider.VmValuesResponseData{
+				Data: &vm.VMOutputApi{
+					ReturnCode: okCodeAfterExecution,
+					ReturnData: returningBytes,
+				},
+			}, nil
+		},
+	}
+}
+
 func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*internalComponents, error) {
-	argsProxy := blockchain.ArgsProxy{
-		ProxyURL:            cfg.Klever.NetworkAddress,
-		SameScState:         false,
-		ShouldBeSynced:      false,
-		FinalityCheck:       cfg.Klever.Proxy.FinalityCheck,
-		AllowedDeltaToFinal: cfg.Klever.Proxy.MaxNoncesDelta,
-		CacheExpirationTime: time.Second * time.Duration(cfg.Klever.Proxy.CacherExpirationSeconds),
-		EntityType:          sdkCore.RestAPIEntityType(cfg.Klever.Proxy.RestAPIEntityType),
-	}
-	proxy, err := blockchain.NewProxy(argsProxy)
-	if err != nil {
-		return nil, err
-	}
+	// argsProxy := blockchain.ArgsProxy{
+	// 	ProxyURL:            cfg.Klever.NetworkAddress,
+	// 	SameScState:         false,
+	// 	ShouldBeSynced:      false,
+	// 	FinalityCheck:       cfg.Klever.Proxy.FinalityCheck,
+	// 	AllowedDeltaToFinal: cfg.Klever.Proxy.MaxNoncesDelta,
+	// 	CacheExpirationTime: time.Second * time.Duration(cfg.Klever.Proxy.CacherExpirationSeconds),
+	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.Klever.Proxy.RestAPIEntityType),
+	// }
+	// proxy, err := blockchain.NewProxy(argsProxy)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	proxy := createMockProxyKLV(nil)
 
 	dummyAddress, err := address.NewAddressFromBytes(bytes.Repeat([]byte{0x1}, 32))
 	if err != nil {

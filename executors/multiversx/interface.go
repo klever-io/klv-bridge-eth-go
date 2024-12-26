@@ -17,7 +17,7 @@ type Proxy interface {
 	GetNetworkConfig(ctx context.Context) (*data.NetworkConfig, error)
 	SendTransaction(ctx context.Context, tx *transaction.FrontendTransaction) (string, error)
 	SendTransactions(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error)
-	ExecuteVMQuery(ctx context.Context, vmRequest *provider.VmValueRequest) (*data.VmValuesResponseData, error)
+	ExecuteVMQuery(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error)
 	GetAccount(ctx context.Context, address address.Address) (*data.Account, error)
 	GetNetworkStatus(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddress(ctx context.Context, bech32Address string) (uint32, error)
