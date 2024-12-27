@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -15,17 +14,16 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/factory"
 	"github.com/klever-io/klv-bridge-eth-go/p2p"
 	"github.com/klever-io/klv-bridge-eth-go/status"
-	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	"github.com/multiversx/mx-chain-communication-go/p2p/libp2p"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/typeConverters/uint64ByteSlice"
-	"github.com/multiversx/mx-chain-core-go/data/vm"
 	"github.com/multiversx/mx-chain-core-go/marshal"
 	factoryMarshaller "github.com/multiversx/mx-chain-core-go/marshal/factory"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
@@ -41,7 +39,6 @@ import (
 	"github.com/multiversx/mx-chain-go/update/disabled"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-chain-logger-go/file"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/urfave/cli"
 )
 
@@ -93,21 +90,6 @@ func main() {
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
-	}
-}
-
-func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
-	// declared on klever client, but for simplicity to run the bridge, redeclared here for now
-	const okCodeAfterExecution = "ok"
-	return &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
-			return &data.VmValuesResponseData{
-				Data: &vm.VMOutputApi{
-					ReturnCode: okCodeAfterExecution,
-					ReturnData: returningBytes,
-				},
-			}, nil
-		},
 	}
 }
 
@@ -175,6 +157,7 @@ func startRelay(ctx *cli.Context, version string) error {
 		return fmt.Errorf("empty Klever.NetworkAddress in config file")
 	}
 
+	// TODO: remove mock when real proxy with klever chain is added
 	// argsProxy := blockchain.ArgsProxy{
 	// 	ProxyURL:            cfg.MultiversX.NetworkAddress,
 	// 	SameScState:         false,
@@ -189,7 +172,7 @@ func startRelay(ctx *cli.Context, version string) error {
 	// 	return err
 	// }
 
-	proxy := createMockProxyKLV(nil)
+	proxy := klever.CreateMockProxyKLV(nil)
 
 	ethClient, err := ethclient.Dial(cfg.Eth.NetworkAddress)
 	if err != nil {

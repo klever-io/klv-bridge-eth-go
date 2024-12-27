@@ -23,8 +23,8 @@
 
 [Klever]
     NetworkAddress = "http://localhost:8080" # the network address
-    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
-    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
+    MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
+    SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
     PrivateKeyFile = "keys/walletKey.pem" # the path to the pem file containing the relayer multiversx wallet
     IntervalToResendTxsInSeconds = 60 # the time in seconds between nonce reads
     MaxRetriesOnQuorumReached = 3
