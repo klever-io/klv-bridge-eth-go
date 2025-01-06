@@ -172,7 +172,7 @@ func startRelay(ctx *cli.Context, version string) error {
 	// 	return err
 	// }
 
-	proxy := klever.CreateMockProxyKLV(nil)
+	proxy := klever.CreateMockProxyKLV()
 
 	ethClient, err := ethclient.Dial(cfg.Eth.NetworkAddress)
 	if err != nil {
