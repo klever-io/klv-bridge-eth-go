@@ -5,8 +5,8 @@ import (
 )
 
 // CreateTestMultiversXGasMap will create a testing gas map for MultiversX client
-func CreateTestMultiversXGasMap() config.MultiversXGasMapConfig {
-	return config.MultiversXGasMapConfig{
+func CreateTestMultiversXGasMap() config.KleverGasMapConfig {
+	return config.KleverGasMapConfig{
 		Sign:                   101,
 		ProposeTransferBase:    102,
 		ProposeTransferForEach: 103,

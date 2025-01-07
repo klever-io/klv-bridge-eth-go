@@ -36,7 +36,7 @@ const (
 
 // ClientArgs represents the argument for the NewClient constructor function
 type ClientArgs struct {
-	GasMapConfig                 config.MultiversXGasMapConfig
+	GasMapConfig                 config.KleverGasMapConfig
 	Proxy                        Proxy
 	Log                          logger.Logger
 	RelayerPrivateKey            crypto.PrivateKey
@@ -59,7 +59,7 @@ type client struct {
 	multisigContractAddress      core.AddressHandler
 	safeContractAddress          core.AddressHandler
 	log                          logger.Logger
-	gasMapConfig                 config.MultiversXGasMapConfig
+	gasMapConfig                 config.KleverGasMapConfig
 	addressPublicKeyConverter    bridgeCore.AddressConverter
 	statusHandler                bridgeCore.StatusHandler
 	clientAvailabilityAllowDelta uint64
@@ -188,7 +188,7 @@ func checkArgs(args ClientArgs) error {
 	return nil
 }
 
-func checkGasMapValues(gasMap config.MultiversXGasMapConfig) error {
+func checkGasMapValues(gasMap config.KleverGasMapConfig) error {
 	gasMapValue := reflect.ValueOf(gasMap)
 	typeOfGasMapValue := gasMapValue.Type()
 

@@ -45,7 +45,7 @@ func TestConfigs(t *testing.T) {
 			SafeContractAddress:          "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
 			PrivateKeyFile:               "keys/multiversx.pem",
 			IntervalToResendTxsInSeconds: 60,
-			GasMap: MultiversXGasMapConfig{
+			GasMap: KleverGasMapConfig{
 				Sign:                   8000000,
 				ProposeTransferBase:    11000000,
 				ProposeTransferForEach: 5500000,
