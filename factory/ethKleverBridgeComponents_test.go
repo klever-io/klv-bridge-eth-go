@@ -264,7 +264,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 }
 
-func TestEthMultiversXBridgeComponents_StartAndCloseShouldWork(t *testing.T) {
+func TestEthKleverBridgeComponents_StartAndCloseShouldWork(t *testing.T) {
 	t.Parallel()
 
 	args := createMockEthKleverBridgeArgs()
@@ -281,7 +281,7 @@ func TestEthMultiversXBridgeComponents_StartAndCloseShouldWork(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestEthMultiversXBridgeComponents_Start(t *testing.T) {
+func TestEthKleverBridgeComponents_Start(t *testing.T) {
 	t.Parallel()
 
 	t.Run("messenger errors on bootstrap", func(t *testing.T) {
@@ -316,7 +316,7 @@ func TestEthMultiversXBridgeComponents_Start(t *testing.T) {
 	})
 }
 
-func TestEthMultiversXBridgeComponents_Close(t *testing.T) {
+func TestEthKleverBridgeComponents_Close(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil closable should not panic", func(t *testing.T) {
@@ -372,7 +372,7 @@ func TestEthMultiversXBridgeComponents_Close(t *testing.T) {
 	})
 }
 
-func TestEthMultiversXBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.T) {
+func TestEthKleverBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.T) {
 	t.Parallel()
 
 	t.Run("close before minTimeBeforeRepeatJoin", func(t *testing.T) {
@@ -419,7 +419,7 @@ func TestEthMultiversXBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.
 	})
 }
 
-func TestEthMultiversXBridgeComponents_RelayerAddresses(t *testing.T) {
+func TestEthKleverBridgeComponents_RelayerAddresses(t *testing.T) {
 	t.Parallel()
 
 	args := createMockEthKleverBridgeArgs()

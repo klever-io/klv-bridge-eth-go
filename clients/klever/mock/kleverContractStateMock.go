@@ -480,7 +480,7 @@ func (mock *kleverContractStateMock) vmRequestSigned(request *data.VmValueReques
 
 	addressBytes, err := hex.DecodeString(hexAddress)
 	if err != nil {
-		panic(err)
+		return createNokVmResponse(err)
 	}
 
 	address := data.NewAddressFromBytes(addressBytes)
