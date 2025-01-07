@@ -4,8 +4,8 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/config"
 )
 
-// CreateTestMultiversXGasMap will create a testing gas map for MultiversX client
-func CreateTestMultiversXGasMap() config.KleverGasMapConfig {
+// CreateTestKleverGasMap will create a testing gas map for Klever client
+func CreateTestKleverGasMap() config.KleverGasMapConfig {
 	return config.KleverGasMapConfig{
 		Sign:                   101,
 		ProposeTransferBase:    102,
