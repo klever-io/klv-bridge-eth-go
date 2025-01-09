@@ -40,7 +40,7 @@ func TestConfigs(t *testing.T) {
 			EventsBlockRangeTo:           400,
 		},
 		Klever: KleverConfig{
-			NetworkAddress:               "https://devnet-gateway.multiversx.com",
+			NetworkAddress:               "https://api.devnet.klever.finance",
 			MultisigContractAddress:      "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:          "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
 			PrivateKeyFile:               "keys/multiversx.pem",
@@ -243,7 +243,7 @@ func TestConfigs(t *testing.T) {
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
 [Klever]
-    NetworkAddress = "https://devnet-gateway.multiversx.com" # the network address
+    NetworkAddress = "https://api.devnet.klever.finance" # the network address
     MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
     SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
     PrivateKeyFile = "keys/multiversx.pem" # the path to the pem file containing the relayer multiversx wallet
@@ -499,7 +499,7 @@ func TestMigrationToolConfig(t *testing.T) {
 			},
 		},
 		Klever: KleverConfig{
-			NetworkAddress:          "https://devnet-gateway.multiversx.com",
+			NetworkAddress:          "https://api.devnet.klever.finance",
 			MultisigContractAddress: "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:     "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
 			Proxy: ProxyConfig{
@@ -536,7 +536,7 @@ func TestMigrationToolConfig(t *testing.T) {
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
 [Klever]
-    NetworkAddress = "https://devnet-gateway.multiversx.com" # the network address
+    NetworkAddress = "https://api.devnet.klever.finance/" # the network address
     MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
     SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
     [Klever.Proxy]
