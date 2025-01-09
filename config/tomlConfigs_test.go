@@ -242,7 +242,7 @@ func TestConfigs(t *testing.T) {
         # GasPriceSelector available options: "SafeGasPrice", "ProposeGasPrice", "FastGasPrice"
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
-[MultiversX]
+[Klever]
     NetworkAddress = "https://devnet-gateway.multiversx.com" # the network address
     MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
     SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
@@ -251,7 +251,7 @@ func TestConfigs(t *testing.T) {
     MaxRetriesOnQuorumReached = 3
     MaxRetriesOnWasTransferProposed = 3
     ClientAvailabilityAllowDelta = 10
-    [MultiversX.Proxy]
+    [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 
         # valid options for ProxyRestAPIEntityType are "observer" and "proxy". Any other value will trigger an error.
@@ -259,7 +259,7 @@ func TestConfigs(t *testing.T) {
         RestAPIEntityType = "observer"
         FinalityCheck = true
         MaxNoncesDelta = 7 # the number of maximum blocks allowed to be "in front" of what the metachain has notarized
-    [MultiversX.GasMap]
+    [Klever.GasMap]
         Sign = 8000000
         ProposeTransferBase = 11000000
         ProposeTransferForEach = 5500000
@@ -535,11 +535,11 @@ func TestMigrationToolConfig(t *testing.T) {
         # GasPriceSelector available options: "SafeGasPrice", "ProposeGasPrice", "FastGasPrice"
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
-[MultiversX]
+[Klever]
     NetworkAddress = "https://devnet-gateway.multiversx.com" # the network address
     MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
     SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
-    [MultiversX.Proxy]
+    [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 
         # valid options for ProxyRestAPIEntityType are "observer" and "proxy". Any other value will trigger an error.
