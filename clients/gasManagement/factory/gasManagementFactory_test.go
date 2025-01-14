@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients/gasManagement"
-	"github.com/multiversx/mx-bridge-eth-go/clients/gasManagement/disabled"
+	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
+	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/disabled"
 	"github.com/stretchr/testify/assert"
 )
 

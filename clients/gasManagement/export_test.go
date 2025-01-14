@@ -1,6 +1,6 @@
 package gasManagement
 
-import "github.com/multiversx/mx-bridge-eth-go/core"
+import "github.com/klever-io/klv-bridge-eth-go/core"
 
 // GetLatestGasPrice -
 func (gs *gasStation) GetLatestGasPrice() int {

@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/executors/ethereum"
+	"github.com/klever-io/klv-bridge-eth-go/executors/ethereum"
 )
 
 // BatchCreator defines the operations implemented by an entity that can create an Ethereum batch message that can be used

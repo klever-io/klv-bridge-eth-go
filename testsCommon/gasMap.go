@@ -1,12 +1,12 @@
 package testsCommon
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/config"
 )
 
-// CreateTestMultiversXGasMap will create a testing gas map for MultiversX client
-func CreateTestMultiversXGasMap() config.MultiversXGasMapConfig {
-	return config.MultiversXGasMapConfig{
+// CreateTestKleverGasMap will create a testing gas map for Klever client
+func CreateTestKleverGasMap() config.KleverGasMapConfig {
+	return config.KleverGasMapConfig{
 		Sign:                   101,
 		ProposeTransferBase:    102,
 		ProposeTransferForEach: 103,

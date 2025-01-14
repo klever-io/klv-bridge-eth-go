@@ -3,7 +3,7 @@ package main
 import (
 	"path"
 
-	"github.com/multiversx/mx-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/config"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/urfave/cli"
 )

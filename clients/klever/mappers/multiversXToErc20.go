@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 )
 

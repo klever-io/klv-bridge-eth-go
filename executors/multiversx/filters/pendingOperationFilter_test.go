@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	"github.com/multiversx/mx-bridge-eth-go/parsers"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"

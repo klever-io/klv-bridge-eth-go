@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/relayers/slowTests/framework"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
 	"github.com/stretchr/testify/require"
 )
 

@@ -8,9 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/multiversx/mx-bridge-eth-go/clients"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum/contract"
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 )
 

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/bridges/ethMultiversX/steps"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	bridgeTests "github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon/stateMachine"
+	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/steps"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon/stateMachine"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

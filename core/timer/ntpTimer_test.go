@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/core/timer/mock"
+	"github.com/klever-io/klv-bridge-eth-go/core/timer/mock"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

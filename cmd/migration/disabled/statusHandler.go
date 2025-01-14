@@ -1,6 +1,6 @@
 package disabled
 
-import "github.com/multiversx/mx-bridge-eth-go/core"
+import "github.com/klever-io/klv-bridge-eth-go/core"
 
 // StatusHandler represents the disabled status handler implementation
 type StatusHandler struct {

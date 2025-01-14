@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/core/batchProcessor"
+	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 )
 
 // BalanceValidatorStub -

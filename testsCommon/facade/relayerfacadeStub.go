@@ -1,7 +1,7 @@
 package facade
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 )
 
 // RelayerFacadeStub -

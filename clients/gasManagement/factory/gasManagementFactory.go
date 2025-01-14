@@ -1,9 +1,9 @@
 package factory
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/clients"
-	"github.com/multiversx/mx-bridge-eth-go/clients/gasManagement"
-	"github.com/multiversx/mx-bridge-eth-go/clients/gasManagement/disabled"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
+	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/disabled"
 )
 
 // CreateGasStation generates an implementation of GasHandler

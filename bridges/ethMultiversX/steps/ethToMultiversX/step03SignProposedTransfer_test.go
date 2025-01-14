@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/bridges/ethMultiversX"
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
+	ethmultiversx "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/stretchr/testify/assert"
 )
 

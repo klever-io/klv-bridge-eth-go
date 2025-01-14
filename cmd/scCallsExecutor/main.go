@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	"github.com/multiversx/mx-bridge-eth-go/executors/multiversx/module"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx/module"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	chainFactory "github.com/multiversx/mx-chain-go/cmd/node/factory"

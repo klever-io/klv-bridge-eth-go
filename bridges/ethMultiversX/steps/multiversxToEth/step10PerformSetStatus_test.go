@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	bridgeTests "github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge"
+	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	"github.com/stretchr/testify/assert"
 )
 

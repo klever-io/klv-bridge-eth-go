@@ -2,8 +2,8 @@ package shared
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 )
 
 // GroupHandler defines the actions needed to be performed by an gin API group

@@ -5,10 +5,10 @@ package slowTests
 import (
 	"math/big"
 
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/relayers/slowTests/framework"
-	"github.com/multiversx/mx-bridge-eth-go/parsers"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
+	"github.com/klever-io/klv-bridge-eth-go/parsers"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
 

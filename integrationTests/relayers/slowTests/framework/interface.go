@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/multiversx/mx-bridge-eth-go/clients/multiversx"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
@@ -29,7 +29,7 @@ type Relayer interface {
 
 // ChainSimulatorWrapper defines the wrapper over the chain simulator
 type ChainSimulatorWrapper interface {
-	Proxy() multiversx.Proxy
+	Proxy() klever.Proxy
 	GetNetworkAddress() string
 	DeploySC(ctx context.Context, path string, ownerSK []byte, gasLimit uint64, extraParams []string) (*MvxAddress, string, *data.TransactionOnNetwork)
 	ScCall(ctx context.Context, senderSK []byte, contract *MvxAddress, value string, gasLimit uint64, function string, parameters []string) (string, *data.TransactionOnNetwork)

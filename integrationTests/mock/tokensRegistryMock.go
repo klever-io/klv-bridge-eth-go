@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 )
 
 // tokensRegistryMock is not concurrent safe

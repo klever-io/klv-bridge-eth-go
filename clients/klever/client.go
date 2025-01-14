@@ -1,4 +1,4 @@
-package multiversx
+package klever
 
 import (
 	"bytes"
@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/core/converters"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core/converters"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/api"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
@@ -36,7 +36,7 @@ const (
 
 // ClientArgs represents the argument for the NewClient constructor function
 type ClientArgs struct {
-	GasMapConfig                 config.MultiversXGasMapConfig
+	GasMapConfig                 config.KleverGasMapConfig
 	Proxy                        Proxy
 	Log                          logger.Logger
 	RelayerPrivateKey            crypto.PrivateKey
@@ -51,7 +51,7 @@ type ClientArgs struct {
 
 // client represents the MultiversX Client implementation
 type client struct {
-	*mxClientDataGetter
+	*klvClientDataGetter
 	txHandler                    txHandler
 	tokensMapper                 TokensMapper
 	relayerPublicKey             crypto.PublicKey
@@ -59,7 +59,7 @@ type client struct {
 	multisigContractAddress      core.AddressHandler
 	safeContractAddress          core.AddressHandler
 	log                          logger.Logger
-	gasMapConfig                 config.MultiversXGasMapConfig
+	gasMapConfig                 config.KleverGasMapConfig
 	addressPublicKeyConverter    bridgeCore.AddressConverter
 	statusHandler                bridgeCore.StatusHandler
 	clientAvailabilityAllowDelta uint64
@@ -93,14 +93,14 @@ func NewClient(args ClientArgs) (*client, error) {
 
 	relayerAddress := data.NewAddressFromBytes(publicKeyBytes)
 
-	argsMXClientDataGetter := ArgsMXClientDataGetter{
+	argsKLVClientDataGetter := ArgsKLVClientDataGetter{
 		MultisigContractAddress: args.MultisigContractAddress,
 		SafeContractAddress:     args.SafeContractAddress,
 		RelayerAddress:          relayerAddress,
 		Proxy:                   args.Proxy,
 		Log:                     bridgeCore.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXDataGetterLogId), multiversXDataGetterLogId),
 	}
-	getter, err := NewMXClientDataGetter(argsMXClientDataGetter)
+	getter, err := NewKLVClientDataGetter(argsKLVClientDataGetter)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func NewClient(args ClientArgs) (*client, error) {
 			singleSigner:            &singlesig.Ed25519Signer{},
 			roleProvider:            args.RoleProvider,
 		},
-		mxClientDataGetter:           getter,
+		klvClientDataGetter:          getter,
 		relayerPublicKey:             publicKey,
 		relayerAddress:               relayerAddress,
 		multisigContractAddress:      args.MultisigContractAddress,
@@ -188,7 +188,7 @@ func checkArgs(args ClientArgs) error {
 	return nil
 }
 
-func checkGasMapValues(gasMap config.MultiversXGasMapConfig) error {
+func checkGasMapValues(gasMap config.KleverGasMapConfig) error {
 	gasMapValue := reflect.ValueOf(gasMap)
 	typeOfGasMapValue := gasMapValue.Type()
 

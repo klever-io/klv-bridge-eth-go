@@ -1,4 +1,4 @@
-package multiversx
+package klever
 
 import (
 	"bytes"
@@ -10,13 +10,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
-	bridgeTests "github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon/interactors"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon/roleProviders"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
+	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
+	roleproviders "github.com/klever-io/klv-bridge-eth-go/testsCommon/roleProviders"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
@@ -37,7 +37,7 @@ func createMockClientArgs() ClientArgs {
 	safeContractAddress, _ := data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
 
 	return ClientArgs{
-		GasMapConfig: config.MultiversXGasMapConfig{
+		GasMapConfig: config.KleverGasMapConfig{
 			Sign:                   10,
 			ProposeTransferBase:    20,
 			ProposeTransferForEach: 30,

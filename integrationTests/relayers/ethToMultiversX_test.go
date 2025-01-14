@@ -12,15 +12,15 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum/contract"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/factory"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/mock"
-	"github.com/multiversx/mx-bridge-eth-go/status"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/factory"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/mock"
+	"github.com/klever-io/klv-bridge-eth-go/status"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	"github.com/multiversx/mx-chain-go/p2p"
 	"github.com/multiversx/mx-chain-go/testscommon/statusHandler"
 	"github.com/stretchr/testify/assert"
@@ -151,7 +151,7 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], multiversXChainMock, ethereumChainMock)
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
-		relayer, err := factory.NewEthMultiversXBridgeComponents(argsBridgeComponents)
+		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
 		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
@@ -347,7 +347,7 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], multiversXChainMock, ethereumChainMock)
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
-		relayer, err := factory.NewEthMultiversXBridgeComponents(argsBridgeComponents)
+		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
 		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
@@ -398,10 +398,10 @@ func createMockBridgeComponentsArgs(
 	messenger p2p.Messenger,
 	multiversXChainMock *mock.MultiversXChainMock,
 	ethereumChainMock *mock.EthereumChainMock,
-) factory.ArgsEthereumToMultiversXBridge {
+) factory.ArgsEthereumToKleverBridge {
 
 	generalConfigs := CreateBridgeComponentsConfig(index, "testdata", noGasStationURL)
-	return factory.ArgsEthereumToMultiversXBridge{
+	return factory.ArgsEthereumToKleverBridge{
 		Configs: config.Configs{
 			GeneralConfig:   generalConfigs,
 			ApiRoutesConfig: config.ApiRoutesConfig{},
@@ -409,14 +409,14 @@ func createMockBridgeComponentsArgs(
 				RestApiInterface: bridgeCore.WebServerOffString,
 			},
 		},
-		Proxy:                         multiversXChainMock,
-		ClientWrapper:                 ethereumChainMock,
-		Messenger:                     messenger,
-		StatusStorer:                  testsCommon.NewStorerMock(),
-		TimeForBootstrap:              time.Second * 5,
-		TimeBeforeRepeatJoin:          time.Second * 30,
-		MetricsHolder:                 status.NewMetricsHolder(),
-		AppStatusHandler:              &statusHandler.AppStatusHandlerStub{},
-		MultiversXClientStatusHandler: &testsCommon.StatusHandlerStub{},
+		Proxy:                     multiversXChainMock,
+		ClientWrapper:             ethereumChainMock,
+		Messenger:                 messenger,
+		StatusStorer:              testsCommon.NewStorerMock(),
+		TimeForBootstrap:          time.Second * 5,
+		TimeBeforeRepeatJoin:      time.Second * 30,
+		MetricsHolder:             status.NewMetricsHolder(),
+		AppStatusHandler:          &statusHandler.AppStatusHandlerStub{},
+		KleverClientStatusHandler: &testsCommon.StatusHandlerStub{},
 	}
 }

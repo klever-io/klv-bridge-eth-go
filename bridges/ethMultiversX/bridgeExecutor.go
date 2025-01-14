@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/clients"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum/contract"
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/core/batchProcessor"
+	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )

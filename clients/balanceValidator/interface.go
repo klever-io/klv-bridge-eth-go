@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 )
 
 // MultiversXClient defines the behavior of the MultiversX client able to communicate with the MultiversX chain

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	apiErrors "github.com/multiversx/mx-bridge-eth-go/api/errors"
-	testsServer "github.com/multiversx/mx-bridge-eth-go/testsCommon/server"
+	apiErrors "github.com/klever-io/klv-bridge-eth-go/api/errors"
+	testsServer "github.com/klever-io/klv-bridge-eth-go/testsCommon/server"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/stretchr/testify/assert"
 )

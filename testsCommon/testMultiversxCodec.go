@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/parsers"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/parsers"
 )
 
 // TestMultiversXCodec is the codec helper used in testing

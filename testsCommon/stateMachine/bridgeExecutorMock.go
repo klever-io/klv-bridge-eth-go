@@ -6,11 +6,11 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/multiversx/mx-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
 
-var fullPath = "github.com/multiversx/mx-bridge-eth-go/testsCommon/stateMachine.(*BridgeExecutorMock)."
+var fullPath = "github.com/klever-io/klv-bridge-eth-go/testsCommon/stateMachine.(*BridgeExecutorMock)."
 
 // BridgeExecutorMock -
 type BridgeExecutorMock struct {

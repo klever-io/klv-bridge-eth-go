@@ -1,4 +1,4 @@
-package multiversx
+package klever
 
 import (
 	"context"

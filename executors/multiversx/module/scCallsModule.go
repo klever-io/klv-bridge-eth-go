@@ -3,10 +3,10 @@ package module
 import (
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	"github.com/multiversx/mx-bridge-eth-go/executors/multiversx"
-	"github.com/multiversx/mx-bridge-eth-go/executors/multiversx/filters"
-	"github.com/multiversx/mx-bridge-eth-go/parsers"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx"
+	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx/filters"
+	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"

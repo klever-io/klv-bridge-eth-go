@@ -3,8 +3,8 @@ package integrationTests
 import (
 	"fmt"
 
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon/crypto"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
 	"github.com/multiversx/mx-chain-communication-go/p2p/libp2p"
 	"github.com/multiversx/mx-chain-core-go/hashing/blake2b"
 	"github.com/multiversx/mx-chain-core-go/marshal"

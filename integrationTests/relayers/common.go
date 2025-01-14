@@ -8,10 +8,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/multiversx/mx-bridge-eth-go/clients/chain"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
-	bridgeTests "github.com/multiversx/mx-bridge-eth-go/testsCommon/bridge"
+	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
+	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	chainConfig "github.com/multiversx/mx-chain-go/config"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
@@ -89,13 +89,13 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 			EventsBlockRangeFrom:               -5,
 			EventsBlockRangeTo:                 50,
 		},
-		MultiversX: config.MultiversXConfig{
+		Klever: config.KleverConfig{
 			NetworkAddress:                  "mock",
 			MultisigContractAddress:         "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:             "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
 			PrivateKeyFile:                  path.Join(workingDir, fmt.Sprintf("multiversx%d.pem", index)),
 			IntervalToResendTxsInSeconds:    10,
-			GasMap:                          testsCommon.CreateTestMultiversXGasMap(),
+			GasMap:                          testsCommon.CreateTestKleverGasMap(),
 			MaxRetriesOnQuorumReached:       1,
 			MaxRetriesOnWasTransferProposed: 3,
 			ClientAvailabilityAllowDelta:    5,

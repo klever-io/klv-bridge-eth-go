@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/factory"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/mock"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/factory"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/mock"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -91,7 +91,7 @@ func TestRelayersShouldExecuteSimpleTransfersFromMultiversXToEth(t *testing.T) {
 		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], multiversXChainMock, ethereumChainMock)
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
-		relayer, err := factory.NewEthMultiversXBridgeComponents(argsBridgeComponents)
+		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
 		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
@@ -203,7 +203,7 @@ func testRelayersShouldExecuteTransfersFromMultiversXToEthIfTransactionsAppearIn
 		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], multiversXChainMock, ethereumChainMock)
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
-		relayer, err := factory.NewEthMultiversXBridgeComponents(argsBridgeComponents)
+		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
 		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())

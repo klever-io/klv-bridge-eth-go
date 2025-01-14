@@ -88,6 +88,6 @@ const (
 	// EthClientStatusHandlerName is the Ethereum client status handler name
 	EthClientStatusHandlerName = "eth-client"
 
-	// MultiversXClientStatusHandlerName is the MultiversX client status handler name
-	MultiversXClientStatusHandlerName = "multiversx-client"
+	// KleverClientStatusHandlerName is the Klever client status handler name
+	KleverClientStatusHandlerName = "klever-client"
 )

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/testsCommon"
-	p2pMocks "github.com/multiversx/mx-bridge-eth-go/testsCommon/p2p"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
+	p2pMocks "github.com/klever-io/klv-bridge-eth-go/testsCommon/p2p"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/stretchr/testify/assert"
 )

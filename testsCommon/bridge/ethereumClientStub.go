@@ -5,9 +5,9 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum/contract"
-	bridgeCore "github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/core/batchProcessor"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
+	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 )
 
 // EthereumClientStub -

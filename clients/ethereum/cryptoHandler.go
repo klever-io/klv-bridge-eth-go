@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/multiversx/mx-bridge-eth-go/core/converters"
+	"github.com/klever-io/klv-bridge-eth-go/core/converters"
 )
 
 type cryptoHandler struct {

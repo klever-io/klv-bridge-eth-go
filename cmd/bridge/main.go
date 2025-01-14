@@ -11,14 +11,15 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum/contract"
-	"github.com/multiversx/mx-bridge-eth-go/clients/ethereum/wrappers"
-	"github.com/multiversx/mx-bridge-eth-go/config"
-	"github.com/multiversx/mx-bridge-eth-go/core"
-	"github.com/multiversx/mx-bridge-eth-go/factory"
-	"github.com/multiversx/mx-bridge-eth-go/p2p"
-	"github.com/multiversx/mx-bridge-eth-go/status"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
+	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/factory"
+	"github.com/klever-io/klv-bridge-eth-go/p2p"
+	"github.com/klever-io/klv-bridge-eth-go/status"
 	"github.com/multiversx/mx-chain-communication-go/p2p/libp2p"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -38,8 +39,6 @@ import (
 	"github.com/multiversx/mx-chain-go/update/disabled"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-chain-logger-go/file"
-	"github.com/multiversx/mx-sdk-go/blockchain"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/urfave/cli"
 )
 
@@ -145,32 +144,31 @@ func startRelay(ctx *cli.Context, version string) error {
 		return err
 	}
 
-	multiversXClientStatusHandler, err := status.NewStatusHandler(core.MultiversXClientStatusHandlerName, statusStorer)
+	kleverClientStatusHandler, err := status.NewStatusHandler(core.KleverClientStatusHandlerName, statusStorer)
 	if err != nil {
 		return err
 	}
-	err = metricsHolder.AddStatusHandler(multiversXClientStatusHandler)
+	err = metricsHolder.AddStatusHandler(kleverClientStatusHandler)
 	if err != nil {
 		return err
 	}
 
-	if len(cfg.MultiversX.NetworkAddress) == 0 {
-		return fmt.Errorf("empty MultiversX.NetworkAddress in config file")
+	if len(cfg.Klever.NetworkAddress) == 0 {
+		return fmt.Errorf("empty Klever.NetworkAddress in config file")
 	}
 
-	argsProxy := blockchain.ArgsProxy{
-		ProxyURL:            cfg.MultiversX.NetworkAddress,
-		SameScState:         false,
-		ShouldBeSynced:      false,
-		FinalityCheck:       cfg.MultiversX.Proxy.FinalityCheck,
-		AllowedDeltaToFinal: cfg.MultiversX.Proxy.MaxNoncesDelta,
-		CacheExpirationTime: time.Second * time.Duration(cfg.MultiversX.Proxy.CacherExpirationSeconds),
-		EntityType:          sdkCore.RestAPIEntityType(cfg.MultiversX.Proxy.RestAPIEntityType),
-	}
-	proxy, err := blockchain.NewProxy(argsProxy)
-	if err != nil {
-		return err
-	}
+	// argsProxy := blockchain.ArgsProxy{
+	// 	ProxyURL:            cfg.MultiversX.NetworkAddress,
+	// 	SameScState:         false,
+	// 	ShouldBeSynced:      false,
+	// 	FinalityCheck:       cfg.MultiversX.Proxy.FinalityCheck,
+	// 	AllowedDeltaToFinal: cfg.MultiversX.Proxy.MaxNoncesDelta,
+	// 	CacheExpirationTime: time.Second * time.Duration(cfg.MultiversX.Proxy.CacherExpirationSeconds),
+	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.MultiversX.Proxy.RestAPIEntityType),
+	// }
+
+	// TODO: remove mock when real proxy with klever chain is added
+	proxy := mock.CreateMockProxyKLV()
 
 	ethClient, err := ethclient.Dial(cfg.Eth.NetworkAddress)
 	if err != nil {
@@ -240,21 +238,21 @@ func startRelay(ctx *cli.Context, version string) error {
 		return err
 	}
 
-	args := factory.ArgsEthereumToMultiversXBridge{
-		Configs:                       configs,
-		Messenger:                     messenger,
-		StatusStorer:                  statusStorer,
-		Proxy:                         proxy,
-		Erc20ContractsHolder:          erc20ContractsHolder,
-		ClientWrapper:                 clientWrapper,
-		TimeForBootstrap:              timeForBootstrap,
-		TimeBeforeRepeatJoin:          timeBeforeRepeatJoin,
-		MetricsHolder:                 metricsHolder,
-		AppStatusHandler:              appStatusHandler,
-		MultiversXClientStatusHandler: multiversXClientStatusHandler,
+	args := factory.ArgsEthereumToKleverBridge{
+		Configs:                   configs,
+		Messenger:                 messenger,
+		StatusStorer:              statusStorer,
+		Proxy:                     proxy,
+		Erc20ContractsHolder:      erc20ContractsHolder,
+		ClientWrapper:             clientWrapper,
+		TimeForBootstrap:          timeForBootstrap,
+		TimeBeforeRepeatJoin:      timeBeforeRepeatJoin,
+		MetricsHolder:             metricsHolder,
+		AppStatusHandler:          appStatusHandler,
+		KleverClientStatusHandler: kleverClientStatusHandler,
 	}
 
-	ethToMultiversXComponents, err := factory.NewEthMultiversXBridgeComponents(args)
+	ethToMultiversXComponents, err := factory.NewEthKleverBridgeComponents(args)
 	if err != nil {
 		return err
 	}

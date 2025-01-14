@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/config"
+	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/multiversx/mx-chain-go/facade"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/urfave/cli"

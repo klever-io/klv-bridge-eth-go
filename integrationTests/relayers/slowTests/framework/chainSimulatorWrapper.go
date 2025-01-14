@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/multiversx/mx-bridge-eth-go/clients/multiversx"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	apiCore "github.com/multiversx/mx-chain-core-go/data/api"
@@ -54,7 +54,7 @@ type ArgChainSimulatorWrapper struct {
 type chainSimulatorWrapper struct {
 	testing.TB
 	clientWrapper httpClientWrapper
-	proxyInstance multiversx.Proxy
+	proxyInstance klever.Proxy
 	pkConv        core.PubkeyConverter
 }
 
@@ -110,7 +110,7 @@ func (instance *chainSimulatorWrapper) probeURLWithRetries() {
 }
 
 // Proxy returns the managed proxy instance
-func (instance *chainSimulatorWrapper) Proxy() multiversx.Proxy {
+func (instance *chainSimulatorWrapper) Proxy() klever.Proxy {
 	return instance.proxyInstance
 }
 

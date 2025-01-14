@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/multiversx/mx-bridge-eth-go/clients/chain"
+	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
 	"github.com/multiversx/mx-chain-go/config"
 	p2pConfig "github.com/multiversx/mx-chain-go/p2p/config"
 )
@@ -16,7 +16,7 @@ type Configs struct {
 // Config general configuration struct
 type Config struct {
 	Eth               EthereumConfig
-	MultiversX        MultiversXConfig
+	Klever            KleverConfig
 	P2P               ConfigP2P
 	StateMachine      map[string]ConfigStateMachine
 	Relayer           ConfigRelayer
@@ -139,14 +139,14 @@ type RoleProviderConfig struct {
 	PollingIntervalInMillis uint64
 }
 
-// MultiversXConfig represents the MultiversX Config parameters
-type MultiversXConfig struct {
+// KleverConfig represents the Klever Config parameters
+type KleverConfig struct {
 	NetworkAddress                  string
 	MultisigContractAddress         string
 	SafeContractAddress             string
 	PrivateKeyFile                  string
 	IntervalToResendTxsInSeconds    uint64
-	GasMap                          MultiversXGasMapConfig
+	GasMap                          KleverGasMapConfig
 	MaxRetriesOnQuorumReached       uint64
 	MaxRetriesOnWasTransferProposed uint64
 	ClientAvailabilityAllowDelta    uint64
@@ -162,7 +162,7 @@ type ProxyConfig struct {
 }
 
 // MultiversXGasMapConfig represents the gas limits for MultiversX operations
-type MultiversXGasMapConfig struct {
+type KleverGasMapConfig struct {
 	Sign                   uint64
 	ProposeTransferBase    uint64
 	ProposeTransferForEach uint64
@@ -220,7 +220,7 @@ type TransactionChecksConfig struct {
 
 // MigrationToolConfig is the migration tool config struct
 type MigrationToolConfig struct {
-	Eth        EthereumConfig
-	MultiversX MultiversXConfig
-	Logs       LogsConfig
+	Eth    EthereumConfig
+	Klever KleverConfig
+	Logs   LogsConfig
 }

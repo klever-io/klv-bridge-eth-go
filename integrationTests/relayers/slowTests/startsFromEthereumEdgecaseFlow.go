@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/relayers/slowTests/framework"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
 )
 
 type startsFromEthereumEdgecaseFlow struct {

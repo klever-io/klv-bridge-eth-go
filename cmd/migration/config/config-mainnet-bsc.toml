@@ -19,7 +19,7 @@
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
 [MultiversX]
-    NetworkAddress = "https://gateway.multiversx.com" # the network address
+    NetworkAddress = "" # the network address
     MultisigContractAddress = "erd1qqqqqqqqqqqqqpgq6pg5e8twgk6vvnzxzmvfyrphrfs3e3c3yfkqe6kx0x"
     SafeContractAddress = "erd1qqqqqqqqqqqqqpgq2tf9zm9xxv96gz50p8jq5jesudhz45dvyfkqyefrss"
     [MultiversX.Proxy]

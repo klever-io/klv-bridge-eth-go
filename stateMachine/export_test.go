@@ -1,6 +1,6 @@
 package stateMachine
 
-import "github.com/multiversx/mx-bridge-eth-go/core"
+import "github.com/klever-io/klv-bridge-eth-go/core"
 
 // GetCurrentStep -
 func (sm *stateMachine) GetCurrentStepIdentifier() core.StepIdentifier {

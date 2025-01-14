@@ -17,8 +17,8 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/mock"
-	"github.com/multiversx/mx-bridge-eth-go/integrationTests/relayers/slowTests/framework"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/mock"
+	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
