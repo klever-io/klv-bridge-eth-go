@@ -39,7 +39,7 @@ func createMockClientArgs() ClientArgs {
 	safeContractAddress, _ := address.NewAddress("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
 
 	return ClientArgs{
-		GasMapConfig: config.MultiversXGasMapConfig{
+		GasMapConfig: config.KleverGasMapConfig{
 			Sign:                   10,
 			ProposeTransferBase:    20,
 			ProposeTransferForEach: 30,

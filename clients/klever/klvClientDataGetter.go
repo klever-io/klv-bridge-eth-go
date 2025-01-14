@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
-	"sync"
 
 	"github.com/klever-io/klever-go-sdk/builders"
 	"github.com/klever-io/klever-go-sdk/core/address"
@@ -61,9 +60,6 @@ type klvClientDataGetter struct {
 	relayerAddress                address.Address
 	proxy                         Proxy
 	log                           logger.Logger
-	mutNodeStatus                 sync.Mutex
-	wasShardIDFetched             bool
-	shardID                       uint32
 }
 
 // NewklvClientDataGetter creates a new instance of the dataGetter type
@@ -125,12 +121,8 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBytes(ctx context.Co
 
 // GetCurrentNonce will get from the shard containing the multisig contract the latest block's nonce
 func (dataGetter *klvClientDataGetter) GetCurrentNonce(ctx context.Context) (uint64, error) {
-	shardID, err := dataGetter.getShardID(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	nodeStatus, err := dataGetter.proxy.GetNetworkStatus(ctx, shardID)
+	// TODO: remove shardID parameter from GetNetworkStatus since kleverchain doesn't have sharding
+	nodeStatus, err := dataGetter.proxy.GetNetworkStatus(ctx, 0)
 	if err != nil {
 		return 0, err
 	}
@@ -139,23 +131,6 @@ func (dataGetter *klvClientDataGetter) GetCurrentNonce(ctx context.Context) (uin
 	}
 
 	return nodeStatus.Nonce, nil
-}
-
-func (dataGetter *klvClientDataGetter) getShardID(ctx context.Context) (uint32, error) {
-	dataGetter.mutNodeStatus.Lock()
-	defer dataGetter.mutNodeStatus.Unlock()
-
-	if dataGetter.wasShardIDFetched {
-		return dataGetter.shardID, nil
-	}
-
-	var err error
-	dataGetter.shardID, err = dataGetter.proxy.GetShardOfAddress(ctx, dataGetter.bech32MultisigContractAddress)
-	if err == nil {
-		dataGetter.wasShardIDFetched = true
-	}
-
-	return dataGetter.shardID, err
 }
 
 // ExecuteQueryReturningBool will try to execute the provided query and return the result as bool

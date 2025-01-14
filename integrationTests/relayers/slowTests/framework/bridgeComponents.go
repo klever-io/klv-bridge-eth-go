@@ -83,7 +83,7 @@ func NewBridgeComponents(
 		argsBridgeComponents.Configs.GeneralConfig.Klever.NetworkAddress = chainSimulator.GetNetworkAddress()
 		argsBridgeComponents.Configs.GeneralConfig.Klever.SafeContractAddress = mvxSafeAddress.Bech32()
 		argsBridgeComponents.Configs.GeneralConfig.Klever.MultisigContractAddress = mvxMultisigAddress.Bech32()
-		argsBridgeComponents.Configs.GeneralConfig.Klever.GasMap = config.MultiversXGasMapConfig{
+		argsBridgeComponents.Configs.GeneralConfig.Klever.GasMap = config.KleverGasMapConfig{
 			Sign:                   8000000,
 			ProposeTransferBase:    11000000,
 			ProposeTransferForEach: 5500000,

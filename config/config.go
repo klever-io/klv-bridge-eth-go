@@ -146,7 +146,7 @@ type KleverConfig struct {
 	SafeContractAddress             string
 	PrivateKeyFile                  string
 	IntervalToResendTxsInSeconds    uint64
-	GasMap                          MultiversXGasMapConfig
+	GasMap                          KleverGasMapConfig
 	MaxRetriesOnQuorumReached       uint64
 	MaxRetriesOnWasTransferProposed uint64
 	ClientAvailabilityAllowDelta    uint64
@@ -162,7 +162,7 @@ type ProxyConfig struct {
 }
 
 // MultiversXGasMapConfig represents the gas limits for MultiversX operations
-type MultiversXGasMapConfig struct {
+type KleverGasMapConfig struct {
 	Sign                   uint64
 	ProposeTransferBase    uint64
 	ProposeTransferForEach uint64

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/klever-io/klv-bridge-eth-go/config"
+	"github.com/multiversx/mx-chain-go/facade"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/urfave/cli"
 )
@@ -56,7 +57,7 @@ var (
 		Name: "rest-api-interface",
 		Usage: "The interface `address and port` to which the REST API will attempt to bind. " +
 			"To bind to all available interfaces, set this flag to :8080",
-		Value: "localhost:9000",
+		Value: facade.DefaultRestInterface,
 	}
 	// workingDirectory defines a flag for the path for the working directory.
 	workingDirectory = cli.StringFlag{

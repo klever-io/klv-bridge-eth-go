@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createMockEthMultiversXBridgeArgs() ArgsEthereumToKleverBridge {
+func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 	stateMachineConfig := config.ConfigStateMachine{
 		StepDurationInMillis:       1000,
 		IntervalForLeaderInSeconds: 60,
@@ -60,7 +60,7 @@ func createMockEthMultiversXBridgeArgs() ArgsEthereumToKleverBridge {
 			NetworkAddress:                  "http://127.0.0.1:8079",
 			MultisigContractAddress:         "erd1qqqqqqqqqqqqqpgqgftcwj09u0nhmskrw7xxqcqh8qmzwyexd8ss7ftcxx",
 			SafeContractAddress:             "erd1qqqqqqqqqqqqqpgqgftcwj09u0nhmskrw7xxqcqh8qmzwyexd8ss7ftcxx",
-			GasMap:                          testsCommon.CreateTestMultiversXGasMap(),
+			GasMap:                          testsCommon.CreateTestKleverGasMap(),
 			MaxRetriesOnQuorumReached:       1,
 			MaxRetriesOnWasTransferProposed: 1,
 			ClientAvailabilityAllowDelta:    10,
@@ -115,7 +115,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 
 	t.Run("nil Proxy", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Proxy = nil
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -124,7 +124,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("nil Messenger", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Messenger = nil
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -133,7 +133,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("nil ClientWrapper", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.ClientWrapper = nil
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -142,7 +142,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("nil StatusStorer", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.StatusStorer = nil
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -151,7 +151,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("nil Erc20ContractsHolder", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Erc20ContractsHolder = nil
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -160,7 +160,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err on createMultiversXKeysAndAddresses, empty pk file", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Klever.PrivateKeyFile = ""
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -169,7 +169,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err on createMultiversXKeysAndAddresses, empty multisig address", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Klever.MultisigContractAddress = ""
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -178,8 +178,8 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err on createMultiversXClient", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
-		args.Configs.GeneralConfig.Klever.GasMap = config.MultiversXGasMapConfig{}
+		args := createMockEthKleverBridgeArgs()
+		args.Configs.GeneralConfig.Klever.GasMap = config.KleverGasMapConfig{}
 
 		components, err := NewEthKleverBridgeComponents(args)
 		assert.NotNil(t, err)
@@ -187,7 +187,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err on createMultiversXRoleProvider", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Relayer.RoleProvider.PollingIntervalInMillis = 0
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -196,7 +196,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err on createEthereumClient, empty eth config", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Eth = config.EthereumConfig{}
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -205,7 +205,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err on createEthereumClient, invalid gas price selector", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Eth.GasStation.GasPriceSelector = core.WebServerOffString
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -214,7 +214,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("err missing state machine config", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.StateMachine = make(map[string]config.ConfigStateMachine)
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -224,7 +224,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("invalid time for bootstrap", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.TimeForBootstrap = minTimeForBootstrap - 1
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -234,7 +234,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("invalid time before retry", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.TimeBeforeRepeatJoin = minTimeBeforeRepeatJoin - 1
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -244,7 +244,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("nil MetricsHolder", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.MetricsHolder = nil
 
 		components, err := NewEthKleverBridgeComponents(args)
@@ -253,21 +253,21 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 
 		components, err := NewEthKleverBridgeComponents(args)
 		require.Nil(t, err)
 		require.NotNil(t, components)
 		require.Equal(t, 7, len(components.closableHandlers))
-		require.False(t, check.IfNil(components.ethToMultiversXStatusHandler))
+		require.False(t, check.IfNil(components.ethtoKleverStatusHandler))
 		require.False(t, check.IfNil(components.multiversXToEthStatusHandler))
 	})
 }
 
-func TestEthMultiversXBridgeComponents_StartAndCloseShouldWork(t *testing.T) {
+func TestEthKleverBridgeComponents_StartAndCloseShouldWork(t *testing.T) {
 	t.Parallel()
 
-	args := createMockEthMultiversXBridgeArgs()
+	args := createMockEthKleverBridgeArgs()
 	components, err := NewEthKleverBridgeComponents(args)
 	assert.Nil(t, err)
 
@@ -281,14 +281,14 @@ func TestEthMultiversXBridgeComponents_StartAndCloseShouldWork(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestEthMultiversXBridgeComponents_Start(t *testing.T) {
+func TestEthKleverBridgeComponents_Start(t *testing.T) {
 	t.Parallel()
 
 	t.Run("messenger errors on bootstrap", func(t *testing.T) {
 		t.Parallel()
 
 		expectedErr := errors.New("expected error")
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		args.Messenger = &p2pMocks.MessengerStub{
 			BootstrapCalled: func() error {
 				return expectedErr
@@ -303,7 +303,7 @@ func TestEthMultiversXBridgeComponents_Start(t *testing.T) {
 		t.Parallel()
 
 		expectedErr := errors.New("expected error")
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		components, _ := NewEthKleverBridgeComponents(args)
 		components.broadcaster = &testsCommon.BroadcasterStub{
 			RegisterOnTopicsCalled: func() error {
@@ -316,7 +316,7 @@ func TestEthMultiversXBridgeComponents_Start(t *testing.T) {
 	})
 }
 
-func TestEthMultiversXBridgeComponents_Close(t *testing.T) {
+func TestEthKleverBridgeComponents_Close(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil closable should not panic", func(t *testing.T) {
@@ -372,14 +372,14 @@ func TestEthMultiversXBridgeComponents_Close(t *testing.T) {
 	})
 }
 
-func TestEthMultiversXBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.T) {
+func TestEthKleverBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.T) {
 	t.Parallel()
 
 	t.Run("close before minTimeBeforeRepeatJoin", func(t *testing.T) {
 		t.Parallel()
 
 		numberOfCalls := uint32(0)
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		components, _ := NewEthKleverBridgeComponents(args)
 
 		components.broadcaster = &testsCommon.BroadcasterStub{
@@ -400,7 +400,7 @@ func TestEthMultiversXBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.
 		t.Parallel()
 
 		numberOfCalls := uint32(0)
-		args := createMockEthMultiversXBridgeArgs()
+		args := createMockEthKleverBridgeArgs()
 		components, _ := NewEthKleverBridgeComponents(args)
 		components.timeBeforeRepeatJoin = time.Second * 3
 		components.broadcaster = &testsCommon.BroadcasterStub{
@@ -419,10 +419,10 @@ func TestEthMultiversXBridgeComponents_startBroadcastJoinRetriesLoop(t *testing.
 	})
 }
 
-func TestEthMultiversXBridgeComponents_RelayerAddresses(t *testing.T) {
+func TestEthKleverBridgeComponents_RelayerAddresses(t *testing.T) {
 	t.Parallel()
 
-	args := createMockEthMultiversXBridgeArgs()
+	args := createMockEthKleverBridgeArgs()
 	components, _ := NewEthKleverBridgeComponents(args)
 
 	bech32Address := components.KleverRelayerAddress().Bech32()

@@ -14,8 +14,8 @@ type dataGetter interface {
 	IsInterfaceNil() bool
 }
 
-// MultiversXRoleProvider defines the operations for the MultiversX role provider
-type MultiversXRoleProvider interface {
+// KleverRoleProvider defines the operations for the klever role provider
+type KleverRoleProvider interface {
 	Execute(ctx context.Context) error
 	IsWhitelisted(address address.Address) bool
 	SortedPublicKeys() [][]byte

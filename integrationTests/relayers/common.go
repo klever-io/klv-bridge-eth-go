@@ -95,7 +95,7 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 			SafeContractAddress:             "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
 			PrivateKeyFile:                  path.Join(workingDir, fmt.Sprintf("multiversx%d.pem", index)),
 			IntervalToResendTxsInSeconds:    10,
-			GasMap:                          testsCommon.CreateTestMultiversXGasMap(),
+			GasMap:                          testsCommon.CreateTestKleverGasMap(),
 			MaxRetriesOnQuorumReached:       1,
 			MaxRetriesOnWasTransferProposed: 3,
 			ClientAvailabilityAllowDelta:    5,

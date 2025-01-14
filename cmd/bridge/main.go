@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,17 +11,15 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/klever-io/klever-go-sdk/provider"
-	"github.com/klever-io/klever-go/data/vm"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/factory"
 	"github.com/klever-io/klv-bridge-eth-go/p2p"
 	"github.com/klever-io/klv-bridge-eth-go/status"
-	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	"github.com/multiversx/mx-chain-communication-go/p2p/libp2p"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -93,22 +90,6 @@ func main() {
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(1)
-	}
-}
-
-// TODO: Remove mock and change to real proxy connection
-// declared on klever client, but for simplicity to run the bridge, redeclared here for now
-func createMockProxyKLV(returningBytes [][]byte) *interactors.ProxyStub {
-	const okCodeAfterExecution = "ok"
-	return &interactors.ProxyStub{
-		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-			return &provider.VmValuesResponseData{
-				Data: &vm.VMOutputApi{
-					ReturnCode: okCodeAfterExecution,
-					ReturnData: returningBytes,
-				},
-			}, nil
-		},
 	}
 }
 
@@ -185,12 +166,9 @@ func startRelay(ctx *cli.Context, version string) error {
 	// 	CacheExpirationTime: time.Second * time.Duration(cfg.MultiversX.Proxy.CacherExpirationSeconds),
 	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.MultiversX.Proxy.RestAPIEntityType),
 	// }
-	// proxy, err := blockchain.NewProxy(argsProxy)
-	// if err != nil {
-	// 	return err
-	// }
 
-	proxy := createMockProxyKLV(nil)
+	// TODO: remove mock when real proxy with klever chain is added
+	proxy := mock.CreateMockProxyKLV()
 
 	ethClient, err := ethclient.Dial(cfg.Eth.NetworkAddress)
 	if err != nil {
