@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/multiversx/mx-sdk-go/core"
+	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -15,8 +15,8 @@ func newKleverAccountsMock() *kleverAccountsMock {
 	}
 }
 
-func (mock *kleverAccountsMock) getOrCreate(address core.AddressHandler) *data.Account {
-	addrAsString := string(address.AddressBytes())
+func (mock *kleverAccountsMock) getOrCreate(address address.Address) *data.Account {
+	addrAsString := string(address.Bytes())
 	acc, found := mock.accounts[addrAsString]
 	if !found {
 		acc = &data.Account{}
@@ -26,7 +26,7 @@ func (mock *kleverAccountsMock) getOrCreate(address core.AddressHandler) *data.A
 	return acc
 }
 
-func (mock *kleverAccountsMock) updateNonce(address core.AddressHandler, nonce uint64) {
+func (mock *kleverAccountsMock) updateNonce(address address.Address, nonce uint64) {
 	acc := mock.getOrCreate(address)
 	acc.Nonce = nonce
 }

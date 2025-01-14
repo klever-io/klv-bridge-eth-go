@@ -8,6 +8,8 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/api"
@@ -63,7 +65,7 @@ func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *tra
 	}
 
 	addrAsBech32 := transaction.Sender
-	addressHandler, err := data.NewAddressFromBech32String(addrAsBech32)
+	addressHandler, err := address.NewAddress(addrAsBech32)
 	if err != nil {
 		panic(fmt.Sprintf("%v while creating address handler for string %s", err, addrAsBech32))
 	}
@@ -111,7 +113,7 @@ func (mock *KleverChainMock) GetAllSentTransactions(_ context.Context) map[strin
 }
 
 // ExecuteVMQuery -
-func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -119,7 +121,7 @@ func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *data.V
 }
 
 // GetAccount -
-func (mock *KleverChainMock) GetAccount(_ context.Context, address sdkCore.AddressHandler) (*data.Account, error) {
+func (mock *KleverChainMock) GetAccount(_ context.Context, address address.Address) (*data.Account, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -217,7 +219,7 @@ func (mock *KleverChainMock) AddDepositToCurrentBatch(deposit KleverDeposit) {
 }
 
 // GetESDTTokenData -
-func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ sdkCore.AddressHandler, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
+func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Address, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
