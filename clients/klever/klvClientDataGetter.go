@@ -6,10 +6,10 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/klever-io/klever-go-sdk/builders"
-	"github.com/klever-io/klever-go-sdk/core/address"
-	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -92,7 +92,7 @@ func NewKLVClientDataGetter(args ArgsKLVClientDataGetter) (*klvClientDataGetter,
 }
 
 // ExecuteQueryReturningBytes will try to execute the provided query and return the result as slice of byte slices
-func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBytes(ctx context.Context, request *provider.VmValueRequest) ([][]byte, error) {
+func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBytes(ctx context.Context, request *models.VmValueRequest) ([][]byte, error) {
 	if request == nil {
 		return nil, errNilRequest
 	}
@@ -134,7 +134,7 @@ func (dataGetter *klvClientDataGetter) GetCurrentNonce(ctx context.Context) (uin
 }
 
 // ExecuteQueryReturningBool will try to execute the provided query and return the result as bool
-func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBool(ctx context.Context, request *provider.VmValueRequest) (bool, error) {
+func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBool(ctx context.Context, request *models.VmValueRequest) (bool, error) {
 	response, err := dataGetter.ExecuteQueryReturningBytes(ctx, request)
 	if err != nil {
 		return false, err
@@ -167,7 +167,7 @@ func (dataGetter *klvClientDataGetter) parseBool(buff []byte, funcName string, a
 }
 
 // ExecuteQueryReturningUint64 will try to execute the provided query and return the result as uint64
-func (dataGetter *klvClientDataGetter) ExecuteQueryReturningUint64(ctx context.Context, request *provider.VmValueRequest) (uint64, error) {
+func (dataGetter *klvClientDataGetter) ExecuteQueryReturningUint64(ctx context.Context, request *models.VmValueRequest) (uint64, error) {
 	response, err := dataGetter.ExecuteQueryReturningBytes(ctx, request)
 	if err != nil {
 		return 0, err
@@ -195,7 +195,7 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningUint64(ctx context.C
 }
 
 // ExecuteQueryReturningBigInt will try to execute the provided query and return the result as big.Int
-func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBigInt(ctx context.Context, request *provider.VmValueRequest) (*big.Int, error) {
+func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBigInt(ctx context.Context, request *models.VmValueRequest) (*big.Int, error) {
 	response, err := dataGetter.ExecuteQueryReturningBytes(ctx, request)
 	if err != nil {
 		return nil, err

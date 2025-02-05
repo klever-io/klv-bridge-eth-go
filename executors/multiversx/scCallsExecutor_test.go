@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klever-go/data/vm"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
@@ -273,7 +273,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := argsForErrors // value copy
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedError
 			},
 		}
@@ -288,8 +288,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := argsForErrors // value copy
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: "NOT OK",
 					},
@@ -308,8 +308,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := argsForErrors // value copy
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -331,8 +331,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := argsForErrors // value copy
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -363,8 +363,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := argsForErrors // value copy
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -407,8 +407,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			},
 		}
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -451,8 +451,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			},
 		}
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -499,8 +499,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			},
 		}
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
-				return &provider.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -548,11 +548,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 		sendWasCalled := false
 
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				assert.Equal(t, args.ScProxyBech32Address, vmRequest.Address)
 				assert.Equal(t, getPendingTransactionsFunction, vmRequest.FuncName)
 
-				return &provider.VmValuesResponseData{
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -650,11 +650,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 		sendWasCalled := false
 
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				assert.Equal(t, args.ScProxyBech32Address, vmRequest.Address)
 				assert.Equal(t, getPendingTransactionsFunction, vmRequest.FuncName)
 
-				return &provider.VmValuesResponseData{
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -743,11 +743,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 		sendWasCalled := false
 
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				assert.Equal(t, args.ScProxyBech32Address, vmRequest.Address)
 				assert.Equal(t, getPendingTransactionsFunction, vmRequest.FuncName)
 
-				return &provider.VmValuesResponseData{
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{
@@ -833,11 +833,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 		args := createMockArgsScCallExecutor()
 
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				assert.Equal(t, args.ScProxyBech32Address, vmRequest.Address)
 				assert.Equal(t, getPendingTransactionsFunction, vmRequest.FuncName)
 
-				return &provider.VmValuesResponseData{
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{

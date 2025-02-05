@@ -3,13 +3,13 @@ package module
 import (
 	"context"
 
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
-	"github.com/multiversx/mx-sdk-go/core"
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 )
 
 type nonceTransactionsHandler interface {
-	ApplyNonceAndGasPrice(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error
-	SendTransaction(ctx context.Context, tx *transaction.FrontendTransaction) (string, error)
+	ApplyNonceAndGasPrice(ctx context.Context, address address.Address, tx *transaction.Transaction) error
+	SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error)
 	Close() error
 	IsInterfaceNil() bool
 }

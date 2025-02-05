@@ -4,38 +4,39 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/klever-io/klever-go-sdk/core/address"
-	"github.com/klever-io/klever-go-sdk/provider"
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/multiversx/mx-chain-core-go/data/api"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
 // ProxyStub -
 type ProxyStub struct {
-	GetNetworkConfigCalled              func(ctx context.Context) (*data.NetworkConfig, error)
-	SendTransactionCalled               func(ctx context.Context, transaction *transaction.FrontendTransaction) (string, error)
-	SendTransactionsCalled              func(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error)
-	ExecuteVMQueryCalled                func(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error)
-	GetAccountCalled                    func(ctx context.Context, address address.Address) (*data.Account, error)
+	GetNetworkConfigCalled              func(ctx context.Context) (*models.NetworkConfig, error)
+	SendTransactionCalled               func(ctx context.Context, transaction *transaction.Transaction) (string, error)
+	SendTransactionsCalled              func(ctx context.Context, txs []*transaction.Transaction) ([]string, error)
+	ExecuteVMQueryCalled                func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error)
+	GetAccountCalled                    func(ctx context.Context, address address.Address) (*models.Account, error)
 	GetNetworkStatusCalled              func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddressCalled             func(ctx context.Context, bech32Address string) (uint32, error)
 	GetESDTTokenDataCalled              func(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
 	GetTransactionInfoWithResultsCalled func(_ context.Context, _ string) (*data.TransactionInfo, error)
-	ProcessTransactionStatusCalled      func(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
+	// ProcessTransactionStatusCalled      func(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
+	EstimateTransactionFeesCalled func(ctx context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error)
 }
 
 // GetNetworkConfig -
-func (eps *ProxyStub) GetNetworkConfig(ctx context.Context) (*data.NetworkConfig, error) {
+func (eps *ProxyStub) GetNetworkConfig(ctx context.Context) (*models.NetworkConfig, error) {
 	if eps.GetNetworkConfigCalled != nil {
 		return eps.GetNetworkConfigCalled(ctx)
 	}
 
-	return &data.NetworkConfig{}, nil
+	return &models.NetworkConfig{}, nil
 }
 
 // SendTransaction -
-func (eps *ProxyStub) SendTransaction(ctx context.Context, transaction *transaction.FrontendTransaction) (string, error) {
+func (eps *ProxyStub) SendTransaction(ctx context.Context, transaction *transaction.Transaction) (string, error) {
 	if eps.SendTransactionCalled != nil {
 		return eps.SendTransactionCalled(ctx, transaction)
 	}
@@ -44,7 +45,7 @@ func (eps *ProxyStub) SendTransaction(ctx context.Context, transaction *transact
 }
 
 // SendTransactions -
-func (eps *ProxyStub) SendTransactions(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error) {
+func (eps *ProxyStub) SendTransactions(ctx context.Context, txs []*transaction.Transaction) ([]string, error) {
 	if eps.SendTransactionCalled != nil {
 		return eps.SendTransactionsCalled(ctx, txs)
 	}
@@ -53,21 +54,21 @@ func (eps *ProxyStub) SendTransactions(ctx context.Context, txs []*transaction.F
 }
 
 // ExecuteVMQuery -
-func (eps *ProxyStub) ExecuteVMQuery(ctx context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+func (eps *ProxyStub) ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 	if eps.ExecuteVMQueryCalled != nil {
 		return eps.ExecuteVMQueryCalled(ctx, vmRequest)
 	}
 
-	return &provider.VmValuesResponseData{}, nil
+	return &models.VmValuesResponseData{}, nil
 }
 
 // GetAccount -
-func (eps *ProxyStub) GetAccount(ctx context.Context, address address.Address) (*data.Account, error) {
+func (eps *ProxyStub) GetAccount(ctx context.Context, address address.Address) (*models.Account, error) {
 	if eps.GetAccountCalled != nil {
 		return eps.GetAccountCalled(ctx, address)
 	}
 
-	return &data.Account{}, nil
+	return &models.Account{}, nil
 }
 
 // GetNetworkStatus -
@@ -107,12 +108,21 @@ func (eps *ProxyStub) GetTransactionInfoWithResults(ctx context.Context, hash st
 }
 
 // ProcessTransactionStatus -
-func (eps *ProxyStub) ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.TxStatus, error) {
-	if eps.ProcessTransactionStatusCalled != nil {
-		return eps.ProcessTransactionStatusCalled(ctx, hexTxHash)
+// func (eps *ProxyStub) ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.TxStatus, error) {
+// 	if eps.ProcessTransactionStatusCalled != nil {
+// 		return eps.ProcessTransactionStatusCalled(ctx, hexTxHash)
+// 	}
+
+// 	return "", nil
+// }
+
+// GetTransactionInfoWithResults -
+func (eps *ProxyStub) EstimateTransactionFees(ctx context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error) {
+	if eps.EstimateTransactionFeesCalled != nil {
+		return eps.EstimateTransactionFeesCalled(ctx, txs)
 	}
 
-	return "", nil
+	return nil, fmt.Errorf("not implemented")
 }
 
 // IsInterfaceNil -

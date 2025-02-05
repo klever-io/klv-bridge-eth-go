@@ -3,6 +3,8 @@ package module
 import (
 	"time"
 
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx"
 	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx/filters"
@@ -11,11 +13,8 @@ import (
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/blockchain"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/core/polling"
 	"github.com/multiversx/mx-sdk-go/interactors"
-	"github.com/multiversx/mx-sdk-go/interactors/nonceHandlerV2"
 )
 
 var suite = ed25519.NewEd25519()
@@ -35,20 +34,22 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 		return nil, err
 	}
 
-	argsProxy := blockchain.ArgsProxy{
-		ProxyURL:            cfg.NetworkAddress,
-		SameScState:         false,
-		ShouldBeSynced:      false,
-		FinalityCheck:       cfg.ProxyFinalityCheck,
-		AllowedDeltaToFinal: cfg.ProxyMaxNoncesDelta,
-		CacheExpirationTime: time.Second * time.Duration(cfg.ProxyCacherExpirationSeconds),
-		EntityType:          sdkCore.RestAPIEntityType(cfg.ProxyRestAPIEntityType),
-	}
+	// argsProxy := blockchain.ArgsProxy{
+	// 	ProxyURL:            cfg.NetworkAddress,
+	// 	SameScState:         false,
+	// 	ShouldBeSynced:      false,
+	// 	FinalityCheck:       cfg.ProxyFinalityCheck,
+	// 	AllowedDeltaToFinal: cfg.ProxyMaxNoncesDelta,
+	// 	CacheExpirationTime: time.Second * time.Duration(cfg.ProxyCacherExpirationSeconds),
+	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.ProxyRestAPIEntityType),
+	// }
 
-	proxy, err := blockchain.NewProxy(argsProxy)
-	if err != nil {
-		return nil, err
-	}
+	// proxy, err := blockchain.NewProxy(argsProxy)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	proxy := mock.CreateMockProxyKLV()
 
 	module := &scCallsModule{}
 

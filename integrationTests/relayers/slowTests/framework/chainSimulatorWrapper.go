@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/klever-io/klever-go-sdk/core/address"
-	"github.com/klever-io/klever-go-sdk/provider"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	apiCore "github.com/multiversx/mx-chain-core-go/data/api"
@@ -372,7 +372,7 @@ func (instance *chainSimulatorWrapper) ExecuteVMQuery(
 	function string,
 	hexParams []string,
 ) [][]byte {
-	vmRequest := &provider.VmValueRequest{
+	vmRequest := &models.VmValueRequest{
 		Address:  scAddress.Bech32(),
 		FuncName: function,
 		Args:     hexParams,

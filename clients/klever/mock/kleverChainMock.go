@@ -8,12 +8,12 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klever-go-sdk/core/address"
-	"github.com/klever-io/klever-go-sdk/provider"
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/api"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -25,7 +25,7 @@ var log = logger.GetOrCreate("integrationTests/mock")
 type KleverChainMock struct {
 	*kleverContractStateMock
 	mutState         sync.RWMutex
-	sentTransactions map[string]*transaction.FrontendTransaction
+	sentTransactions map[string]*transaction.Transaction
 	accounts         *kleverAccountsMock
 }
 
@@ -33,18 +33,18 @@ type KleverChainMock struct {
 func NewKleverChainMock() *KleverChainMock {
 	return &KleverChainMock{
 		kleverContractStateMock: newKleverContractStateMock(),
-		sentTransactions:        make(map[string]*transaction.FrontendTransaction),
+		sentTransactions:        make(map[string]*transaction.Transaction),
 		accounts:                newKleverAccountsMock(),
 	}
 }
 
 // GetNetworkConfig -
-func (mock *KleverChainMock) GetNetworkConfig(_ context.Context) (*data.NetworkConfig, error) {
-	return &data.NetworkConfig{
-		ChainID:                  "t",
-		LatestTagSoftwareVersion: "",
-		MinGasPrice:              1000000000,
-		MinTransactionVersion:    1,
+func (mock *KleverChainMock) GetNetworkConfig(_ context.Context) (*models.NetworkConfig, error) {
+	return &models.NetworkConfig{
+		ChainID: "t",
+		// LatestTagSoftwareVersion: "",
+		// MinGasPrice:              1000000000,
+		// MinTransactionVersion:    1,
 	}, nil
 }
 
@@ -59,13 +59,13 @@ func (mock *KleverChainMock) GetShardOfAddress(_ context.Context, _ string) (uin
 }
 
 // SendTransaction -
-func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *transaction.FrontendTransaction) (string, error) {
+func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *transaction.Transaction) (string, error) {
 	if transaction == nil {
 		panic("nil transaction")
 	}
 
-	addrAsBech32 := transaction.Sender
-	addressHandler, err := address.NewAddress(addrAsBech32)
+	addrAsBech32 := transaction.GetSender()
+	addressHandler, err := address.NewAddressFromBytes(addrAsBech32)
 	if err != nil {
 		panic(fmt.Sprintf("%v while creating address handler for string %s", err, addrAsBech32))
 	}
@@ -75,13 +75,18 @@ func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *tra
 		panic(err)
 	}
 
-	log.Info("sent Klever transaction", "sender", addrAsBech32, "data", string(transaction.Data))
+	var data []byte
+	if len(transaction.GetData()) > 0 {
+		data = transaction.GetData()[0]
+	}
+
+	log.Info("sent Klever transaction", "sender", addrAsBech32, "data", string(data))
 
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
 	mock.sentTransactions[string(hash)] = transaction
-	mock.accounts.updateNonce(addressHandler, transaction.Nonce)
+	mock.accounts.updateNonce(addressHandler, transaction.GetNonce())
 
 	mock.processTransaction(transaction)
 
@@ -89,7 +94,7 @@ func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *tra
 }
 
 // SendTransactions -
-func (mock *KleverChainMock) SendTransactions(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error) {
+func (mock *KleverChainMock) SendTransactions(ctx context.Context, txs []*transaction.Transaction) ([]string, error) {
 	hashes := make([]string, 0, len(txs))
 	for _, tx := range txs {
 		hash, _ := mock.SendTransaction(ctx, tx)
@@ -100,11 +105,11 @@ func (mock *KleverChainMock) SendTransactions(ctx context.Context, txs []*transa
 }
 
 // GetAllSentTransactions -
-func (mock *KleverChainMock) GetAllSentTransactions(_ context.Context) map[string]*transaction.FrontendTransaction {
+func (mock *KleverChainMock) GetAllSentTransactions(_ context.Context) map[string]*transaction.Transaction {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
-	txs := make(map[string]*transaction.FrontendTransaction)
+	txs := make(map[string]*transaction.Transaction)
 	for hash, tx := range mock.sentTransactions {
 		txs[hash] = tx
 	}
@@ -113,7 +118,7 @@ func (mock *KleverChainMock) GetAllSentTransactions(_ context.Context) map[strin
 }
 
 // ExecuteVMQuery -
-func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -121,7 +126,7 @@ func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *provid
 }
 
 // GetAccount -
-func (mock *KleverChainMock) GetAccount(_ context.Context, address address.Address) (*data.Account, error) {
+func (mock *KleverChainMock) GetAccount(_ context.Context, address address.Address) (*models.Account, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -134,8 +139,8 @@ func (mock *KleverChainMock) GetTransactionInfoWithResults(_ context.Context, _ 
 }
 
 // ProcessTransactionStatus -
-func (mock *KleverChainMock) ProcessTransactionStatus(_ context.Context, _ string) (transaction.TxStatus, error) {
-	return "", nil
+func (mock *KleverChainMock) ProcessTransactionStatus(_ context.Context, _ string) (transaction.Transaction_TXResult, error) {
+	return transaction.Transaction_SUCCESS, nil
 }
 
 // AddRelayer -
@@ -233,6 +238,11 @@ func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Addre
 		TokenIdentifier: tokenIdentifier,
 		Balance:         balance.String(),
 	}, nil
+}
+
+// EstimateTransactionFees -
+func (mock *KleverChainMock) EstimateTransactionFees(_ context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error) {
+	return nil, nil
 }
 
 // IsInterfaceNil -

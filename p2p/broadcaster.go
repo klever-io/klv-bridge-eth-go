@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"

@@ -9,9 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/klever-io/klever-go-sdk/builders"
-	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
@@ -20,7 +21,6 @@ import (
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/interactors/nonceHandlerV2"
 )
 
 const (

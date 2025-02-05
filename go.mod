@@ -3,12 +3,14 @@ module github.com/klever-io/klv-bridge-eth-go
 go 1.22.1
 
 require (
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/btcsuite/websocket v0.0.0-20150119174127-31079b680792
 	github.com/ethereum/go-ethereum v1.13.15
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/klever-io/klever-go v1.7.8
+	github.com/klever-io/klever-go v1.7.9-0.20250131153227-05cadef1bba7
+	github.com/klever-io/klever-go-logger v1.3.1
 	github.com/klever-io/klever-go-sdk v0.5.2
 	github.com/multiversx/mx-chain-communication-go v1.0.14
 	github.com/multiversx/mx-chain-core-go v1.2.20
@@ -33,7 +35,6 @@ require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.4 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
-	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
 	github.com/bytedance/sonic v1.11.2 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
@@ -94,7 +95,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.5 // indirect
-	github.com/herumi/bls-go-binary v1.28.2 // indirect
+	github.com/herumi/bls-go-binary v1.31.0 // indirect
 	github.com/holiman/billy v0.0.0-20240216141850-2abb0c79d3c4 // indirect
 	github.com/holiman/bloomfilter/v2 v2.0.3 // indirect
 	github.com/holiman/uint256 v1.2.4 // indirect
@@ -111,7 +112,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
-	github.com/klever-io/klever-go-logger v1.3.1 // indirect
 	github.com/koron/go-ssdp v0.0.4 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect

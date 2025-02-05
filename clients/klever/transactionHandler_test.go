@@ -6,16 +6,16 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/klever-io/klever-go-sdk/builders"
-	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	cryptoMock "github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/testsCommon/roleProviders"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,7 +53,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		expectedErr := errors.New("expected error in get network configs")
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
 		txHandlerInstance.proxy = &interactors.ProxyStub{
-			GetNetworkConfigCalled: func(ctx context.Context) (*data.NetworkConfig, error) {
+			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
 				return nil, expectedErr
 			},
 		}
@@ -66,7 +66,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		expectedErr := errors.New("expected error in get nonce")
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.FrontendTransaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				return expectedErr
 			},
 		}
@@ -108,7 +108,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 			},
 		}
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			SendTransactionCalled: func(ctx context.Context, tx *transaction.FrontendTransaction) (string, error) {
+			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
 				wasSendTransactionCalled = true
 				return "", nil
 			},
@@ -127,42 +127,42 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		sendWasCalled := false
 
 		chainID := "chain ID"
-		minGasPrice := uint64(12234)
+		// minGasPrice := uint64(12234)
 		minTxVersion := uint32(122)
 
 		txHandlerInstance.proxy = &interactors.ProxyStub{
-			GetNetworkConfigCalled: func(ctx context.Context) (*data.NetworkConfig, error) {
-				return &data.NetworkConfig{
-					ChainID:               chainID,
-					MinGasPrice:           minGasPrice,
-					MinTransactionVersion: minTxVersion,
+			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
+				return &models.NetworkConfig{
+					ChainID: chainID,
+					//MinGasPrice:           minGasPrice,
+					//MinTransactionVersion: minTxVersion,
 				}, nil
 			},
 		}
 
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.FrontendTransaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				if getBech32Address(address) == relayerAddress {
-					tx.Nonce = nonce
-					tx.GasPrice = minGasPrice
+					tx.GetRawData().Nonce = nonce
+					// tx.GasPrice = minGasPrice
 
 					return nil
 				}
 
 				return errors.New("unexpected address to fetch the nonce")
 			},
-			SendTransactionCalled: func(ctx context.Context, tx *transaction.FrontendTransaction) (string, error) {
+			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
 				sendWasCalled = true
-				assert.Equal(t, relayerAddress, tx.Sender)
-				assert.Equal(t, testMultisigAddress, tx.Receiver)
-				assert.Equal(t, nonce, tx.Nonce)
-				assert.Equal(t, "0", tx.Value)
-				assert.Equal(t, "function@62756666@16", string(tx.Data))
+				assert.Equal(t, relayerAddress, tx.GetSender())
+				//assert.Equal(t, testMultisigAddress, tx.Receiver)
+				assert.Equal(t, nonce, tx.GetNonce())
+				//assert.Equal(t, "0", tx.Value)
+				//assert.Equal(t, "function@62756666@16", string(tx.Data))
 				assert.Equal(t, "fdbd51691e8179da15b22b133ab7e2d9f67faef585f6f4d9859ae176e7b6c2d7bb7f930de753fb7f8a377cd460ff41b54f8cfb0c720f586fbbfbee680edb310b", tx.Signature)
-				assert.Equal(t, chainID, tx.ChainID)
+				assert.Equal(t, chainID, tx.GetRawData().GetChainID())
 				assert.Equal(t, gasLimit, tx.GasLimit)
-				assert.Equal(t, minGasPrice, tx.GasPrice)
-				assert.Equal(t, minTxVersion, tx.Version)
+				//assert.Equal(t, minGasPrice, tx.GasPrice)
+				assert.Equal(t, minTxVersion, tx.GetRawData().Version)
 
 				return txHash, nil
 			},

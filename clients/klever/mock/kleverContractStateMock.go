@@ -7,11 +7,12 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klever-go-sdk/provider"
+	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klever-go/data/vm"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
@@ -88,8 +89,13 @@ func (mock *kleverContractStateMock) cleanState() {
 	mock.pendingBatch = nil
 }
 
-func (mock *kleverContractStateMock) processTransaction(tx *transaction.FrontendTransaction) {
-	dataSplit := strings.Split(string(tx.Data), "@")
+func (mock *kleverContractStateMock) processTransaction(tx *transaction.Transaction) {
+	// TODO: check how transactions call contract methods
+	var data []byte
+	if len(tx.GetData()) > 0 {
+		data = tx.GetData()[0]
+	}
+	dataSplit := strings.Split(string(data), "@")
 	funcName := dataSplit[0]
 	switch funcName {
 	case "proposeEsdtSafeSetCurrentTransactionBatchStatus":
@@ -114,13 +120,13 @@ func (mock *kleverContractStateMock) processTransaction(tx *transaction.Frontend
 	panic("can not execute transaction that calls function: " + funcName)
 }
 
-func (mock *kleverContractStateMock) proposeEsdtSafeSetCurrentTransactionBatchStatus(dataSplit []string, _ *transaction.FrontendTransaction) {
+func (mock *kleverContractStateMock) proposeEsdtSafeSetCurrentTransactionBatchStatus(dataSplit []string, _ *transaction.Transaction) {
 	status, hash := mock.createProposedStatus(dataSplit)
 
 	mock.proposedStatus[hash] = status
 }
 
-func (mock *kleverContractStateMock) proposeMultiTransferEsdtBatch(dataSplit []string, _ *transaction.FrontendTransaction) {
+func (mock *kleverContractStateMock) proposeMultiTransferEsdtBatch(dataSplit []string, _ *transaction.Transaction) {
 	transfer, hash := mock.createProposedTransfer(dataSplit)
 
 	mock.proposedTransfers[hash] = transfer
@@ -223,7 +229,7 @@ func (mock *kleverContractStateMock) createProposedTransfer(dataSplit []string) 
 	return transfer, string(hash)
 }
 
-func (mock *kleverContractStateMock) processVmRequests(vmRequest *provider.VmValueRequest) (*provider.VmValuesResponseData, error) {
+func (mock *kleverContractStateMock) processVmRequests(vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 	if vmRequest == nil {
 		panic("vmRequest is nil")
 	}
@@ -278,7 +284,7 @@ func (mock *kleverContractStateMock) processVmRequests(vmRequest *provider.VmVal
 	return nil, fmt.Errorf("unimplemented function: %s", vmRequest.FuncName)
 }
 
-func (mock *kleverContractStateMock) vmRequestWasSetCurrentTransactionBatchStatusActionProposed(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestWasSetCurrentTransactionBatchStatusActionProposed(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	args := append([]string{vmRequest.FuncName}, vmRequest.Args...) // prepend the function name so the next call will work
 	_, hash := mock.createProposedStatus(args)
 
@@ -287,7 +293,7 @@ func (mock *kleverContractStateMock) vmRequestWasSetCurrentTransactionBatchStatu
 	return createOkVmResponse([][]byte{BoolToByteSlice(found)})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetActionIdForSetCurrentTransactionBatchStatus(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetActionIdForSetCurrentTransactionBatchStatus(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	args := append([]string{vmRequest.FuncName}, vmRequest.Args...) // prepend the function name so the next call will work
 	_, hash := mock.createProposedStatus(args)
 
@@ -299,7 +305,7 @@ func (mock *kleverContractStateMock) vmRequestGetActionIdForSetCurrentTransactio
 	return createOkVmResponse([][]byte{Uint64BytesFromHash(hash)})
 }
 
-func (mock *kleverContractStateMock) vmRequestwasTransferActionProposed(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestwasTransferActionProposed(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	args := append([]string{vmRequest.FuncName}, vmRequest.Args...) // prepend the function name so the next call will work
 	_, hash := mock.createProposedTransfer(args)
 
@@ -308,7 +314,7 @@ func (mock *kleverContractStateMock) vmRequestwasTransferActionProposed(vmReques
 	return createOkVmResponse([][]byte{BoolToByteSlice(found)})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetActionIdForTransferBatch(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetActionIdForTransferBatch(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	args := append([]string{vmRequest.FuncName}, vmRequest.Args...) // prepend the function name so the next call will work
 	_, hash := mock.createProposedTransfer(args)
 
@@ -321,7 +327,7 @@ func (mock *kleverContractStateMock) vmRequestGetActionIdForTransferBatch(vmRequ
 	return createOkVmResponse([][]byte{Uint64BytesFromHash(hash)})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetStatusesAfterExecution(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetStatusesAfterExecution(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	statuses := mock.GetStatusesAfterExecutionHandler()
 
 	args := [][]byte{BoolToByteSlice(true)} // batch finished
@@ -332,7 +338,7 @@ func (mock *kleverContractStateMock) vmRequestGetStatusesAfterExecution(_ *provi
 	return createOkVmResponse(args)
 }
 
-func (mock *kleverContractStateMock) sign(dataSplit []string, tx *transaction.FrontendTransaction) {
+func (mock *kleverContractStateMock) sign(dataSplit []string, tx *transaction.Transaction) {
 	actionID := getBigIntFromString(dataSplit[1])
 	if !mock.actionIDExists(actionID) {
 		panic(fmt.Sprintf("attempted to sign on a missing action ID: %v as big int, raw: %s", actionID, dataSplit[1]))
@@ -343,10 +349,17 @@ func (mock *kleverContractStateMock) sign(dataSplit []string, tx *transaction.Fr
 		m = make(map[string]struct{})
 		mock.signedActionIDs[actionID.String()] = m
 	}
-	m[tx.Sender] = struct{}{}
+
+	addr, err := address.NewAddressFromBytes(tx.GetSender())
+	if err != nil {
+		log.Error("failed to get address from contract state mock sign")
+		return
+	}
+
+	m[addr.Bech32()] = struct{}{}
 }
 
-func (mock *kleverContractStateMock) performAction(dataSplit []string, _ *transaction.FrontendTransaction) {
+func (mock *kleverContractStateMock) performAction(dataSplit []string, _ *transaction.Transaction) {
 	actionID := getBigIntFromString(dataSplit[1])
 	if !mock.actionIDExists(actionID) {
 		panic(fmt.Sprintf("attempted to perform on a missing action ID: %v as big int, raw: %s", actionID, dataSplit[1]))
@@ -362,7 +375,7 @@ func (mock *kleverContractStateMock) performAction(dataSplit []string, _ *transa
 	}
 }
 
-func (mock *kleverContractStateMock) vmRequestWasActionExecuted(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestWasActionExecuted(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	actionID := getBigIntFromString(vmRequest.Args[0])
 
 	if mock.performedAction == nil {
@@ -392,7 +405,7 @@ func (mock *kleverContractStateMock) actionIDExists(actionID *big.Int) bool {
 	return false
 }
 
-func (mock *kleverContractStateMock) vmRequestQuorumReached(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestQuorumReached(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	actionID := getBigIntFromString(vmRequest.Args[0])
 	m, found := mock.signedActionIDs[actionID.String()]
 	if !found {
@@ -404,35 +417,35 @@ func (mock *kleverContractStateMock) vmRequestQuorumReached(vmRequest *provider.
 	return createOkVmResponse([][]byte{BoolToByteSlice(quorumReached)})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetTokenIdForErc20Address(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetTokenIdForErc20Address(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := common.HexToAddress(vmRequest.Args[0])
 
 	return createOkVmResponse([][]byte{[]byte(mock.getTicker(address))})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetErc20AddressForTokenId(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetErc20AddressForTokenId(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := vmRequest.Args[0]
 
 	return createOkVmResponse([][]byte{mock.getErc20Address(address).Bytes()})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetAllStakedRelayers(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetAllStakedRelayers(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	return createOkVmResponse(mock.relayers)
 }
 
-func (mock *kleverContractStateMock) vmRequestGetLastExecutedEthBatchId(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetLastExecutedEthBatchId(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	val := big.NewInt(int64(mock.lastExecutedEthBatchId))
 
 	return createOkVmResponse([][]byte{val.Bytes()})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetLastExecutedEthTxId(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetLastExecutedEthTxId(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	val := big.NewInt(int64(mock.lastExecutedEthTxId))
 
 	return createOkVmResponse([][]byte{val.Bytes()})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetCurrentPendingBatch(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetCurrentPendingBatch(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	if mock.pendingBatch == nil {
 		return createOkVmResponse(make([][]byte, 0))
 	}
@@ -440,7 +453,7 @@ func (mock *kleverContractStateMock) vmRequestGetCurrentPendingBatch(_ *provider
 	return mock.responseWithPendingBatch()
 }
 
-func (mock *kleverContractStateMock) responseWithPendingBatch() *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) responseWithPendingBatch() *models.VmValuesResponseData {
 	args := [][]byte{mock.pendingBatch.Nonce.Bytes()} // first non-empty slice
 	for _, deposit := range mock.pendingBatch.KleverDeposits {
 		args = append(args, make([]byte, 0)) // mocked block nonce
@@ -453,7 +466,7 @@ func (mock *kleverContractStateMock) responseWithPendingBatch() *provider.VmValu
 	return createOkVmResponse(args)
 }
 
-func (mock *kleverContractStateMock) vmRequestGetBatch(request *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetBatch(request *models.VmValueRequest) *models.VmValuesResponseData {
 	if mock.pendingBatch == nil {
 		return createOkVmResponse(make([][]byte, 0))
 	}
@@ -470,7 +483,7 @@ func (mock *kleverContractStateMock) setPendingBatch(pendingBatch *KleverPending
 	mock.pendingBatch = pendingBatch
 }
 
-func (mock *kleverContractStateMock) vmRequestSigned(request *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestSigned(request *models.VmValueRequest) *models.VmValuesResponseData {
 	hexAddress := request.Args[0]
 	actionID := getBigIntFromString(request.Args[1])
 
@@ -494,41 +507,41 @@ func (mock *kleverContractStateMock) vmRequestSigned(request *provider.VmValueRe
 	return createOkVmResponse([][]byte{BoolToByteSlice(found)})
 }
 
-func (mock *kleverContractStateMock) vmRequestIsPaused(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestIsPaused(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	return createOkVmResponse([][]byte{BoolToByteSlice(false)})
 }
 
-func (mock *kleverContractStateMock) vmRequestIsMintBurnToken(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestIsMintBurnToken(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := vmRequest.Args[0]
 
 	return createOkVmResponse([][]byte{BoolToByteSlice(mock.isMintBurnToken(address))})
 }
 
-func (mock *kleverContractStateMock) vmRequestIsNativeToken(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestIsNativeToken(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := vmRequest.Args[0]
 
 	return createOkVmResponse([][]byte{BoolToByteSlice(mock.isNativeToken(address))})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetTotalBalances(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetTotalBalances(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := vmRequest.Args[0]
 
 	return createOkVmResponse([][]byte{mock.getTotalBalances(address).Bytes()})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetMintBalances(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetMintBalances(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := vmRequest.Args[0]
 
 	return createOkVmResponse([][]byte{mock.getMintBalances(address).Bytes()})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetBurnBalances(vmRequest *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetBurnBalances(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
 	address := vmRequest.Args[0]
 
 	return createOkVmResponse([][]byte{mock.getBurnBalances(address).Bytes()})
 }
 
-func (mock *kleverContractStateMock) vmRequestGetLastBatchId(_ *provider.VmValueRequest) *provider.VmValuesResponseData {
+func (mock *kleverContractStateMock) vmRequestGetLastBatchId(_ *models.VmValueRequest) *models.VmValuesResponseData {
 	if mock.pendingBatch == nil {
 		return createOkVmResponse([][]byte{big.NewInt(0).Bytes()})
 	}
@@ -544,8 +557,8 @@ func getBigIntFromString(data string) *big.Int {
 	return big.NewInt(0).SetBytes(buff)
 }
 
-func createOkVmResponse(args [][]byte) *provider.VmValuesResponseData {
-	return &provider.VmValuesResponseData{
+func createOkVmResponse(args [][]byte) *models.VmValuesResponseData {
+	return &models.VmValuesResponseData{
 		Data: &vm.VMOutputApi{
 			ReturnData: args,
 			ReturnCode: "ok",
@@ -553,8 +566,8 @@ func createOkVmResponse(args [][]byte) *provider.VmValuesResponseData {
 	}
 }
 
-func createNokVmResponse(err error) *provider.VmValuesResponseData {
-	return &provider.VmValuesResponseData{
+func createNokVmResponse(err error) *models.VmValuesResponseData {
+	return &models.VmValuesResponseData{
 		Data: &vm.VMOutputApi{
 			ReturnCode:    "nok",
 			ReturnMessage: err.Error(),

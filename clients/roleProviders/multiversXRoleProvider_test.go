@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"

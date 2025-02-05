@@ -3,7 +3,7 @@ package bridge
 import (
 	"context"
 
-	"github.com/klever-io/klever-go-sdk/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 )
 
 // TxHandlerStub -

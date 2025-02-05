@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/klever-io/klever-go-sdk/builders"
-	"github.com/klever-io/klever-go-sdk/provider"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
@@ -179,7 +179,7 @@ func (executor *scCallExecutor) Execute(ctx context.Context) error {
 }
 
 func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[uint64]parsers.ProxySCCompleteCallData, error) {
-	request := &provider.VmValueRequest{
+	request := &models.VmValueRequest{
 		Address:  executor.scProxyBech32Address,
 		FuncName: getPendingTransactionsFunction,
 	}
@@ -203,7 +203,7 @@ func (executor *scCallExecutor) getPendingOperations(ctx context.Context) (map[u
 	return executor.parseResponse(response)
 }
 
-func (executor *scCallExecutor) parseResponse(response *provider.VmValuesResponseData) (map[uint64]parsers.ProxySCCompleteCallData, error) {
+func (executor *scCallExecutor) parseResponse(response *models.VmValuesResponseData) (map[uint64]parsers.ProxySCCompleteCallData, error) {
 	numResponseLines := len(response.Data.ReturnData)
 	if numResponseLines%2 != 0 {
 		return nil, fmt.Errorf("%w: expected an even number, got %d", errInvalidNumberOfResponseLines, numResponseLines)

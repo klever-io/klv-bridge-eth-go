@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klever-go-sdk/core/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 )
 
 // CreateRandomEthereumAddress will create a random Ethereum address

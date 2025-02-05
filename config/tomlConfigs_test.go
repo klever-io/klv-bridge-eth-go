@@ -499,11 +499,7 @@ func TestMigrationToolConfig(t *testing.T) {
 			},
 		},
 		Klever: KleverConfig{
-<<<<<<< HEAD
-			NetworkAddress:          "https://devnet-gateway.multiversx.com",
-=======
 			NetworkAddress:          "https://api.devnet.klever.finance",
->>>>>>> main
 			MultisigContractAddress: "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
 			SafeContractAddress:     "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
 			Proxy: ProxyConfig{

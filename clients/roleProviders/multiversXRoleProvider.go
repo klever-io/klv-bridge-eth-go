@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/data"

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klever-go-sdk/core/wallet"
 	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
 	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/disabled"
@@ -22,6 +21,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mappers"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/clients/roleProviders"
 	"github.com/klever-io/klv-bridge-eth-go/config"

@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/klever-io/klever-go-sdk/core/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
