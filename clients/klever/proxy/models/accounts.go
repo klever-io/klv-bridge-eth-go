@@ -24,6 +24,18 @@ type AccountInfo struct {
 	Foundation    bool          `json:"foundation,omitempty"`
 }
 
+// ResponseAccount follows the format of the data field of an account response
+type ResponseAccount struct {
+	AccountData Account `json:"account"`
+}
+
+// AccountApiResponse defines a wrapped account that the node respond with
+type AccountApiResponse struct {
+	Data  ResponseAccount `json:"data"`
+	Error string          `json:"error"`
+	Code  string          `json:"code"`
+}
+
 type AccountAllowance struct {
 	Allowance      int64 `json:"allowance"`
 	StakingRewards int64 `json:"stakingRewards"`

@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/status"
@@ -18,8 +20,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-go/testscommon/statusHandler"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/blockchain"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -89,12 +89,12 @@ func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 		},
 	}
 
-	argsProxy := blockchain.ArgsProxy{
+	argsProxy := proxy.ArgsProxy{
 		ProxyURL:            cfg.Klever.NetworkAddress,
 		CacheExpirationTime: time.Minute,
-		EntityType:          sdkCore.ObserverNode,
+		EntityType:          models.ObserverNode,
 	}
-	proxy, _ := blockchain.NewProxy(argsProxy)
+	proxy, _ := proxy.NewProxy(argsProxy)
 	return ArgsEthereumToKleverBridge{
 		Configs:                   configs,
 		Messenger:                 &p2pMocks.MessengerStub{},

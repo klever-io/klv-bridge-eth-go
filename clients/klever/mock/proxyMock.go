@@ -4,7 +4,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 )
 
 // TODO: check if the tokenID in the Safe contract uses a ticker value or the token contract address.
@@ -33,7 +33,7 @@ var tokenList = []tokenMock{
 // TODO: remove CreateMockProxyKLV when real proxy is implemented.
 // CreateMockProxyKLV returns a Proxy interface, to be used as a klever client proxy
 // while real proxy implementation is in development.
-func CreateMockProxyKLV() klever.Proxy {
+func CreateMockProxyKLV() proxy.Proxy {
 	proxyMock := NewKleverChainMock()
 
 	for _, token := range tokenList {

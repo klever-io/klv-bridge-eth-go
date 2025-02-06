@@ -7,7 +7,6 @@ import (
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -20,7 +19,7 @@ type ProxyStub struct {
 	GetAccountCalled                    func(ctx context.Context, address address.Address) (*models.Account, error)
 	GetNetworkStatusCalled              func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddressCalled             func(ctx context.Context, bech32Address string) (uint32, error)
-	GetESDTTokenDataCalled              func(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
+	GetESDTTokenDataCalled              func(ctx context.Context, address address.Address, tokenIdentifier string) (*data.ESDTFungibleTokenData, error)
 	GetTransactionInfoWithResultsCalled func(_ context.Context, _ string) (*data.TransactionInfo, error)
 	// ProcessTransactionStatusCalled      func(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
 	EstimateTransactionFeesCalled func(ctx context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error)
@@ -90,9 +89,9 @@ func (eps *ProxyStub) GetShardOfAddress(ctx context.Context, bech32Address strin
 }
 
 // GetESDTTokenData -
-func (eps *ProxyStub) GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
+func (eps *ProxyStub) GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string) (*data.ESDTFungibleTokenData, error) {
 	if eps.GetESDTTokenDataCalled != nil {
-		return eps.GetESDTTokenDataCalled(ctx, address, tokenIdentifier, queryOptions)
+		return eps.GetESDTTokenDataCalled(ctx, address, tokenIdentifier)
 	}
 
 	return nil, fmt.Errorf("not implemented")

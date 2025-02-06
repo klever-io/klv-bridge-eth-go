@@ -10,6 +10,7 @@ import (
 
 	sdkAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 )
 
 // addressNonceHandler is the handler used for one address. It is able to handle the current
@@ -22,7 +23,7 @@ import (
 type addressNonceHandler struct {
 	mut                 sync.RWMutex
 	address             sdkAddress.Address
-	proxy               interactors.Proxy
+	proxy               proxy.Proxy
 	computedNonceWasSet bool
 	computedNonce       uint64
 	lowestNonce         uint64
@@ -31,7 +32,7 @@ type addressNonceHandler struct {
 }
 
 // NewAddressNonceHandler returns a new instance of a addressNonceHandler
-func NewAddressNonceHandler(proxy interactors.Proxy, address sdkAddress.Address) (interactors.AddressNonceHandler, error) {
+func NewAddressNonceHandler(proxy proxy.Proxy, address sdkAddress.Address) (interactors.AddressNonceHandler, error) {
 	if check.IfNil(proxy) {
 		return nil, interactors.ErrNilProxy
 	}
