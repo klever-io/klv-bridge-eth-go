@@ -12,6 +12,7 @@ import (
 
 	sdkAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 )
 
 const minimumIntervalToResend = time.Second
@@ -20,7 +21,7 @@ var log = logger.GetOrCreate("klv-bridge-eth-go/interactors/nonceHandlerV2")
 
 // ArgsNonceTransactionsHandlerV2 is the argument DTO for a nonce transactions handler component
 type ArgsNonceTransactionsHandlerV2 struct {
-	Proxy            interactors.Proxy
+	Proxy            proxy.Proxy
 	IntervalToResend time.Duration
 }
 
@@ -33,7 +34,7 @@ type ArgsNonceTransactionsHandlerV2 struct {
 // nonceTransactionsHandlerV2 should be terminated and collected by the GC.
 // This struct is concurrent safe.
 type nonceTransactionsHandlerV2 struct {
-	proxy            interactors.Proxy
+	proxy            proxy.Proxy
 	mutHandlers      sync.RWMutex
 	handlers         map[string]interactors.AddressNonceHandler
 	cancelFunc       func()
