@@ -11,7 +11,6 @@ import (
 
 // Proxy defines the behavior of a proxy able to serve MultiversX blockchain requests
 type Proxy interface {
-	GetNetworkConfig(ctx context.Context) (*models.NetworkConfig, error)
 	SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error)
 	SendTransactions(ctx context.Context, txs []*transaction.Transaction) ([]string, error)
 	ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error)
