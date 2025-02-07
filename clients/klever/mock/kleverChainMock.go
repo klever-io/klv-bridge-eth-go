@@ -13,7 +13,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -224,7 +223,7 @@ func (mock *KleverChainMock) AddDepositToCurrentBatch(deposit KleverDeposit) {
 }
 
 // GetESDTTokenData -
-func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Address, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
+func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Address, tokenIdentifier string) (*data.ESDTFungibleTokenData, error) {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
