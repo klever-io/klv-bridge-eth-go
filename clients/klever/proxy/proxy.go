@@ -13,7 +13,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	sdkHttp "github.com/multiversx/mx-sdk-go/core/http"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -303,45 +302,6 @@ func (ep *proxy) GetESDTTokenData(
 	}
 
 	response := &data.ESDTFungibleResponse{}
-	err = json.Unmarshal(buff, response)
-	if err != nil {
-		return nil, err
-	}
-	if response.Error != "" {
-		return nil, errors.New(response.Error)
-	}
-
-	return response.Data.TokenData, nil
-}
-
-// GetNFTTokenData returns the address' NFT/SFT/MetaESDT token data
-func (ep *proxy) GetNFTTokenData(
-	ctx context.Context,
-	address sdkCore.AddressHandler,
-	tokenIdentifier string,
-	nonce uint64,
-	queryOptions api.AccountQueryOptions, // TODO: provide AccountQueryOptions on all accounts-related getters
-) (*data.ESDTNFTTokenData, error) {
-	if check.IfNil(address) {
-		return nil, ErrNilAddress
-	}
-	if !address.IsValid() {
-		return nil, ErrInvalidAddress
-	}
-
-	addressAsBech32String, err := address.AddressAsBech32String()
-	if err != nil {
-		return nil, err
-	}
-
-	endpoint := ep.endpointProvider.GetNFTTokenData(addressAsBech32String, tokenIdentifier, nonce)
-	endpoint = sdkCore.BuildUrlWithAccountQueryOptions(endpoint, queryOptions)
-	buff, code, err := ep.GetHTTP(ctx, endpoint)
-	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
-	}
-
-	response := &data.ESDTNFTResponse{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err

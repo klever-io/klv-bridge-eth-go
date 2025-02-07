@@ -96,7 +96,7 @@ func (builder *vmQueryBuilder) ToVmValueRequest() (*models.VmValueRequest, error
 	}
 
 	return &models.VmValueRequest{
-		Address:    builder.address,
+		ScAddress:  builder.address,
 		FuncName:   builder.function,
 		CallerAddr: builder.callerAddr,
 		Args:       builder.args,

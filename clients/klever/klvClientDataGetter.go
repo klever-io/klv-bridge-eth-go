@@ -101,11 +101,11 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBytes(ctx context.Co
 	response, err := dataGetter.proxy.ExecuteVMQuery(ctx, request)
 	if err != nil {
 		dataGetter.log.Error("got error on VMQuery", "FuncName", request.FuncName,
-			"Args", request.Args, "SC address", request.Address, "Caller", request.CallerAddr, "error", err)
+			"Args", request.Args, "SC address", request.ScAddress, "Caller", request.CallerAddr, "error", err)
 		return nil, err
 	}
 	dataGetter.log.Debug("executed VMQuery", "FuncName", request.FuncName,
-		"Args", request.Args, "SC address", request.Address, "Caller", request.CallerAddr,
+		"Args", request.Args, "SC address", request.ScAddress, "Caller", request.CallerAddr,
 		"response.ReturnCode", response.Data.ReturnCode,
 		"response.ReturnData", fmt.Sprintf("%+v", response.Data.ReturnData))
 	if response.Data.ReturnCode != okCodeAfterExecution {
@@ -113,7 +113,7 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBytes(ctx context.Co
 			response.Data.ReturnCode,
 			response.Data.ReturnMessage,
 			request.FuncName,
-			request.Address,
+			request.ScAddress,
 			request.Args...,
 		)
 	}
@@ -145,7 +145,7 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBool(ctx context.Con
 		return false, nil
 	}
 
-	return dataGetter.parseBool(response[0], request.FuncName, request.Address, request.Args...)
+	return dataGetter.parseBool(response[0], request.FuncName, request.ScAddress, request.Args...)
 }
 
 func (dataGetter *klvClientDataGetter) parseBool(buff []byte, funcName string, address string, args ...string) (bool, error) {
@@ -187,7 +187,7 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningUint64(ctx context.C
 			internalError,
 			err.Error(),
 			request.FuncName,
-			request.Address,
+			request.ScAddress,
 			request.Args...,
 		)
 	}

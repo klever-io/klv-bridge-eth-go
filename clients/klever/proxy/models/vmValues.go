@@ -16,15 +16,13 @@ type ResponseVmValue struct {
 	Code  string               `json:"code"`
 }
 
-// TODO: check if needed since there is one similar in klever-io/klever-go/network/api/vm/vmValuesGroup.go and also
-// check if the struct needs to be separeted with VmValueRequestWithOptionalParameters
-// VmValueRequest defines the request struct for values available in a VM
+// VmValueRequest represents the structure on which user input for generating a new transaction will validate against
 type VmValueRequest struct {
-	Address    string   `json:"scAddress"`
-	FuncName   string   `json:"funcName"`
-	CallerAddr string   `json:"caller"`
-	CallValue  string   `json:"value"`
-	Args       []string `json:"args"`
+	ScAddress  string           `json:"scAddress"`
+	FuncName   string           `json:"funcName"`
+	CallerAddr string           `json:"caller"`
+	CallValue  map[string]int64 `json:"value"`
+	Args       []string         `json:"args"`
 }
 
 // VmValueRequestWithOptionalParameters defines the request struct for values available in a VM

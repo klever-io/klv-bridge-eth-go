@@ -50,7 +50,7 @@ func TestTxDataBuilder_Address(t *testing.T) {
 		assert.Nil(t, err)
 
 		addressAsBech32String := addr.Bech32()
-		assert.Equal(t, addressAsBech32String, valueRequest.Address)
+		assert.Equal(t, addressAsBech32String, valueRequest.ScAddress)
 	})
 }
 
