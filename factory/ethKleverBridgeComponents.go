@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klever-go-sdk/core/wallet"
 	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
 	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/disabled"
 	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/steps/ethToMultiversX"
@@ -22,6 +21,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/wallet"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mappers"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/clients/roleProviders"
@@ -247,12 +247,15 @@ func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainC
 		return err
 	}
 
-	relayerAccount, err := relayerWallet.GetAccount()
+	// relayerAccount, err := relayerWallet.GetAccount()
+	// if err != nil {
+	// 	return err
+	// }
+
+	components.kleverRelayerAddress, err = address.NewAddressFromBytes(relayerWallet.PublicKey())
 	if err != nil {
 		return err
 	}
-
-	components.kleverRelayerAddress = relayerAccount.Address()
 
 	// TODO: change decoder to use klever from string to hex
 	components.kleverMultisigContractAddress, err = address.NewAddress(chainConfigs.MultisigContractAddress)
