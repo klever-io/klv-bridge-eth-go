@@ -1,13 +1,11 @@
 package endpointProviders
 
 import (
-	"fmt"
-
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
 
 const (
-	proxyGetNodeStatus = "network/status/%d"
+	proxyGetNodeStatus = "network/overview"
 )
 
 // proxyEndpointProvider is suitable to work with a MultiversX Proxy
@@ -21,8 +19,8 @@ func NewProxyEndpointProvider() *proxyEndpointProvider {
 }
 
 // GetNodeStatus returns the node status endpoint
-func (proxy *proxyEndpointProvider) GetNodeStatus(shardID uint32) string {
-	return fmt.Sprintf(proxyGetNodeStatus, shardID)
+func (proxy *proxyEndpointProvider) GetNodeStatus() string {
+	return proxyGetNodeStatus
 }
 
 // GetRestAPIEntityType returns the proxy constant

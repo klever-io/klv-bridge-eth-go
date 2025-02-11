@@ -17,7 +17,7 @@ import (
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
-var log = logger.GetOrCreate("mx-sdk-go/blockchain")
+var log = logger.GetOrCreate("klv-bridge-eth-go/klever/proxy")
 
 const (
 	minimumCachingInterval = time.Second
@@ -122,22 +122,22 @@ func (proxy *baseProxy) getNetworkConfigFromSource(ctx context.Context) (*models
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	response := &models.NetworkConfig{}
+	response := &models.NetworkConfigResponse{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
 	}
 
-	// if response.Error != "" {
-	// 	return nil, errors.New(response.Error)
-	// }
+	if response.Error != "" {
+		return nil, errors.New(response.Error)
+	}
 
-	return response, nil
+	return response.Data, nil
 }
 
 // GetNetworkStatus will return the network status of a provided shard
-func (proxy *baseProxy) GetNetworkStatus(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
-	endpoint := proxy.endpointProvider.GetNodeStatus(shardID)
+func (proxy *baseProxy) GetNetworkStatus(ctx context.Context) (*models.NodeOverview, error) {
+	endpoint := proxy.endpointProvider.GetNodeStatus()
 	buff, code, err := proxy.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
 		return nil, createHTTPStatusError(code, err)
@@ -146,16 +146,16 @@ func (proxy *baseProxy) GetNetworkStatus(ctx context.Context, shardID uint32) (*
 	endpointProviderType := proxy.endpointProvider.GetRestAPIEntityType()
 	switch endpointProviderType {
 	case models.Proxy:
-		return proxy.getNetworkStatus(buff, shardID)
+		return proxy.getNetworkStatus(buff)
 	case models.ObserverNode:
-		return proxy.getNodeStatus(buff, shardID)
+		return proxy.getNodeStatus(buff)
 	}
 
-	return &data.NetworkStatus{}, ErrInvalidEndpointProvider
+	return &models.NodeOverview{}, ErrInvalidEndpointProvider
 }
 
-func (proxy *baseProxy) getNetworkStatus(buff []byte, shardID uint32) (*data.NetworkStatus, error) {
-	response := &data.NetworkStatusResponse{}
+func (proxy *baseProxy) getNetworkStatus(buff []byte) (*models.NodeOverview, error) {
+	response := &models.NodeOverviewApiResponse{}
 	err := json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
@@ -164,16 +164,15 @@ func (proxy *baseProxy) getNetworkStatus(buff []byte, shardID uint32) (*data.Net
 		return nil, errors.New(response.Error)
 	}
 
-	err = proxy.checkReceivedNodeStatus(response.Data.Status, shardID)
-	if err != nil {
-		return nil, err
+	if response.Data.NodeOverview == nil {
+		return nil, ErrNilNetworkStatus
 	}
 
-	return response.Data.Status, nil
+	return response.Data.NodeOverview, nil
 }
 
-func (proxy *baseProxy) getNodeStatus(buff []byte, shardID uint32) (*data.NetworkStatus, error) {
-	response := &data.NodeStatusResponse{}
+func (proxy *baseProxy) getNodeStatus(buff []byte) (*models.NodeOverview, error) {
+	response := &models.NodeOverviewApiResponse{}
 	err := json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
@@ -182,24 +181,11 @@ func (proxy *baseProxy) getNodeStatus(buff []byte, shardID uint32) (*data.Networ
 		return nil, errors.New(response.Error)
 	}
 
-	err = proxy.checkReceivedNodeStatus(response.Data.Status, shardID)
-	if err != nil {
-		return nil, err
+	if response.Data.NodeOverview == nil {
+		return nil, ErrNilNetworkStatus
 	}
 
-	return response.Data.Status, nil
-}
-
-func (proxy *baseProxy) checkReceivedNodeStatus(networkStatus *data.NetworkStatus, shardID uint32) error {
-	if networkStatus == nil {
-		return fmt.Errorf("%w, requested from %d", ErrNilNetworkStatus, shardID)
-	}
-
-	if networkStatus.ShardID == shardID {
-		return nil
-	}
-
-	return fmt.Errorf("%w, requested from %d, got response from %d", ErrShardIDMismatch, shardID, networkStatus.ShardID)
+	return response.Data.NodeOverview, nil
 }
 
 // GetRestAPIEntityType returns the REST API entity type that this implementation works with

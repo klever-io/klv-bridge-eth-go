@@ -48,8 +48,8 @@ func (mock *KleverChainMock) GetNetworkConfig(_ context.Context) (*models.Networ
 }
 
 // GetNetworkStatus -
-func (mock *KleverChainMock) GetNetworkStatus(_ context.Context, _ uint32) (*data.NetworkStatus, error) {
-	return &data.NetworkStatus{}, nil
+func (mock *KleverChainMock) GetNetworkStatus(_ context.Context) (*models.NodeOverview, error) {
+	return &models.NodeOverview{}, nil
 }
 
 // GetShardOfAddress -

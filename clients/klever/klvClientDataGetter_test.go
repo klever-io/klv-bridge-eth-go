@@ -21,7 +21,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1314,7 +1313,7 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
 				return nil, expectedErr
 			},
 		}
@@ -1332,8 +1331,8 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
-				return nil, nil
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
+				return nil, expectedErr
 			},
 		}
 		dg, _ := NewKLVClientDataGetter(args)
@@ -1350,8 +1349,8 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
-				return &data.NetworkStatus{
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
+				return &models.NodeOverview{
 					Nonce: expectedNonce,
 				}, nil
 			},
@@ -1373,9 +1372,9 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 				numCallsGetShardOfAddress++
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
 				numCallsGetNetworkStatus++
-				return &data.NetworkStatus{
+				return &models.NodeOverview{
 					Nonce: expectedNonce,
 				}, nil
 			},

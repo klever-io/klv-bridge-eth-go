@@ -13,7 +13,7 @@ type EndpointProvider interface {
 	GetTransactionStatus(hexHash string) string
 	GetTransactionInfo(hexHash string) string
 	GetVmValues() string
-	GetNodeStatus(shardID uint32) string
+	GetNodeStatus() string
 	GetRestAPIEntityType() models.RestAPIEntityType
 	GetProcessedTransactionStatus(hexHash string) string
 	GetESDTTokenData(addressAsBech32 string, tokenIdentifier string) string

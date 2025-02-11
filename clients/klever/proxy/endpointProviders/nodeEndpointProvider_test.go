@@ -19,7 +19,7 @@ func TestNodeEndpointProvider_GetNodeStatus(t *testing.T) {
 	t.Parallel()
 
 	provider := NewNodeEndpointProvider()
-	assert.Equal(t, nodeGetNodeStatusEndpoint, provider.GetNodeStatus(2))
+	assert.Equal(t, nodeGetNodeStatusEndpoint, provider.GetNodeStatus())
 }
 
 func TestNodeEndpointProvider_Getters(t *testing.T) {

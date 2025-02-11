@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type NetworkConfig struct {
 	NumMetachainNodes  uint64 `json:"klv_num_metachain_nodes"`
 	ConsensusGroupSize uint64 `json:"klv_consensus_group_size"`
@@ -14,4 +16,30 @@ type NetworkConfigResponse struct {
 	Data  *NetworkConfig `json:"config"`
 	Error string         `json:"error"`
 	Code  string         `json:"code"`
+}
+
+type NodeOverview struct {
+	BaseTxSize           int64         `json:"baseTxSize"`
+	ChainID              string        `json:"chainID"`
+	CurrentSlot          uint64        `json:"currentSlot"`
+	EpochNumber          int64         `json:"epochNumber"`
+	Nonce                uint64        `json:"nonce"`
+	NonceAtEpochStart    uint64        `json:"nonceAtEpochStart"`
+	SlotAtEpochStart     uint64        `json:"slotAtEpochStart"`
+	SlotCurrentTimestamp time.Duration `json:"slotCurrentTimestamp"`
+	SlotDuration         time.Duration `json:"slotDuration"`
+	SlotsPerEpoch        uint64        `json:"slotsPerEpoch"`
+	StartTime            time.Duration `json:"startTime"`
+}
+
+// NodeOverviewResponse respects the format the node statistics are received from the observers
+type NodeOverviewResponse struct {
+	NodeOverview *NodeOverview `json:"overview"`
+}
+
+// NodeOverviewApiResponse respects the format the node statistics are received from the observers
+type NodeOverviewApiResponse struct {
+	Data  NodeOverviewResponse `json:"data"`
+	Error string               `json:"error"`
+	Code  string               `json:"code"`
 }

@@ -14,7 +14,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/endpointProviders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
-	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -185,10 +184,8 @@ func TestBaseProxy_GetNetworkConfig(t *testing.T) {
 		t.Parallel()
 
 		errMessage := "error message"
-		erroredResponse := &data.NetworkConfigResponse{
-			Data: struct {
-				Config *data.NetworkConfig `json:"config"`
-			}{},
+		erroredResponse := &models.NetworkConfigResponse{
+			Data:  &models.NetworkConfig{},
 			Error: errMessage,
 			Code:  "",
 		}
@@ -254,7 +251,7 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.True(t, errors.Is(err, expectedErr))
 		assert.True(t, strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)))
@@ -270,7 +267,7 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.NotNil(t, err)
 		assert.True(t, strings.Contains(err.Error(), "invalid character 'm'"))
@@ -287,7 +284,7 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.NotNil(t, err)
 		assert.True(t, strings.Contains(err.Error(), "invalid character 'm'"))
@@ -312,7 +309,7 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.NotNil(t, err)
 		assert.True(t, strings.Contains(err.Error(), expectedErr.Error()))
@@ -338,7 +335,7 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.NotNil(t, err)
 		assert.True(t, strings.Contains(err.Error(), expectedErr.Error()))
@@ -354,10 +351,9 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.True(t, errors.Is(err, ErrNilNetworkStatus))
-		assert.True(t, strings.Contains(err.Error(), "requested from 0"))
 	})
 	t.Run("GetNodeStatus returns nil network status - proxy endpoint provider", func(t *testing.T) {
 		t.Parallel()
@@ -371,53 +367,17 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, result)
 		assert.True(t, errors.Is(err, ErrNilNetworkStatus))
-		assert.True(t, strings.Contains(err.Error(), "requested from 0"))
-	})
-	t.Run("requested from wrong shard should error", func(t *testing.T) {
-		t.Parallel()
-
-		providedNetworkStatus := &data.NetworkStatus{
-			CurrentRound:               1,
-			EpochNumber:                2,
-			Nonce:                      3,
-			NonceAtEpochStart:          4,
-			NoncesPassedInCurrentEpoch: 5,
-			RoundAtEpochStart:          6,
-			RoundsPassedInCurrentEpoch: 7,
-			RoundsPerEpoch:             8,
-			CrossCheckBlockHeight:      "aaa",
-			ShardID:                    core.MetachainShardId,
-		}
-
-		args := createMockArgsBaseProxy()
-		args.httpClientWrapper = &testsCommon.HTTPClientWrapperStub{
-			GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-				return getNodeStatusBytes(providedNetworkStatus), http.StatusOK, nil
-			},
-		}
-		baseProxyInstance, _ := newBaseProxy(args)
-
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
-		assert.Nil(t, result)
-		assert.True(t, errors.Is(err, ErrShardIDMismatch))
-		assert.True(t, strings.Contains(err.Error(), "requested from 0, got response from 4294967295"))
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
 
-		providedNetworkStatus := &data.NetworkStatus{
-			CurrentRound:               1,
-			EpochNumber:                2,
-			Nonce:                      3,
-			NonceAtEpochStart:          4,
-			NoncesPassedInCurrentEpoch: 5,
-			RoundAtEpochStart:          6,
-			RoundsPassedInCurrentEpoch: 7,
-			RoundsPerEpoch:             8,
-			CrossCheckBlockHeight:      "aaa",
+		providedNetworkStatus := &models.NodeOverview{
+			EpochNumber:       2,
+			Nonce:             3,
+			NonceAtEpochStart: 4,
 		}
 
 		args := createMockArgsBaseProxy()
@@ -428,24 +388,17 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, err)
 		assert.Equal(t, providedNetworkStatus, result)
 	})
 	t.Run("should work with proxy endpoint provider", func(t *testing.T) {
 		t.Parallel()
 
-		providedNetworkStatus := &data.NetworkStatus{
-			CurrentRound:               1,
-			EpochNumber:                2,
-			Nonce:                      3,
-			NonceAtEpochStart:          4,
-			NoncesPassedInCurrentEpoch: 5,
-			RoundAtEpochStart:          6,
-			RoundsPassedInCurrentEpoch: 7,
-			RoundsPerEpoch:             8,
-			CrossCheckBlockHeight:      "aaa",
-			ShardID:                    core.MetachainShardId, // this won't be tested in this test
+		providedNetworkStatus := &models.NodeOverview{
+			EpochNumber:       2,
+			Nonce:             3,
+			NonceAtEpochStart: 4,
 		}
 
 		args := createMockArgsBaseProxy()
@@ -457,28 +410,28 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 		}
 		baseProxyInstance, _ := newBaseProxy(args)
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background(), 0)
+		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
 		assert.Nil(t, err)
 		assert.Equal(t, providedNetworkStatus, result)
 	})
 }
 
-func getNetworkStatusBytes(status *data.NetworkStatus) []byte {
-	resp := &data.NetworkStatusResponse{
-		Data: struct {
-			Status *data.NetworkStatus `json:"status"`
-		}{Status: status},
+func getNetworkStatusBytes(status *models.NodeOverview) []byte {
+	resp := &models.NodeOverviewApiResponse{
+		Data: models.NodeOverviewResponse{
+			NodeOverview: status,
+		},
 	}
 	respBytes, _ := json.Marshal(resp)
 
 	return respBytes
 }
 
-func getNodeStatusBytes(status *data.NetworkStatus) []byte {
-	resp := &data.NodeStatusResponse{
-		Data: struct {
-			Status *data.NetworkStatus `json:"metrics"`
-		}{Status: status},
+func getNodeStatusBytes(status *models.NodeOverview) []byte {
+	resp := &models.NodeOverviewApiResponse{
+		Data: models.NodeOverviewResponse{
+			NodeOverview: status,
+		},
 	}
 	respBytes, _ := json.Marshal(resp)
 
