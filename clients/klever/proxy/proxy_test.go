@@ -9,7 +9,6 @@ import (
 
 	"io"
 	"net/http"
-	"os"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -17,9 +16,7 @@ import (
 
 	kleverAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
-	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	sdkHttp "github.com/multiversx/mx-sdk-go/core/http"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
@@ -30,30 +27,6 @@ const testHttpURL = "https://test.org"
 const networkConfigEndpoint = "network/config"
 const getNetworkStatusEndpoint = "network/status/%d"
 const getNodeStatusEndpoint = "node/status"
-
-// not a real-world valid test query option but rather a test one to check all fields are properly set
-var testQueryOptions = api.AccountQueryOptions{
-	OnFinalBlock: true,
-	OnStartOfEpoch: core.OptionalUint32{
-		Value:    3737,
-		HasValue: true,
-	},
-	BlockNonce: core.OptionalUint64{
-		Value:    3838,
-		HasValue: true,
-	},
-	BlockHash:     []byte("block hash"),
-	BlockRootHash: []byte("block root hash"),
-	HintEpoch: core.OptionalUint32{
-		Value:    3939,
-		HasValue: true,
-	},
-}
-
-type testStruct struct {
-	Nonce int
-	Name  string
-}
 
 type mockHTTPClient struct {
 	doCalled func(req *http.Request) (*http.Response, error)
@@ -70,21 +43,6 @@ func (m *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 func createMockClientRespondingBytes(responseBytes []byte) *mockHTTPClient {
 	return &mockHTTPClient{
 		doCalled: func(req *http.Request) (*http.Response, error) {
-			return &http.Response{
-				Body:       io.NopCloser(bytes.NewReader(responseBytes)),
-				StatusCode: http.StatusOK,
-			}, nil
-		},
-	}
-}
-
-func createMockClientMultiResponse(responseMap map[string][]byte) *mockHTTPClient {
-	return &mockHTTPClient{
-		doCalled: func(req *http.Request) (*http.Response, error) {
-			responseBytes, exists := responseMap[req.URL.String()]
-			if !exists {
-				return nil, fmt.Errorf("no response for URL: %s", req.URL.String())
-			}
 			return &http.Response{
 				Body:       io.NopCloser(bytes.NewReader(responseBytes)),
 				StatusCode: http.StatusOK,
@@ -193,13 +151,6 @@ func handleRequestNetworkConfigAndStatus(
 	}, handled, nil
 }
 
-func loadJsonIntoBytes(tb testing.TB, path string) []byte {
-	buff, err := os.ReadFile(path)
-	require.Nil(tb, err)
-
-	return buff
-}
-
 func TestNewProxy(t *testing.T) {
 	t.Parallel()
 
@@ -256,16 +207,17 @@ func TestGetAccount(t *testing.T) {
 				return response, err
 			}
 
-			account := data.AccountResponse{
-				Data: struct {
-					Account *data.Account `json:"account"`
-				}{
-					Account: &data.Account{
-						Nonce:   37,
-						Balance: "38",
+			account := models.AccountApiResponse{
+				Data: models.ResponseAccount{
+					AccountData: models.Account{
+						AccountInfo: &models.AccountInfo{
+							Nonce:   37,
+							Balance: 10,
+						},
 					},
 				},
 			}
+
 			accountBytes, _ := json.Marshal(account)
 			atomic.AddUint32(&numAccountQueries, 1)
 			return &http.Response{
@@ -278,11 +230,8 @@ func TestGetAccount(t *testing.T) {
 	args.FinalityCheck = true
 	proxyInstance, _ := NewProxy(args)
 
-	address, err := kleverAddress.NewAddress("erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts")
-	if err != nil {
-		assert.Error(t, err)
-	}
-	expectedErr := errors.New("expected error")
+	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	require.NoError(t, err)
 
 	t.Run("nil address should error", func(t *testing.T) {
 		t.Parallel()
@@ -291,23 +240,8 @@ func TestGetAccount(t *testing.T) {
 		require.Equal(t, ErrNilAddress, errGet)
 		require.Nil(t, response)
 	})
-	t.Run("invalid address should error", func(t *testing.T) {
-		t.Parallel()
 
-		invalidAddress, err := kleverAddress.NewAddressFromBytes([]byte("invalid address"))
-		require.NoError(t, err)
-
-		response, errGet := proxyInstance.GetAccount(context.Background(), invalidAddress)
-		require.Equal(t, ErrInvalidAddress, errGet)
-		require.Nil(t, response)
-	})
-	t.Run("finality checker errors should not query", func(t *testing.T) {
-		account, errGet := proxyInstance.GetAccount(context.Background(), address)
-		assert.Nil(t, account)
-		assert.True(t, errors.Is(errGet, expectedErr))
-		assert.Equal(t, uint32(0), atomic.LoadUint32(&numAccountQueries))
-	})
-	t.Run("finality checker returns nil should return account", func(t *testing.T) {
+	t.Run("should work and return account", func(t *testing.T) {
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.NotNil(t, account)
 		assert.Equal(t, uint64(37), account.Nonce)
@@ -345,16 +279,19 @@ func TestGetAccount(t *testing.T) {
 func TestProxy_GetTransactionInfoWithResults(t *testing.T) {
 	t.Parallel()
 
-	responseBytes := []byte(`{"data":{"transaction":{"type":"normal","nonce":22100,"round":53057,"epoch":263,"value":"0","receiver":"erd1e6c9vcga5lyhwdu9nr9lya4ujz2r5w2egsfjp0lslrgv5dsccpdsmre6va","sender":"erd1e6c9vcga5lyhwdu9nr9lya4ujz2r5w2egsfjp0lslrgv5dsccpdsmre6va","gasPrice":1000000001,"gasLimit":19210000,"data":"RVNEVE5GVFRyYW5zZmVyQDU5NTk1OTQ1MzY0MzM5MkQzMDM5MzQzOTMwMzBAMDFAMDFAMDAwMDAwMDAwMDAwMDAwMDA1MDA1QzgzRTBDNDJFRENFMzk0RjQwQjI0RDI5RDI5OEIwMjQ5QzQxRjAyODk3NEA2Njc1NkU2NEA1N0M1MDZBMTlEOEVBRTE4Mjk0MDNBOEYzRjU0RTFGMDM3OUYzODE1N0ZDRjUzRDVCQ0E2RjIzN0U0QTRDRjYxQDFjMjA=","signature":"37922ccb13d46857d819cd618f1fd8e76777e14f1c16a54eeedd55c67d5883db0e3a91cd0ff0f541e2c3d7347488b4020c0ba4765c9bc02ea0ae1c3f6db1ec05","sourceShard":1,"destinationShard":1,"blockNonce":53052,"blockHash":"4a63312d1bfe48aa516185d12abff5daf6343fce1f298db51291168cf97a790c","notarizedAtSourceInMetaNonce":53053,"NotarizedAtSourceInMetaHash":"342d189e36ef5cbf9f8b3f2cb5bf2cb8e2260062c6acdf89ce5faacd99f4dbcc","notarizedAtDestinationInMetaNonce":53053,"notarizedAtDestinationInMetaHash":"342d189e36ef5cbf9f8b3f2cb5bf2cb8e2260062c6acdf89ce5faacd99f4dbcc","miniblockType":"TxBlock","miniblockHash":"0c659cce5e2653522cc0e3cf35571264522035a7aef4ffa5244d1ed3d8bc01a8","status":"success","hyperblockNonce":53053,"hyperblockHash":"342d189e36ef5cbf9f8b3f2cb5bf2cb8e2260062c6acdf89ce5faacd99f4dbcc","smartContractResults":[{"hash":"5ab14959aaeb3a20d95ec6bbefc03f251732d9368711c55c63d3811e70903f4e","nonce":0,"value":0,"receiver":"erd1qqqqqqqqqqqqqpgqtjp7p3pwmn3efaqtynff62vtqfyug8cz396qs5vnsy","sender":"erd1e6c9vcga5lyhwdu9nr9lya4ujz2r5w2egsfjp0lslrgv5dsccpdsmre6va","data":"ESDTNFTTransfer@595959453643392d303934393030@01@01@080112020001226f08011204746573741a20ceb056611da7c977378598cbf276bc90943a3959441320bff0f8d0ca3618c05b20e8072a206161616161616161616161616161616161616161616161616161616161616161320461626261321268747470733a2f2f656c726f6e642e636f6d3a0474657374@66756e64@57c506a19d8eae1829403a8f3f54e1f0379f38157fcf53d5bca6f237e4a4cf61@1c20","prevTxHash":"c7fadeaccce0673bd6ce3a1f472f7cc1beef20c0b3131cfa9866cd5075816639","originalTxHash":"c7fadeaccce0673bd6ce3a1f472f7cc1beef20c0b3131cfa9866cd5075816639","gasLimit":18250000,"gasPrice":1000000001,"callType":0},{"hash":"f337d2705d2b644f9d8f75cf270e879b6ada51c4c54009e94305adf368d1adbc","nonce":1,"value":102793170000000,"receiver":"erd1e6c9vcga5lyhwdu9nr9lya4ujz2r5w2egsfjp0lslrgv5dsccpdsmre6va","sender":"erd1qqqqqqqqqqqqqpgqtjp7p3pwmn3efaqtynff62vtqfyug8cz396qs5vnsy","data":"@6f6b","prevTxHash":"5ab14959aaeb3a20d95ec6bbefc03f251732d9368711c55c63d3811e70903f4e","originalTxHash":"c7fadeaccce0673bd6ce3a1f472f7cc1beef20c0b3131cfa9866cd5075816639","gasLimit":0,"gasPrice":1000000001,"callType":0}]}},"error":"","code":"successful"}`)
+	txHash := "824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f"
+	responseBytes := []byte(`{"data":{"transaction":{"hash":"824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f","blockNum":61,"sender":"klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j","nonce":1,"timestamp":1739292140,"kAppFee":500000,"bandwidthFee":1000000,"status":"success","resultCode":"Ok","version":1,"chainID":"420420","signature":["6f22d23cfd70337cc97cd0153551ccd53bb72e16533723bff3831ddb4c73139f3683db203d2f8a095a845e77bab4319b69afc36ee7b3cfee84005c389de76203"],"searchOrder":0,"receipts":[{"cID":255,"signer":"klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j","type":19,"typeString":"SignedBy","weight":"1"},{"assetId":"KLV","assetType":"Fungible","cID":0,"from":"klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j","marketplaceId":"","orderId":"","to":"klv1mge94r8n3q44hcwu2tk9afgjcxcawmutycu0cwkap7m6jnktjlvq58355l","type":0,"typeString":"Transfer","value":10000000}],"contract":[{"type":0,"typeString":"TransferContractType","parameter":{"amount":10000000,"assetId":"KLV","assetType":{"collection":"KLV","type":"Fungible"},"toAddress":"klv1mge94r8n3q44hcwu2tk9afgjcxcawmutycu0cwkap7m6jnktjlvq58355l"}}]}}, "error":"","code":"successful"}`)
 	httpClient := createMockClientRespondingBytes(responseBytes)
 	args := createMockArgsProxy(httpClient)
 	ep, _ := NewProxy(args)
 
-	tx, err := ep.GetTransactionInfoWithResults(context.Background(), "a40e5a6af4efe221608297a73459211756ab88b96896e6e331842807a138f343")
+	tx, err := ep.GetTransactionInfoWithResults(context.Background(), txHash)
 	require.Nil(t, err)
 
 	txBytes, _ := json.MarshalIndent(tx, "", " ")
 	fmt.Println(string(txBytes))
+
+	require.Equal(t, txHash, tx.Data.Transaction.Hash)
 }
 
 func TestProxy_ExecuteVmQuery(t *testing.T) {

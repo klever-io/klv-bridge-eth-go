@@ -227,16 +227,16 @@ func (ep *proxy) GetTransactionStatus(ctx context.Context, hash string) (string,
 }
 
 // GetTransactionInfo retrieves a transaction's details from the network
-func (ep *proxy) GetTransactionInfo(ctx context.Context, hash string) (*data.TransactionInfo, error) {
+func (ep *proxy) GetTransactionInfo(ctx context.Context, hash string) (*models.GetTransactionResponse, error) {
 	return ep.getTransactionInfo(ctx, hash, false)
 }
 
 // GetTransactionInfoWithResults retrieves a transaction's details from the network with events
-func (ep *proxy) GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error) {
+func (ep *proxy) GetTransactionInfoWithResults(ctx context.Context, hash string) (*models.GetTransactionResponse, error) {
 	return ep.getTransactionInfo(ctx, hash, true)
 }
 
-func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResults bool) (*data.TransactionInfo, error) {
+func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResults bool) (*models.GetTransactionResponse, error) {
 	endpoint := ep.endpointProvider.GetTransactionInfo(hash)
 	if withResults {
 		endpoint += withResultsQueryParam
@@ -247,7 +247,7 @@ func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResult
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	response := &data.TransactionInfo{}
+	response := &models.GetTransactionResponse{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
