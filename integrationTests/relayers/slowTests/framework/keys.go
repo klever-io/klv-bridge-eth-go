@@ -13,7 +13,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	mxCrypto "github.com/multiversx/mx-chain-crypto-go"
+	klvCrypto "github.com/klever-io/klever-go/crypto"
 	"github.com/stretchr/testify/require"
 )
 
@@ -185,9 +185,9 @@ func GenerateMvxPrivatePublicKey(tb testing.TB, projectedShard byte) KeysHolder 
 	}
 }
 
-func generateSkPkInShard(tb testing.TB, projectedShard byte) (mxCrypto.PrivateKey, []byte) {
-	var sk mxCrypto.PrivateKey
-	var pk mxCrypto.PublicKey
+func generateSkPkInShard(tb testing.TB, projectedShard byte) (klvCrypto.PrivateKey, []byte) {
+	var sk klvCrypto.PrivateKey
+	var pk klvCrypto.PublicKey
 
 	for {
 		sk, pk = keyGenerator.GeneratePair()

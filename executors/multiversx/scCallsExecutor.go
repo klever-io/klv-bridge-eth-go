@@ -2,23 +2,22 @@ package multiversx
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math/big"
 	"sync/atomic"
 	"time"
 
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/multiversx/mx-chain-core-go/core/check"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -61,7 +60,7 @@ type scCallExecutor struct {
 	nonceTxHandler                  NonceTransactionsHandler
 	privateKey                      crypto.PrivateKey
 	singleSigner                    crypto.SingleSigner
-	senderAddress                   core.AddressHandler
+	senderAddress                   address.Address
 	numSentTransactions             uint32
 	checkTransactionResults         bool
 	timeBetweenChecks               time.Duration
@@ -83,7 +82,11 @@ func NewScCallExecutor(args ArgsScCallExecutor) (*scCallExecutor, error) {
 	if err != nil {
 		return nil, err
 	}
-	senderAddress := data.NewAddressFromBytes(publicKeyBytes)
+
+	senderAddress, err := address.NewAddressFromBytes(publicKeyBytes)
+	if err != nil {
+		return nil, err
+	}
 
 	return &scCallExecutor{
 		scProxyBech32Address:            args.ScProxyBech32Address,
@@ -263,7 +266,7 @@ func (executor *scCallExecutor) executeOperation(
 	ctx context.Context,
 	id uint64,
 	callData parsers.ProxySCCompleteCallData,
-	networkConfig *data.NetworkConfig,
+	networkConfig *models.NetworkConfig,
 ) error {
 	txBuilder := builders.NewTxDataBuilder()
 	txBuilder.Function(scProxyCallFunction).ArgInt64(int64(id))
@@ -273,26 +276,31 @@ func (executor *scCallExecutor) executeOperation(
 		return err
 	}
 
-	bech32Address, err := executor.senderAddress.AddressAsBech32String()
+	receiverAddr, err := address.NewAddress(executor.scProxyBech32Address)
 	if err != nil {
 		return err
 	}
 
-	gasLimit, err := executor.codec.ExtractGasLimitFromRawCallData(callData.RawCallData)
+	tx := transaction.NewBaseTransaction(executor.senderAddress.Bytes(), 0, nil, 0, 0)
+	err = tx.SetChainID([]byte(networkConfig.ChainID))
 	if err != nil {
-		executor.log.Warn("scCallExecutor.executeOperation found a non-parsable raw call data",
-			"raw call data", callData.RawCallData, "error", err)
-		gasLimit = 0
+		return err
 	}
 
-	tx := &transaction.FrontendTransaction{
-		ChainID:  networkConfig.ChainID,
-		Version:  networkConfig.MinTransactionVersion,
-		GasLimit: gasLimit + executor.extraGasToExecute,
-		Data:     dataBytes,
-		Sender:   bech32Address,
-		Receiver: executor.scProxyBech32Address,
-		Value:    "0",
+	contractRequest := transaction.SmartContract{
+		Address: receiverAddr.Bytes(),
+	}
+
+	txArgs := transaction.TXArgs{
+		Type:     uint32(transaction.SmartContract_SCInvoke),
+		Sender:   executor.senderAddress.Bytes(),
+		Contract: json.RawMessage(contractRequest.String()),
+		Data:     [][]byte{dataBytes},
+	}
+
+	err = tx.AddTransaction(txArgs)
+	if err != nil {
+		return err
 	}
 
 	to, _ := callData.To.AddressAsBech32String()
@@ -347,7 +355,7 @@ func (executor *scCallExecutor) executeOperation(
 		"tx ID", id,
 		"call data", callData.String(),
 		"extra gas", executor.extraGasToExecute,
-		"sender", bech32Address,
+		"sender", executor.senderAddress.Bech32(),
 		"to", to)
 
 	atomic.AddUint32(&executor.numSentTransactions, 1)
@@ -366,8 +374,8 @@ func (executor *scCallExecutor) handleResults(ctx context.Context, hash string) 
 }
 
 // signTransactionWithPrivateKey signs a transaction with the client's private key
-func (executor *scCallExecutor) signTransactionWithPrivateKey(tx *transaction.FrontendTransaction) error {
-	tx.Signature = ""
+func (executor *scCallExecutor) signTransactionWithPrivateKey(tx *transaction.Transaction) error {
+	tx.Signature = [][]byte{}
 	bytes, err := json.Marshal(&tx)
 	if err != nil {
 		return err
@@ -378,7 +386,7 @@ func (executor *scCallExecutor) signTransactionWithPrivateKey(tx *transaction.Fr
 		return err
 	}
 
-	tx.Signature = hex.EncodeToString(signature)
+	tx.AddSignature(signature)
 
 	return nil
 }
@@ -413,11 +421,8 @@ func (executor *scCallExecutor) checkResults(ctx context.Context, hash string) (
 		return err, true
 	}
 
-	if txStatus == transaction.TxStatusSuccess {
+	if txStatus == transaction.Transaction_SUCCESS {
 		return nil, true
-	}
-	if txStatus == transaction.TxStatusPending {
-		return nil, false
 	}
 
 	executor.logFullTransaction(ctx, hash)

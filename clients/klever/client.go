@@ -17,7 +17,6 @@ import (
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
 	"github.com/multiversx/mx-chain-core-go/core/check"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
@@ -463,7 +462,7 @@ func (c *client) CheckRequiredBalance(ctx context.Context, token []byte, value *
 	}
 	safeAddress := c.safeContractAddress.Bech32()
 
-	esdt, err := c.proxy.GetESDTTokenData(ctx, c.safeContractAddress, string(token), api.AccountQueryOptions{})
+	esdt, err := c.proxy.GetESDTTokenData(ctx, c.safeContractAddress, string(token))
 	if err != nil {
 		return fmt.Errorf("%w for address %s for ESDT token %s", err, safeAddress, string(token))
 	}

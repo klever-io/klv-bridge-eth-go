@@ -7,7 +7,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -20,9 +19,9 @@ type Proxy interface {
 	GetAccount(ctx context.Context, address address.Address) (*models.Account, error)
 	GetNetworkStatus(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetShardOfAddress(ctx context.Context, bech32Address string) (uint32, error)
-	GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string, queryOptions api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error)
+	GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string) (*data.ESDTFungibleTokenData, error)
 	GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error)
-	// ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
+	ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error)
 	EstimateTransactionFees(ctx context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error)
 	IsInterfaceNil() bool
 }
