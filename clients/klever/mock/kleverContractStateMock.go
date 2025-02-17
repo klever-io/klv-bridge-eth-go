@@ -13,7 +13,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -45,7 +44,7 @@ type KleverPendingBatch struct {
 
 // KleverDeposit -
 type KleverDeposit struct {
-	From         sdkCore.AddressHandler
+	From         address.Address
 	To           common.Address
 	Ticker       string
 	Amount       *big.Int
@@ -458,7 +457,7 @@ func (mock *kleverContractStateMock) responseWithPendingBatch() *models.VmValues
 	for _, deposit := range mock.pendingBatch.KleverDeposits {
 		args = append(args, make([]byte, 0)) // mocked block nonce
 		args = append(args, big.NewInt(0).SetUint64(deposit.DepositNonce).Bytes())
-		args = append(args, deposit.From.AddressBytes())
+		args = append(args, deposit.From.Bytes())
 		args = append(args, deposit.To.Bytes())
 		args = append(args, []byte(deposit.Ticker))
 		args = append(args, deposit.Amount.Bytes())

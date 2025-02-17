@@ -5,17 +5,17 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
 
 const ethTestAddress1 = "0x880ec53af800b5cd051531672ef4fc4de233bd5d"
 const ethTestAddress2 = "0x880ebbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-const mvxTestAddress1 = "erd1qqqqqqqqqqqqqpgqk839entmk46ykukvhpn90g6knskju3dtanaq20f66e"
-const mvxTestAddress2 = "erd1qqqqqqqqqqqqqpgqptqsx2llrwh4phaf42lwwxez2hzeulxwanaqg7kgky"
+const klvTestAddress1 = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
+const klvTestAddress2 = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc"
 
 var testLog = logger.GetOrCreate("filters")
 var ethTestAddress1Bytes, _ = hex.DecodeString(ethTestAddress1[2:])
@@ -166,8 +166,8 @@ func TestNewPendingOperationFilter(t *testing.T) {
 		cfg := createTestConfig()
 		cfg.AllowedEthAddresses = append(cfg.AllowedMvxAddresses, ethTestAddress1)
 		cfg.DeniedEthAddresses = append(cfg.DeniedEthAddresses, ethTestAddress1)
-		cfg.AllowedMvxAddresses = append(cfg.AllowedMvxAddresses, mvxTestAddress1)
-		cfg.DeniedMvxAddresses = append(cfg.DeniedMvxAddresses, mvxTestAddress1)
+		cfg.AllowedMvxAddresses = append(cfg.AllowedMvxAddresses, klvTestAddress1)
+		cfg.DeniedMvxAddresses = append(cfg.DeniedMvxAddresses, klvTestAddress1)
 		filter, err := NewPendingOperationFilter(cfg, testLog)
 		assert.NotNil(t, filter)
 		assert.Nil(t, err)
@@ -199,11 +199,12 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 
 		assert.False(t, filter.ShouldExecute(callData))
 	})
-	t.Run("callData.To is not a valid Mvx address should return false", func(t *testing.T) {
+	t.Run("callData.To is not a valid KLV address should return false", func(t *testing.T) {
 		t.Parallel()
 
+		addr, _ := address.NewAddressFromBytes([]byte{0x1, 0x2})
 		callData := parsers.ProxySCCompleteCallData{
-			To: data.NewAddressFromBytes([]byte{0x1, 0x2}),
+			To: addr,
 		}
 
 		cfg := createTestConfig()
@@ -217,7 +218,7 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 		callData := parsers.ProxySCCompleteCallData{
 			From: common.BytesToAddress(ethTestAddress1Bytes),
 		}
-		callData.To, _ = data.NewAddressFromBech32String(mvxTestAddress1)
+		callData.To, _ = address.NewAddress(klvTestAddress1)
 		t.Run("is denied should return false", func(t *testing.T) {
 			t.Parallel()
 
@@ -263,13 +264,13 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 		callData := parsers.ProxySCCompleteCallData{
 			From: common.BytesToAddress(ethTestAddress1Bytes),
 		}
-		callData.To, _ = data.NewAddressFromBech32String(mvxTestAddress1)
+		callData.To, _ = address.NewAddress(klvTestAddress1)
 		t.Run("is denied should return false", func(t *testing.T) {
 			t.Parallel()
 
 			cfg := createTestConfig()
-			cfg.DeniedMvxAddresses = []string{mvxTestAddress1}
-			cfg.AllowedMvxAddresses = []string{mvxTestAddress1}
+			cfg.DeniedMvxAddresses = []string{klvTestAddress1}
+			cfg.AllowedMvxAddresses = []string{klvTestAddress1}
 
 			filter, _ := NewPendingOperationFilter(cfg, testLog)
 			assert.False(t, filter.ShouldExecute(callData))
@@ -282,7 +283,7 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			t.Parallel()
 
 			cfg := createTestConfig()
-			cfg.AllowedMvxAddresses = []string{mvxTestAddress1}
+			cfg.AllowedMvxAddresses = []string{klvTestAddress1}
 
 			filter, _ := NewPendingOperationFilter(cfg, testLog)
 			assert.True(t, filter.ShouldExecute(callData))
@@ -295,7 +296,7 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			t.Parallel()
 
 			cfg := createTestConfig()
-			cfg.AllowedMvxAddresses = []string{mvxTestAddress2}
+			cfg.AllowedMvxAddresses = []string{klvTestAddress2}
 			cfg.AllowedTokens = nil
 			cfg.AllowedEthAddresses = nil
 
@@ -312,7 +313,7 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			From:  common.BytesToAddress(ethTestAddress1Bytes),
 			Token: token1,
 		}
-		callData.To, _ = data.NewAddressFromBech32String(mvxTestAddress1)
+		callData.To, _ = address.NewAddress(klvTestAddress1)
 
 		t.Run("is denied should return false", func(t *testing.T) {
 			t.Parallel()

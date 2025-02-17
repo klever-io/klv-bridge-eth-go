@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,13 +28,13 @@ func TestProxySCCompleteCallData_String(t *testing.T) {
 		expectedString := "Eth address: 0x0000000000000000000000000000000000000000, MvX address: <nil>, token: tkn, amount: <nil>, nonce: 1, raw call data: 414243"
 		assert.Equal(t, expectedString, callData.String())
 	})
-	t.Run("not a Valid MvX address should work", func(t *testing.T) {
+	t.Run("not a Valid Klever address should work", func(t *testing.T) {
 		t.Parallel()
-
+		addr, _ := address.NewAddressFromBytes([]byte{0x1, 0x2})
 		callData := ProxySCCompleteCallData{
 			RawCallData: []byte{65, 66, 67},
 			From:        common.Address{},
-			To:          data.NewAddressFromBytes([]byte{0x1, 0x2}),
+			To:          addr,
 			Token:       "tkn",
 			Nonce:       1,
 		}
@@ -54,9 +54,9 @@ func TestProxySCCompleteCallData_String(t *testing.T) {
 		}
 		ethUnhexed, _ := hex.DecodeString("880ec53af800b5cd051531672ef4fc4de233bd5d")
 		callData.From.SetBytes(ethUnhexed)
-		callData.To, _ = data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqsudu3a3n9yu62k5qkgcpy4j9ywl2x2gl5smsy7t4uv")
+		callData.To, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
 
-		expectedString := "Eth address: 0x880EC53Af800b5Cd051531672EF4fc4De233bD5d, MvX address: erd1qqqqqqqqqqqqqpgqsudu3a3n9yu62k5qkgcpy4j9ywl2x2gl5smsy7t4uv, token: tkn, amount: 37, nonce: 1, raw call data: 414243"
+		expectedString := "Eth address: 0x880EC53Af800b5Cd051531672EF4fc4De233bD5d, MvX address: klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0, token: tkn, amount: 37, nonce: 1, raw call data: 414243"
 		assert.Equal(t, expectedString, callData.String())
 	})
 }

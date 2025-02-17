@@ -303,7 +303,7 @@ func (executor *scCallExecutor) executeOperation(
 		return err
 	}
 
-	to, _ := callData.To.AddressAsBech32String()
+	to := callData.To.Bech32()
 	if tx.GasLimit > contractMaxGasLimit {
 		// the contract will refund this transaction, so we will use less gas to preserve funds
 		executor.log.Warn("setting a lower gas limit for this transaction because it will be refunded",

@@ -14,7 +14,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -143,11 +142,11 @@ func (mock *KleverChainMock) ProcessTransactionStatus(_ context.Context, _ strin
 }
 
 // AddRelayer -
-func (mock *KleverChainMock) AddRelayer(address sdkCore.AddressHandler) {
+func (mock *KleverChainMock) AddRelayer(address address.Address) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
-	mock.relayers = append(mock.relayers, address.AddressBytes())
+	mock.relayers = append(mock.relayers, address.Bytes())
 }
 
 // SetLastExecutedEthBatchID -

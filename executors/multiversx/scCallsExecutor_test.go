@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klever-go/data/vm"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	kleverAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
@@ -70,7 +71,7 @@ func createTestProxySCCompleteCallData(token string) parsers.ProxySCCompleteCall
 		Amount: big.NewInt(37),
 		Nonce:  1,
 	}
-	callData.To, _ = data.NewAddressFromBech32String("klv1qqqqqqqqqqqqqpgqswlgqde4tfwp4ucwkh42m6d8a0d49w92sg8shyj6q3")
+	callData.To, _ = kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqswlgqde4tfwp4ucwkh42m6d8a0d49w92sg8shyj6q3")
 
 	return callData
 }
@@ -347,9 +348,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 		args.Codec = &testsCommon.MultiversxCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
+				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
+				require.Error(t, err)
 
 				return parsers.ProxySCCompleteCallData{
-					To: data.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32)),
+					To: addr,
 				}, expectedError
 			},
 		}
@@ -383,8 +386,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
+				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
+				require.Error(t, err)
+
 				return parsers.ProxySCCompleteCallData{
-					To: data.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32)),
+					To: addr,
 				}, nil
 			},
 		}
@@ -427,8 +433,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
+				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
+				require.Error(t, err)
+
 				return parsers.ProxySCCompleteCallData{
-					To: data.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32)),
+					To: addr,
 				}, nil
 			},
 		}
@@ -471,8 +480,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
+				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
+				require.Error(t, err)
+
 				return parsers.ProxySCCompleteCallData{
-					To: data.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32)),
+					To: addr,
 				}, nil
 			},
 		}
@@ -519,9 +531,12 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
+				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
+				require.Error(t, err)
+
 				return parsers.ProxySCCompleteCallData{
 					RawCallData: []byte("dummy"),
-					To:          data.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32)),
+					To:          addr,
 				}, nil
 			},
 			ExtractGasLimitFromRawCallDataCalled: func(buff []byte) (uint64, error) {
@@ -586,8 +601,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 					return createTestProxySCCompleteCallData("tkn2"), nil
 				}
 
+				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
+				require.Error(t, err)
+
 				return parsers.ProxySCCompleteCallData{
-					To: data.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32)),
+					To: addr,
 				}, errors.New("wrong buffer")
 			},
 			ExtractGasLimitFromRawCallDataCalled: func(buff []byte) (uint64, error) {

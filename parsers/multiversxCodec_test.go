@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +21,7 @@ func createTestProxySCCompleteCallData() ProxySCCompleteCallData {
 		Amount:      big.NewInt(20000),
 		Nonce:       1,
 	}
-	completeCallData.To, _ = data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqsudu3a3n9yu62k5qkgcpy4j9ywl2x2gl5smsy7t4uv")
+	completeCallData.To, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
 	completeCallData.From.SetBytes(ethUnhexed)
 
 	return completeCallData
@@ -255,10 +255,14 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 
 		completeCallData, err := codec.DecodeProxySCCompleteCallData(buff)
 		assert.Nil(t, err)
+
+		address, err := address.NewAddressFromBytes(bytes.Repeat([]byte{0x01}, 32))
+		assert.Nil(t, err)
+
 		expectedCallData := ProxySCCompleteCallData{
 			RawCallData: []byte{0x03},
 			From:        common.HexToAddress("0x0101010101010101010101010101010101010101"),
-			To:          data.NewAddressFromBytes(bytes.Repeat([]byte{0x01}, 32)),
+			To:          address,
 			Token:       string([]byte{2, 3}),
 			Amount:      big.NewInt(0),
 			Nonce:       1,

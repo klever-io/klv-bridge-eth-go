@@ -5,8 +5,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/multiversx/mx-chain-core-go/core/check"
-	"github.com/multiversx/mx-sdk-go/core"
 )
 
 // CallData defines the struct holding SC call data parameters
@@ -21,7 +21,7 @@ type CallData struct {
 type ProxySCCompleteCallData struct {
 	RawCallData []byte
 	From        common.Address
-	To          core.AddressHandler
+	To          address.Address
 	Token       string
 	Amount      *big.Int
 	Nonce       uint64
@@ -30,12 +30,8 @@ type ProxySCCompleteCallData struct {
 // String returns the human-readable string version of the call data
 func (callData ProxySCCompleteCallData) String() string {
 	toString := "<nil>"
-	var err error
 	if !check.IfNil(callData.To) {
-		toString, err = callData.To.AddressAsBech32String()
-		if err != nil {
-			toString = "<err>"
-		}
+		toString = callData.To.Bech32()
 	}
 	amountString := "<nil>"
 	if callData.Amount != nil {
