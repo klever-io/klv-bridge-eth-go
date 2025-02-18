@@ -71,8 +71,9 @@ func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *tra
 	}
 
 	var data []byte
-	if len(transaction.GetData()) > 0 {
-		data = transaction.GetData()[0]
+	txData := transaction.GetData()
+	if len(txData) > 0 && len(txData[0]) > 0 {
+		data = txData[0]
 	}
 
 	log.Info("sent Klever transaction", "sender", addrAsBech32, "data", string(data))

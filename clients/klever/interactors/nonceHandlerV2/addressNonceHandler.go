@@ -26,7 +26,6 @@ type addressNonceHandler struct {
 	computedNonceWasSet bool
 	computedNonce       uint64
 	lowestNonce         uint64
-	gasMultiplier       uint64
 	transactions        map[uint64]*transaction.Transaction
 }
 
@@ -47,22 +46,26 @@ func NewAddressNonceHandler(proxy interactors.Proxy, address sdkAddress.Address)
 
 // ApplyNonceAndGasPrice will apply the computed nonce to the given FrontendTransaction
 func (anh *addressNonceHandler) ApplyNonceAndGasPrice(ctx context.Context, tx *transaction.Transaction) error {
-	oldTx := anh.getOlderTxWithSameNonce(tx)
+	fees, err := anh.proxy.EstimateTransactionFees(ctx, tx)
+	if err != nil {
+		return err
+	}
+
+	// clone tx to not modify the original one before validating transaction with same nonce
+	txClone := tx.Clone()
+	txClone.GetRawData().BandwidthFee = fees.BandwidthFee
+	txClone.GetRawData().KAppFee = fees.KAppFee
+
+	oldTx := anh.getOlderTxWithSameNonce(txClone)
 	if oldTx != nil {
-		err := anh.handleTxWithSameNonce(oldTx, tx)
+		err := anh.handleTxWithSameNonce(oldTx, txClone)
 		if err != nil {
 			return err
 		}
 	}
 
 	nonce, err := anh.getNonceUpdatingCurrent(ctx)
-	tx.RawData.Nonce = nonce
-	if err != nil {
-		return err
-	}
-
-	// should get estimate fee according with klever chain
-	fees, err := anh.proxy.EstimateTransactionFees(ctx, tx)
+	tx.GetRawData().Nonce = nonce
 	if err != nil {
 		return err
 	}
@@ -73,11 +76,7 @@ func (anh *addressNonceHandler) ApplyNonceAndGasPrice(ctx context.Context, tx *t
 }
 
 func (anh *addressNonceHandler) handleTxWithSameNonce(oldTx *transaction.Transaction, tx *transaction.Transaction) error {
-	if oldTx.GetRawData().BandwidthFee < tx.GetRawData().BandwidthFee {
-		return nil
-	}
-
-	if oldTx.GetRawData().BandwidthFee == tx.GetRawData().BandwidthFee && oldTx.GasMultiplier < anh.gasMultiplier {
+	if oldTx.GetRawData().BandwidthFee != tx.GetRawData().BandwidthFee {
 		return nil
 	}
 
@@ -156,7 +155,7 @@ func (anh *addressNonceHandler) ReSendTransactionsIfRequired(ctx context.Context
 // SendTransaction will save and propagate a transaction to the network
 func (anh *addressNonceHandler) SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error) {
 	anh.mut.Lock()
-	anh.transactions[tx.RawData.Nonce] = tx
+	anh.transactions[tx.GetRawData().GetNonce()] = tx
 	anh.mut.Unlock()
 
 	return anh.proxy.SendTransaction(ctx, tx)
@@ -174,7 +173,7 @@ func (anh *addressNonceHandler) getOlderTxWithSameNonce(tx *transaction.Transact
 	anh.mut.RLock()
 	defer anh.mut.RUnlock()
 
-	return anh.transactions[tx.RawData.Nonce]
+	return anh.transactions[tx.GetRawData().GetNonce()]
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

@@ -70,12 +70,12 @@ func TestNonceTransactionsHandlerV2_GetNonce(t *testing.T) {
 	err := nth.ApplyNonceAndGasPrice(context.Background(), nil, nil)
 	assert.Equal(t, interactors.ErrNilAddress, err)
 
-	tx := transaction.Transaction{}
-	err = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, &tx)
+	tx := transaction.NewBaseTransaction(testAddress.Bytes(), 0, nil, 0, 0)
+	err = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
 	assert.Nil(t, err)
 	assert.Equal(t, currentNonce, tx.RawData.Nonce)
 
-	err = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, &tx)
+	err = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
 	assert.Nil(t, err)
 	assert.Equal(t, currentNonce+1, tx.RawData.Nonce)
 
@@ -308,12 +308,6 @@ func createMockTransactions(addr address.Address, numTxs int, startNonce uint64)
 		tx.AddSignature([]byte("sig"))
 		tx.SetChainID([]byte{3})
 
-		// tx := &transaction.FrontendTransaction{
-		// 	Value:    "1",
-		// 	Receiver: addrAsBech32String,
-		// 	Sender:   addrAsBech32String,
-		// }
-
 		txs = append(txs, tx)
 		startNonce++
 	}
@@ -404,23 +398,9 @@ func TestNonceTransactionsHandlerV2_SendDuplicateTransactions(t *testing.T) {
 	nth, _ := NewNonceTransactionHandlerV2(args)
 
 	tx := transaction.NewBaseTransaction(testAddress.Bytes(), 0, nil, 0, 0)
-	tx.GasLimit = 50000
-	tx.GasMultiplier = 100000
 	tx.AddSignature([]byte("sig"))
 	tx.SetChainID([]byte{3})
 
-	// tx := &transaction.Transaction{
-	// 	RawData: &transaction.Transaction_Raw{
-	// 		ChainID: 3,
-	// 		Version: 1,
-	// 		Data:    nil,
-	// 	},
-	// 	Value:         "1",
-	// 	Receiver:      testAddressAsBech32String,
-	// 	Sender:        testAddressAsBech32String,
-	// 	GasMultiplier: 100000,
-	// 	GasLimit:      50000,
-	// }
 	err := nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
 	require.Nil(t, err)
 
@@ -450,18 +430,12 @@ func createMockTransactionsWithGetNonce(
 ) []*transaction.Transaction {
 	txs := make([]*transaction.Transaction, 0, numTxs)
 	for i := 0; i < numTxs; i++ {
-		tx := &transaction.Transaction{}
+		tx := transaction.NewBaseTransaction(addr.Bytes(), 0, nil, 0, 0)
 		err := nth.ApplyNonceAndGasPrice(context.Background(), addr, tx)
 		require.Nil(tb, err)
 
-		//tx.Value = "1"
-		//tx.Receiver = addrAsBech32String
-		tx.RawData.Sender = addr.Bytes()
-		tx.GasLimit = 50000
-		tx.RawData.Data = nil
-		tx.Signature = [][]byte{[]byte("sig")}
+		tx.AddSignature([]byte("sig"))
 		tx.SetChainID([]byte{3})
-		tx.RawData.Version = 1
 
 		txs = append(txs, tx)
 	}
@@ -491,7 +465,7 @@ func TestNonceTransactionsHandlerV2_ForceNonceReFetch(t *testing.T) {
 	}
 
 	nth, _ := NewNonceTransactionHandlerV2(args)
-	tx := &transaction.Transaction{}
+	tx := transaction.NewBaseTransaction(nil, 0, nil, 0, 0)
 	_ = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
 	_ = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
 	err := nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)

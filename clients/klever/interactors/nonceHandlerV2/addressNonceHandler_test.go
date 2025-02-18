@@ -54,7 +54,7 @@ func TestAddressNonceHandler_NewAddressNonceHandlerWithPrivateAccess(t *testing.
 
 func TestAddressNonceHandler_ApplyNonceAndGasPrice(t *testing.T) {
 	t.Parallel()
-	t.Run("tx already sent; oldTx.GasPrice == txArgs.GasPrice == anh.gasPrice", func(t *testing.T) {
+	t.Run("tx already sent; oldTx.BandwidthFee == txArgs.BandwidthFee", func(t *testing.T) {
 		t.Parallel()
 
 		tx := createDefaultTx()
@@ -68,18 +68,30 @@ func TestAddressNonceHandler_ApplyNonceAndGasPrice(t *testing.T) {
 		_, err = anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
 
-		anh.gasMultiplier = tx.GasMultiplier
 		err = anh.ApplyNonceAndGasPrice(context.Background(), tx)
 		require.Equal(t, interactors.ErrTxWithSameNonceAndGasPriceAlreadySent, err)
 	})
-	t.Run("tx already sent; oldTx.GasPrice < txArgs.GasPrice", func(t *testing.T) {
+	t.Run("tx already sent; oldTx.BandwidthFee < txArgs.BandwidthFee", func(t *testing.T) {
 		t.Parallel()
 
 		tx := createDefaultTx()
-		initialGasMultiplier := tx.GasMultiplier
-		tx.GasMultiplier--
 
-		anh, err := NewAddressNonceHandlerWithPrivateAccess(&testsCommon.ProxyStub{}, testAddress)
+		estimateTransactionFeesTimesCalled := 0
+		proxy := &testsCommon.ProxyStub{
+			EstimateTransactionFeesCalled: func(_ context.Context, tx *transaction.Transaction) (*transaction.FeesResponse, error) {
+				estimateTransactionFeesTimesCalled++
+				fees := &transaction.FeesResponse{
+					CostResponse: &transaction.CostResponse{
+						BandwidthFee: 100 * int64(estimateTransactionFeesTimesCalled),
+						KAppFee:      100,
+					},
+				}
+
+				return fees, nil
+			},
+		}
+
+		anh, err := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
 		require.Nil(t, err)
 
 		err = anh.ApplyNonceAndGasPrice(context.Background(), tx)
@@ -88,27 +100,6 @@ func TestAddressNonceHandler_ApplyNonceAndGasPrice(t *testing.T) {
 		_, err = anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
 
-		anh.gasMultiplier = initialGasMultiplier
-		err = anh.ApplyNonceAndGasPrice(context.Background(), tx)
-		require.Nil(t, err)
-
-		_, err = anh.SendTransaction(context.Background(), tx)
-		require.Nil(t, err)
-	})
-	t.Run("oldTx.GasPrice == txArgs.GasPrice && oldTx.GasPrice < anh.gasPrice", func(t *testing.T) {
-		t.Parallel()
-
-		tx := createDefaultTx()
-		anh, err := NewAddressNonceHandlerWithPrivateAccess(&testsCommon.ProxyStub{}, testAddress)
-		require.Nil(t, err)
-
-		err = anh.ApplyNonceAndGasPrice(context.Background(), tx)
-		require.Nil(t, err)
-
-		_, err = anh.SendTransaction(context.Background(), tx)
-		require.Nil(t, err)
-
-		anh.gasMultiplier = tx.GasMultiplier + 1
 		err = anh.ApplyNonceAndGasPrice(context.Background(), tx)
 		require.Nil(t, err)
 
@@ -232,7 +223,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		err := anh.ReSendTransactionsIfRequired(context.Background())
 		require.Equal(t, expectedErr, err)
 	})
-	t.Run("proxy returns error shall error", func(t *testing.T) {
+	t.Run("proxy sendTransaction returns error shall error", func(t *testing.T) {
 		t.Parallel()
 
 		blockchainNonce := uint64(100)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/klever-io/klever-go/data/transaction"
+	idata "github.com/klever-io/klever-go/indexer/data"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/multiversx/mx-sdk-go/data"
@@ -67,7 +68,10 @@ func (eps *ProxyStub) GetAccount(ctx context.Context, address address.Address) (
 		return eps.GetAccountCalled(ctx, address)
 	}
 
-	return &models.Account{}, nil
+	return &models.Account{
+		AccountInfo: &idata.AccountInfo{},
+		Assets:      make(map[string]*idata.AccountKDA),
+	}, nil
 }
 
 // GetNetworkStatus -
@@ -121,7 +125,10 @@ func (eps *ProxyStub) EstimateTransactionFees(ctx context.Context, txs *transact
 		return eps.EstimateTransactionFeesCalled(ctx, txs)
 	}
 
-	return nil, fmt.Errorf("not implemented")
+	return &transaction.FeesResponse{
+		CostResponse: &transaction.CostResponse{},
+		KDAFees:      &transaction.Transaction_KDAFee{},
+	}, nil
 }
 
 // IsInterfaceNil -
