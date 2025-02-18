@@ -34,21 +34,7 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 		return nil, err
 	}
 
-	// argsProxy := blockchain.ArgsProxy{
-	// 	ProxyURL:            cfg.NetworkAddress,
-	// 	SameScState:         false,
-	// 	ShouldBeSynced:      false,
-	// 	FinalityCheck:       cfg.ProxyFinalityCheck,
-	// 	AllowedDeltaToFinal: cfg.ProxyMaxNoncesDelta,
-	// 	CacheExpirationTime: time.Second * time.Duration(cfg.ProxyCacherExpirationSeconds),
-	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.ProxyRestAPIEntityType),
-	// }
-
-	// proxy, err := blockchain.NewProxy(argsProxy)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
+	// TODO: change to real klever proxy when available
 	proxy := mock.CreateMockProxyKLV()
 
 	module := &scCallsModule{}

@@ -63,18 +63,6 @@ type chainSimulatorWrapper struct {
 // CreateChainSimulatorWrapper creates a new instance of the chain simulator wrapper
 func CreateChainSimulatorWrapper(args ArgChainSimulatorWrapper) *chainSimulatorWrapper {
 	// TODO: change this to use the real klever proxy when available
-	// argsProxy := blockchain.ArgsProxy{
-	// 	ProxyURL:            proxyURL,
-	// 	SameScState:         false,
-	// 	ShouldBeSynced:      false,
-	// 	FinalityCheck:       false,
-	// 	AllowedDeltaToFinal: args.ProxyMaxNoncesDelta,
-	// 	CacheExpirationTime: time.Second * time.Duration(args.ProxyCacherExpirationSeconds),
-	// 	EntityType:          sdkCore.Proxy,
-	// }
-	// proxyInstance, err := blockchain.NewProxy(argsProxy)
-	// require.Nil(args.TB, err)
-
 	proxyInstance := mock.NewKleverChainMock()
 
 	pubKeyConverter, err := pubkeyConverter.NewBech32PubkeyConverter(32, "erd")

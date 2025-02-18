@@ -89,12 +89,6 @@ func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 	}
 
 	// TODO: change to real klever proxy when available
-	// argsProxy := blockchain.ArgsProxy{
-	// 	ProxyURL:            cfg.Klever.NetworkAddress,
-	// 	CacheExpirationTime: time.Minute,
-	// 	EntityType:          sdkCore.ObserverNode,
-	// }
-	// proxy, _ := blockchain.NewProxy(argsProxy)
 	proxy := mock.CreateMockProxyKLV()
 
 	return ArgsEthereumToKleverBridge{
