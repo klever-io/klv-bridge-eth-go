@@ -45,7 +45,7 @@ func (eps *ProxyStub) SendTransaction(ctx context.Context, transaction *transact
 
 // SendTransactions -
 func (eps *ProxyStub) SendTransactions(ctx context.Context, txs []*transaction.Transaction) ([]string, error) {
-	if eps.SendTransactionCalled != nil {
+	if eps.SendTransactionsCalled != nil {
 		return eps.SendTransactionsCalled(ctx, txs)
 	}
 
