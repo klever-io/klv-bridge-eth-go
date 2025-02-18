@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/klever-io/klever-go/data/transaction"
+	idata "github.com/klever-io/klever-go/indexer/data"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
@@ -58,7 +59,7 @@ func TestNonceTransactionsHandlerV2_GetNonce(t *testing.T) {
 			numCalls++
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: currentNonce,
 				},
 			}, nil
@@ -101,7 +102,7 @@ func TestNonceTransactionsHandlerV2_SendMultipleTransactionsResendingEliminating
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil
@@ -168,7 +169,7 @@ func TestNonceTransactionsHandlerV2_SendMultipleTransactionsResendingEliminating
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil
@@ -221,7 +222,7 @@ func TestNonceTransactionsHandlerV2_SendTransactionResendingEliminatingAll(t *te
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil
@@ -273,7 +274,7 @@ func TestNonceTransactionsHandlerV2_SendTransactionErrors(t *testing.T) {
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil
@@ -338,7 +339,7 @@ func TestNonceTransactionsHandlerV2_SendTransactionsWithGetNonce(t *testing.T) {
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil
@@ -389,7 +390,7 @@ func TestNonceTransactionsHandlerV2_SendDuplicateTransactions(t *testing.T) {
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil
@@ -482,7 +483,7 @@ func TestNonceTransactionsHandlerV2_ForceNonceReFetch(t *testing.T) {
 			}
 
 			return &models.Account{
-				AccountInfo: &models.AccountInfo{
+				AccountInfo: &idata.AccountInfo{
 					Nonce: atomic.LoadUint64(&currentNonce),
 				},
 			}, nil

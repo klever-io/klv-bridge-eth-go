@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/klever-io/klever-go/data/transaction"
+	idata "github.com/klever-io/klever-go/indexer/data"
 	chainModels "github.com/klever-io/klever-go/network/api/models"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors"
@@ -162,7 +163,7 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &models.AccountInfo{
+					AccountInfo: &idata.AccountInfo{
 						Nonce: blockchainNonce,
 					},
 				}, nil
@@ -183,7 +184,7 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &models.AccountInfo{
+					AccountInfo: &idata.AccountInfo{
 						Nonce: blockchainNonce,
 					},
 				}, nil
@@ -215,48 +216,6 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 	})
 }
 
-// func TestAddressNonceHandler_DropTransactions(t *testing.T) {
-// 	t.Parallel()
-
-// 	tx := createDefaultTx()
-
-// 	blockchainNonce := uint64(100)
-// 	minGasPrice := uint64(10)
-// 	proxy := &testsCommon.ProxyStub{
-// 		GetAccountCalled: func(address address.Address) (*models.Account, error) {
-// 			return &models.Account{
-// 				AccountInfo: &models.AccountInfo{
-// 					Nonce: blockchainNonce,
-// 				},
-// 			}, nil
-// 		},
-// 		GetNetworkConfigCalled: func() (*models.NetworkConfig, error) {
-// 			return &models.NetworkConfig{MinGasPrice: minGasPrice}, nil
-// 		},
-// 	}
-
-// 	anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-
-// 	err := anh.ApplyNonceAndGasPrice(context.Background(), tx)
-// 	require.Nil(t, err)
-
-// 	_, err = anh.SendTransaction(context.Background(), tx)
-// 	require.Nil(t, err)
-
-// 	require.True(t, anh.computedNonceWasSet)
-// 	require.Equal(t, blockchainNonce, anh.computedNonce)
-// 	require.Equal(t, uint64(0), anh.nonceUntilGasIncreased)
-// 	require.Equal(t, minGasPrice, anh.gasPrice)
-// 	require.Equal(t, 1, len(anh.transactions))
-
-// 	anh.DropTransactions()
-
-// 	require.False(t, anh.computedNonceWasSet)
-// 	require.Equal(t, blockchainNonce, anh.nonceUntilGasIncreased)
-// 	require.Equal(t, minGasPrice+1, anh.gasPrice)
-// 	require.Equal(t, 0, len(anh.transactions))
-// }
-
 func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 	t.Parallel()
 
@@ -280,7 +239,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &models.AccountInfo{
+					AccountInfo: &idata.AccountInfo{
 						Nonce: blockchainNonce - 1,
 					},
 				}, nil
@@ -309,7 +268,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &models.AccountInfo{
+					AccountInfo: &idata.AccountInfo{
 						Nonce: blockchainNonce,
 					},
 				}, nil
@@ -351,7 +310,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &models.AccountInfo{
+					AccountInfo: &idata.AccountInfo{
 						Nonce: blockchainNonce - 1,
 					},
 				}, nil
@@ -378,7 +337,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &models.AccountInfo{
+					AccountInfo: &idata.AccountInfo{
 						Nonce: blockchainNonce - 1,
 					},
 				}, nil
@@ -402,23 +361,6 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 	})
 }
 
-// func TestAddressNonceHandler_fetchGasPriceIfRequired(t *testing.T) {
-// 	t.Parallel()
-
-// 	// proxy returns error should set invalid gasPrice(0)
-// 	proxy := &testsCommon.ProxyStub{
-// 		GetNetworkConfigCalled: func() (*models.NetworkConfig, error) {
-// 			return nil, expectedErr
-// 		},
-// 	}
-// 	anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-// 	anh.gasPrice = 100000
-// 	anh.nonceUntilGasIncreased = 100
-
-// 	anh.fetchGasPriceIfRequired(context.Background(), 101)
-// 	require.Equal(t, uint64(0), anh.gasPrice)
-// }
-
 func createDefaultTx() *transaction.Transaction {
 	tx := transaction.NewBaseTransaction(testAddress.Bytes(), 0, nil, 0, 0)
 	contractRequest := chainModels.TransferTXRequest{
@@ -438,28 +380,4 @@ func createDefaultTx() *transaction.Transaction {
 	tx.AddTransaction(txArgs)
 
 	return tx
-
-	// return transaction.Transaction{
-	// 	RawData: &transaction.Transaction_Raw{
-	// 		Sender:  testAddressAsBech32String,
-	// 		Version: 1,
-	// 		ChainID: 420420,
-	// 		Data:    nil,
-	// 	},
-	// 	Receiver: testAddressAsBech32String,
-
-	// 	GasMultiplier: 100000,
-	// 	GasLimit:      50000,
-	// }
 }
-
-// transaction.Transaction{
-// 	Value:         "1",
-// 	Receiver:      testAddressAsBech32String,
-// 	Sender:        testAddressAsBech32String,
-// 	GasMultiplier: 100000,
-// 	GasLimit:      50000,
-// 	Data:          nil,
-// 	ChainID:       "3",
-// 	Version:       1,
-// }
