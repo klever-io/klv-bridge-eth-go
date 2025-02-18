@@ -24,8 +24,8 @@ type NetMessenger interface {
 	IsInterfaceNil() bool
 }
 
-// MultiversXRoleProvider defines the operations for an MultiversX role provider
-type MultiversXRoleProvider interface {
+// KleverChainRoleProvider defines the operations for an KleverChain role provider
+type KleverChainRoleProvider interface {
 	IsWhitelisted(address address.Address) bool
 	IsInterfaceNil() bool
 }

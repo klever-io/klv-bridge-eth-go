@@ -28,7 +28,7 @@ const (
 type ArgsBroadcaster struct {
 	Messenger              NetMessenger
 	Log                    logger.Logger
-	MultiversXRoleProvider MultiversXRoleProvider
+	MultiversXRoleProvider KleverChainRoleProvider
 	SignatureProcessor     SignatureProcessor
 	KeyGen                 crypto.KeyGenerator
 	SingleSigner           crypto.SingleSigner
@@ -42,7 +42,7 @@ type broadcaster struct {
 	*noncesOfPublicKeys
 	messenger             NetMessenger
 	log                   logger.Logger
-	multiversRoleProvider MultiversXRoleProvider
+	multiversRoleProvider KleverChainRoleProvider
 	signatureProcessor    SignatureProcessor
 	name                  string
 	mutClients            sync.RWMutex
