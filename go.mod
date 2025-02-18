@@ -5,7 +5,6 @@ go 1.22.1
 require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/btcsuite/websocket v0.0.0-20150119174127-31079b680792
-	github.com/cosmos/go-bip39 v1.0.0
 	github.com/ethereum/go-ethereum v1.13.15
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-contrib/pprof v1.4.0
@@ -21,7 +20,6 @@ require (
 	github.com/pelletier/go-toml v1.9.3
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli v1.22.10
-	github.com/xdg-go/pbkdf2 v1.0.0
 )
 
 require (
@@ -170,7 +168,6 @@ require (
 	github.com/opencontainers/runtime-spec v1.2.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
-	github.com/pborman/uuid v1.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

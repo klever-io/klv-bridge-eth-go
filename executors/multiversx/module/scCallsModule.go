@@ -3,6 +3,7 @@ package module
 import (
 	"time"
 
+	"github.com/klever-io/klever-go/tools"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
 	"github.com/klever-io/klv-bridge-eth-go/config"
@@ -14,7 +15,6 @@ import (
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
 	"github.com/multiversx/mx-sdk-go/core/polling"
-	"github.com/multiversx/mx-sdk-go/interactors"
 )
 
 var suite = ed25519.NewEd25519()
@@ -62,13 +62,13 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 		return nil, err
 	}
 
-	wallet := interactors.NewWallet()
-	multiversXPrivateKeyBytes, err := wallet.LoadPrivateKeyFromPemFile(cfg.PrivateKeyFile)
+	// Public key not used in this case
+	kleverChainPrivateKeyBytes, _, err := tools.LoadSkPkFromPemFile(cfg.PrivateKeyFile, 0, "")
 	if err != nil {
 		return nil, err
 	}
 
-	privateKey, err := keyGen.PrivateKeyFromByteArray(multiversXPrivateKeyBytes)
+	privateKey, err := keyGen.PrivateKeyFromByteArray(kleverChainPrivateKeyBytes)
 	if err != nil {
 		return nil, err
 	}

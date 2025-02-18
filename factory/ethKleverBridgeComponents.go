@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klever-go/tools"
 	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
 	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/disabled"
 	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/steps/ethToMultiversX"
@@ -21,7 +22,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/wallet"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mappers"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/clients/roleProviders"
 	"github.com/klever-io/klv-bridge-eth-go/config"
@@ -234,24 +234,17 @@ func checkArgsEthereumToKleverBridge(args ArgsEthereumToKleverBridge) error {
 }
 
 func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainConfigs config.KleverConfig) error {
-	relayerWallet, err := wallet.NewWalletFromPEM(chainConfigs.PrivateKeyFile)
+	kleverPrivateKeyBytes, pbkString, err := tools.LoadSkPkFromPemFile(chainConfigs.PrivateKeyFile, 0, "")
 	if err != nil {
 		return err
 	}
-
-	kleverPrivateKeyBytes := relayerWallet.PrivateKey()
 
 	components.kleverRelayerPrivateKey, err = keyGen.PrivateKeyFromByteArray(kleverPrivateKeyBytes)
 	if err != nil {
 		return err
 	}
 
-	// relayerAccount, err := relayerWallet.GetAccount()
-	// if err != nil {
-	// 	return err
-	// }
-
-	components.kleverRelayerAddress, err = address.NewAddressFromBytes(relayerWallet.PublicKey())
+	components.kleverRelayerAddress, err = address.NewAddress(pbkString)
 	if err != nil {
 		return err
 	}
