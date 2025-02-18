@@ -146,8 +146,12 @@ func (b *broadcaster) ProcessReceivedMessage(message p2p.MessageP2P, fromConnect
 		return err
 	}
 
-	// TODO: verify if check error is needed, since before change to klever-go-sdk wasn't checking this error
-	addr, _ := address.NewAddressFromBytes(msg.PublicKeyBytes)
+	addr, err := address.NewAddressFromBytes(msg.PublicKeyBytes)
+	if err != nil {
+		b.log.Debug("got error when parsing public key", "error", err)
+		return err
+	}
+
 	hexPkBytes := hex.EncodeToString(msg.PublicKeyBytes)
 	if !b.multiversRoleProvider.IsWhitelisted(addr) {
 		return fmt.Errorf("%w for peer: %s", ErrPeerNotWhitelisted, hexPkBytes)
