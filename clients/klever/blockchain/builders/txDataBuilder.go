@@ -97,7 +97,7 @@ func (builder *txDataBuilder) ToDataBytes() ([]byte, error) {
 		return nil, err
 	}
 
-	return []byte(dataField), err
+	return []byte(dataField), nil
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
