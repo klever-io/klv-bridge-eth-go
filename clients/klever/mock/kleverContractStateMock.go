@@ -91,7 +91,8 @@ func (mock *kleverContractStateMock) cleanState() {
 func (mock *kleverContractStateMock) processTransaction(tx *transaction.Transaction) {
 	// TODO: check how transactions call contract methods
 	var data []byte
-	if len(tx.GetData()) > 0 {
+	txData := tx.GetData()
+	if len(txData) > 0 {
 		data = tx.GetData()[0]
 	}
 	dataSplit := strings.Split(string(data), "@")
