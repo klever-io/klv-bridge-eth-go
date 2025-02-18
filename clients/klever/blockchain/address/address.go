@@ -17,17 +17,15 @@ type address struct {
 	bech32 string
 }
 
-const addrLen = 32
-
 func ZeroAddress() Address {
 	addr, _ := NewAddressFromHex("0000000000000000000000000000000000000000000000000000000000000000")
 	return addr
 }
 
 func NewAddressFromBytes(pkBytes []byte) (Address, error) {
-	if len(pkBytes) != addrLen {
+	if len(pkBytes) != AddressBytesLen {
 		return nil, fmt.Errorf("decoding address, expected length %d, received %d",
-			addrLen, len(pkBytes))
+			AddressBytesLen, len(pkBytes))
 	}
 
 	//since the errors generated here are usually because of a bad config, they will be treated here
@@ -50,9 +48,9 @@ func NewAddressFromHex(hexAddr string) (Address, error) {
 		return nil, err
 	}
 
-	if len(decodedBytes) != addrLen {
+	if len(decodedBytes) != AddressBytesLen {
 		return nil, fmt.Errorf("decoding address, expected length %d, received %d",
-			addrLen, len(decodedBytes))
+			AddressBytesLen, len(decodedBytes))
 	}
 
 	return NewAddressFromBytes(decodedBytes)
@@ -73,9 +71,9 @@ func NewAddress(bech32Addr string) (Address, error) {
 		return nil, err
 	}
 
-	if len(decodedBytes) != addrLen {
+	if len(decodedBytes) != AddressBytesLen {
 		return nil, fmt.Errorf("decoding address, expected length %d, received %d",
-			addrLen, len(decodedBytes))
+			AddressBytesLen, len(decodedBytes))
 	}
 
 	return newAddress(decodedBytes, bech32Addr), nil
