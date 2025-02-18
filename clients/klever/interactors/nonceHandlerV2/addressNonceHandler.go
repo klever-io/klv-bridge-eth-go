@@ -84,21 +84,6 @@ func (anh *addressNonceHandler) handleTxWithSameNonce(oldTx *transaction.Transac
 	return interactors.ErrTxWithSameNonceAndGasPriceAlreadySent
 }
 
-// func (anh *addressNonceHandler) fetchGasPriceIfRequired(ctx context.Context, nonce uint64) {
-// 	if nonce == anh.nonceUntilGasIncreased+1 || anh.gasPrice == 0 {
-// 		networkConfig, err := anh.proxy.GetNetworkConfig(ctx)
-
-// 		anh.mut.Lock()
-// 		defer anh.mut.Unlock()
-// 		if err != nil {
-// 			log.Error("%w: while fetching network config", err)
-// 			anh.gasPrice = 0
-// 			return
-// 		}
-// 		anh.gasPrice = networkConfig.MinGasPrice
-// 	}
-// }
-
 func (anh *addressNonceHandler) getNonceUpdatingCurrent(ctx context.Context) (uint64, error) {
 	account, err := anh.proxy.GetAccount(ctx, anh.address)
 	if err != nil {

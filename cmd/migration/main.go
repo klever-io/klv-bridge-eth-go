@@ -124,19 +124,6 @@ func executeQuery(cfg config.MigrationToolConfig) error {
 }
 
 func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*internalComponents, error) {
-	// argsProxy := blockchain.ArgsProxy{
-	// 	ProxyURL:            cfg.Klever.NetworkAddress,
-	// 	SameScState:         false,
-	// 	ShouldBeSynced:      false,
-	// 	FinalityCheck:       cfg.Klever.Proxy.FinalityCheck,
-	// 	AllowedDeltaToFinal: cfg.Klever.Proxy.MaxNoncesDelta,
-	// 	CacheExpirationTime: time.Second * time.Duration(cfg.Klever.Proxy.CacherExpirationSeconds),
-	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.Klever.Proxy.RestAPIEntityType),
-	// }
-	// proxy, err := blockchain.NewProxy(argsProxy)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	proxy := mock.CreateMockProxyKLV()
 
 	dummyAddress, err := address.NewAddressFromBytes(bytes.Repeat([]byte{0x1}, 32))

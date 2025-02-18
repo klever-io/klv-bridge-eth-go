@@ -40,9 +40,6 @@ func NewKleverChainMock() *KleverChainMock {
 func (mock *KleverChainMock) GetNetworkConfig(_ context.Context) (*models.NetworkConfig, error) {
 	return &models.NetworkConfig{
 		ChainID: "t",
-		// LatestTagSoftwareVersion: "",
-		// MinGasPrice:              1000000000,
-		// MinTransactionVersion:    1,
 	}, nil
 }
 
