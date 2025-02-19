@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"sync"
 	"testing"
 
 	"github.com/klever-io/klever-go/data/transaction"
@@ -204,6 +205,38 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 
 		err := anh.ApplyNonceAndGasPrice(context.Background(), tx)
 		require.Equal(t, expectedErr, err)
+	})
+	t.Run("getNonceUpdatingCurrent computed nonce concurrent usage should work", func(t *testing.T) {
+		t.Parallel()
+
+		proxy := &testsCommon.ProxyStub{}
+		anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
+
+		numberOfWorkers := 10
+		var wg sync.WaitGroup
+		var mu sync.Mutex
+
+		nonces := make(map[uint64]bool)
+		for i := 0; i < numberOfWorkers; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				tx := createDefaultTx()
+				err := anh.ApplyNonceAndGasPrice(context.Background(), tx)
+				assert.Nil(t, err)
+
+				mu.Lock()
+				nonces[tx.RawData.Nonce] = true
+				mu.Unlock()
+			}()
+		}
+		wg.Wait()
+
+		require.Equal(t, numberOfWorkers, len(nonces))
+		for i := 0; i < numberOfWorkers; i++ {
+			_, exists := nonces[uint64(i)]
+			require.True(t, exists)
+		}
 	})
 }
 

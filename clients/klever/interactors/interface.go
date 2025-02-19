@@ -24,7 +24,6 @@ type AddressNonceHandler interface {
 	ApplyNonceAndGasPrice(ctx context.Context, tx *transaction.Transaction) error
 	ReSendTransactionsIfRequired(ctx context.Context) error
 	SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error)
-	DropTransactions()
 	IsInterfaceNil() bool
 }
 

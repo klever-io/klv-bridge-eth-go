@@ -161,14 +161,6 @@ func (anh *addressNonceHandler) SendTransaction(ctx context.Context, tx *transac
 	return anh.proxy.SendTransaction(ctx, tx)
 }
 
-// DropTransactions will delete the cached transactions and will try to replace the current transactions from the pool using more gas price
-func (anh *addressNonceHandler) DropTransactions() {
-	anh.mut.Lock()
-	anh.transactions = make(map[uint64]*transaction.Transaction)
-	anh.computedNonceWasSet = false
-	anh.mut.Unlock()
-}
-
 func (anh *addressNonceHandler) getOlderTxWithSameNonce(tx *transaction.Transaction) *transaction.Transaction {
 	anh.mut.RLock()
 	defer anh.mut.RUnlock()

@@ -238,7 +238,12 @@ func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Addre
 
 // EstimateTransactionFees -
 func (mock *KleverChainMock) EstimateTransactionFees(_ context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error) {
-	return nil, nil
+	return &transaction.FeesResponse{
+		CostResponse: &transaction.CostResponse{
+			KAppFee:      100,
+			BandwidthFee: 200,
+		},
+	}, nil
 }
 
 // IsInterfaceNil -

@@ -443,46 +443,6 @@ func createMockTransactionsWithGetNonce(
 	return txs
 }
 
-func TestNonceTransactionsHandlerV2_ForceNonceReFetch(t *testing.T) {
-	t.Parallel()
-
-	currentNonce := uint64(664)
-
-	args := createMockArgsNonceTransactionsHandlerV2()
-	args.Proxy = &testsCommon.ProxyStub{
-		GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
-			addressAsBech32String := address.Bech32()
-			if addressAsBech32String != testAddressAsBech32String {
-				return nil, errors.New("unexpected address")
-			}
-
-			return &models.Account{
-				AccountInfo: &idata.AccountInfo{
-					Nonce: atomic.LoadUint64(&currentNonce),
-				},
-			}, nil
-		},
-	}
-
-	nth, _ := NewNonceTransactionHandlerV2(args)
-	tx := transaction.NewBaseTransaction(nil, 0, nil, 0, 0)
-	_ = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
-	_ = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
-	err := nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
-	require.Nil(t, err)
-	assert.Equal(t, atomic.LoadUint64(&currentNonce)+2, tx.RawData.Nonce)
-
-	err = nth.DropTransactions(nil)
-	assert.Equal(t, interactors.ErrNilAddress, err)
-
-	err = nth.DropTransactions(testAddress)
-	assert.Nil(t, err)
-
-	err = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, atomic.LoadUint64(&currentNonce), tx.RawData.Nonce)
-}
-
 func createMockArgsNonceTransactionsHandlerV2() ArgsNonceTransactionsHandlerV2 {
 	return ArgsNonceTransactionsHandlerV2{
 		Proxy:            &testsCommon.ProxyStub{},

@@ -182,23 +182,6 @@ func (nth *nonceTransactionsHandlerV2) resendTransactions(ctx context.Context) {
 	}
 }
 
-// DropTransactions will clean the addressNonceHandler cached transactions. A little gas increase will be applied to the next transactions
-// in order to also replace the transactions from the txPool.
-// This should be only used in a fallback plan, when some transactions are completely lost (or due to a bug, not even sent in first time)
-func (nth *nonceTransactionsHandlerV2) DropTransactions(address sdkAddress.Address) error {
-	if check.IfNil(address) {
-		return interactors.ErrNilAddress
-	}
-
-	anh, err := nth.getOrCreateAddressNonceHandler(address)
-	if err != nil {
-		return err
-	}
-	anh.DropTransactions()
-
-	return nil
-}
-
 // Close finishes the transactions resend go routine
 func (nth *nonceTransactionsHandlerV2) Close() error {
 	nth.cancelFunc()
