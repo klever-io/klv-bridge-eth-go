@@ -35,8 +35,8 @@ var pausedBytes = []byte{1}
 
 func createMockClientArgs() ClientArgs {
 	privateKey, _ := testKeyGen.PrivateKeyFromByteArray(bytes.Repeat([]byte{1}, 32))
-	multisigContractAddress, _ := address.NewAddress("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
-	safeContractAddress, _ := address.NewAddress("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
+	multisigContractAddress, _ := address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	safeContractAddress, _ := address.NewAddress("klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc")
 
 	return ClientArgs{
 		GasMapConfig: config.KleverGasMapConfig{
@@ -354,7 +354,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{2}, 20),
 					DisplayableTo:         "0x0202020202020202020202020202020202020202",
 					FromBytes:             bytes.Repeat([]byte{1}, 32),
-					DisplayableFrom:       "erd1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsl6e0p7",
+					DisplayableFrom:       "klv1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsy6zanq",
 					SourceTokenBytes:      tokenBytes1,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes1...),
 					DisplayableToken:      string(tokenBytes1),
@@ -365,7 +365,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{5}, 20),
 					DisplayableTo:         "0x0505050505050505050505050505050505050505",
 					FromBytes:             bytes.Repeat([]byte{4}, 32),
-					DisplayableFrom:       "erd1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqxjfvxn",
+					DisplayableFrom:       "klv1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqajj75d",
 					SourceTokenBytes:      tokenBytes2,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes2...),
 					DisplayableToken:      string(tokenBytes2),
@@ -511,7 +511,7 @@ func TestClient_GetBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{2}, 20),
 					DisplayableTo:         "0x0202020202020202020202020202020202020202",
 					FromBytes:             bytes.Repeat([]byte{1}, 32),
-					DisplayableFrom:       "erd1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsl6e0p7",
+					DisplayableFrom:       "klv1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsy6zanq",
 					SourceTokenBytes:      tokenBytes1,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes1...),
 					DisplayableToken:      string(tokenBytes1),
@@ -522,7 +522,7 @@ func TestClient_GetBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{5}, 20),
 					DisplayableTo:         "0x0505050505050505050505050505050505050505",
 					FromBytes:             bytes.Repeat([]byte{4}, 32),
-					DisplayableFrom:       "erd1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqxjfvxn",
+					DisplayableFrom:       "klv1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqajj75d",
 					SourceTokenBytes:      tokenBytes2,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes2...),
 					DisplayableToken:      string(tokenBytes2),

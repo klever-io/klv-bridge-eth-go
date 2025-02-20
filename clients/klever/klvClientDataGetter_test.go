@@ -39,9 +39,9 @@ func createMockArgsKLVClientDataGetter() ArgsKLVClientDataGetter {
 		Proxy: &interactors.ProxyStub{},
 	}
 
-	args.MultisigContractAddress, _ = address.NewAddress("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
-	args.SafeContractAddress, _ = address.NewAddress("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
-	args.RelayerAddress, _ = address.NewAddress("erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede")
+	args.MultisigContractAddress, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	args.SafeContractAddress, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc")
+	args.RelayerAddress, _ = address.NewAddress("klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j")
 
 	return args
 }
@@ -959,7 +959,7 @@ func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 		result, err := dg.GetTransactionsStatuses(context.Background(), batchID)
 		assert.Nil(t, result)
 		expectedErr := bridgeErrors.NewQueryResponseError(internalError, `error converting the received bytes to bool, strconv.ParseBool: parsing "56": invalid syntax`,
-			"getStatusesAfterExecution", "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
+			"getStatusesAfterExecution", "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
 		assert.Equal(t, expectedErr, err)
 	})
 	t.Run("batch not finished", func(t *testing.T) {

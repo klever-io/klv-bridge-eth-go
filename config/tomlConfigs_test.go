@@ -41,8 +41,8 @@ func TestConfigs(t *testing.T) {
 		},
 		Klever: KleverConfig{
 			NetworkAddress:               "https://api.devnet.klever.finance",
-			MultisigContractAddress:      "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
-			SafeContractAddress:          "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
+			MultisigContractAddress:      "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
+			SafeContractAddress:          "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
 			PrivateKeyFile:               "keys/multiversx.pem",
 			IntervalToResendTxsInSeconds: 60,
 			GasMap: KleverGasMapConfig{
@@ -244,8 +244,8 @@ func TestConfigs(t *testing.T) {
 
 [Klever]
     NetworkAddress = "https://api.devnet.klever.finance" # the network address
-    MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
-    SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
     PrivateKeyFile = "keys/multiversx.pem" # the path to the pem file containing the relayer multiversx wallet
     IntervalToResendTxsInSeconds = 60 # the time in seconds between nonce reads
     MaxRetriesOnQuorumReached = 3
@@ -500,8 +500,8 @@ func TestMigrationToolConfig(t *testing.T) {
 		},
 		Klever: KleverConfig{
 			NetworkAddress:          "https://api.devnet.klever.finance",
-			MultisigContractAddress: "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
-			SafeContractAddress:     "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
+			MultisigContractAddress: "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
+			SafeContractAddress:     "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
 			Proxy: ProxyConfig{
 				CacherExpirationSeconds: 600,
 				RestAPIEntityType:       "observer",
@@ -537,8 +537,8 @@ func TestMigrationToolConfig(t *testing.T) {
 
 [Klever]
     NetworkAddress = "https://api.devnet.klever.finance/" # the network address
-    MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
-    SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
     [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 

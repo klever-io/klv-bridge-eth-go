@@ -22,8 +22,8 @@ import (
 var (
 	testSigner          = &singlesig.Ed25519Signer{}
 	skBytes             = bytes.Repeat([]byte{1}, 32)
-	testMultisigAddress = "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede"
-	relayerAddress      = "erd132yw8ht5p8cetl2jmvknewjawt9xwzdlrk2pyxlnwjyqrdq0dawqvjzv73"
+	testMultisigAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
+	relayerAddress      = "klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j"
 )
 
 func createTransactionHandlerWithMockComponents() *transactionHandler {
@@ -127,15 +127,12 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		sendWasCalled := false
 
 		chainID := "chain ID"
-		// minGasPrice := uint64(12234)
 		minTxVersion := uint32(122)
 
 		txHandlerInstance.proxy = &interactors.ProxyStub{
 			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
 				return &models.NetworkConfig{
 					ChainID: chainID,
-					//MinGasPrice:           minGasPrice,
-					//MinTransactionVersion: minTxVersion,
 				}, nil
 			},
 		}
@@ -144,7 +141,6 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				if getBech32Address(address) == relayerAddress {
 					tx.GetRawData().Nonce = nonce
-					// tx.GasPrice = minGasPrice
 
 					return nil
 				}
@@ -156,12 +152,10 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 				assert.Equal(t, relayerAddress, tx.GetSender())
 				//assert.Equal(t, testMultisigAddress, tx.Receiver)
 				assert.Equal(t, nonce, tx.GetNonce())
-				//assert.Equal(t, "0", tx.Value)
-				//assert.Equal(t, "function@62756666@16", string(tx.Data))
+				assert.Equal(t, "function@62756666@16", string(tx.GetRawData().Data[0]))
 				assert.Equal(t, "fdbd51691e8179da15b22b133ab7e2d9f67faef585f6f4d9859ae176e7b6c2d7bb7f930de753fb7f8a377cd460ff41b54f8cfb0c720f586fbbfbee680edb310b", tx.Signature)
 				assert.Equal(t, chainID, tx.GetRawData().GetChainID())
 				assert.Equal(t, gasLimit, tx.GasLimit)
-				//assert.Equal(t, minGasPrice, tx.GasPrice)
 				assert.Equal(t, minTxVersion, tx.GetRawData().Version)
 
 				return txHash, nil
