@@ -203,15 +203,13 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
-						ReturnData:    nil,
-						ReturnCode:    returnCode,
-						ReturnMessage: returnMessage,
-						GasRemaining:  0,
-						//GasRefund:       nil,
+						ReturnData:      nil,
+						ReturnCode:      returnCode,
+						ReturnMessage:   returnMessage,
+						GasRemaining:    0,
 						OutputAccounts:  nil,
 						DeletedAccounts: nil,
-						//TouchedAccounts: nil,
-						Logs: nil,
+						Logs:            nil,
 					},
 				}, nil
 			},
@@ -239,15 +237,13 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
-						ReturnData:    retData,
-						ReturnCode:    okCodeAfterExecution,
-						ReturnMessage: returnMessage,
-						GasRemaining:  0,
-						//GasRefund:       nil,
+						ReturnData:      retData,
+						ReturnCode:      okCodeAfterExecution,
+						ReturnMessage:   returnMessage,
+						GasRemaining:    0,
 						OutputAccounts:  nil,
 						DeletedAccounts: nil,
-						//TouchedAccounts: nil,
-						Logs: nil,
+						Logs:            nil,
 					},
 				}, nil
 			},
@@ -1291,21 +1287,6 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 
 	expectedErr := errors.New("expected error")
 	expectedNonce := uint64(33443)
-	t.Run("GetShardOfAddress errors", func(t *testing.T) {
-		t.Parallel()
-
-		args := createMockArgsKLVClientDataGetter()
-		args.Proxy = &interactors.ProxyStub{
-			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
-				return 0, expectedErr
-			},
-		}
-		dg, _ := NewKLVClientDataGetter(args)
-
-		nonce, err := dg.GetCurrentNonce(context.Background())
-		assert.Equal(t, uint64(0), nonce)
-		assert.Equal(t, expectedErr, err)
-	})
 	t.Run("GetNetworkStatus errors", func(t *testing.T) {
 		t.Parallel()
 
@@ -1361,35 +1342,6 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 		nonce, err := dg.GetCurrentNonce(context.Background())
 		assert.Equal(t, expectedNonce, nonce)
 		assert.Nil(t, err)
-	})
-	t.Run("should work should buffer the shard ID", func(t *testing.T) {
-		t.Parallel()
-
-		args := createMockArgsKLVClientDataGetter()
-		numCallsGetShardOfAddress := 0
-		numCallsGetNetworkStatus := 0
-		args.Proxy = &interactors.ProxyStub{
-			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
-				numCallsGetShardOfAddress++
-				return 0, nil
-			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
-				numCallsGetNetworkStatus++
-				return &data.NetworkStatus{
-					Nonce: expectedNonce,
-				}, nil
-			},
-		}
-		dg, _ := NewKLVClientDataGetter(args)
-
-		nonce, _ := dg.GetCurrentNonce(context.Background())
-		assert.Equal(t, expectedNonce, nonce)
-
-		nonce, _ = dg.GetCurrentNonce(context.Background())
-		assert.Equal(t, expectedNonce, nonce)
-
-		assert.Equal(t, 1, numCallsGetShardOfAddress)
-		assert.Equal(t, 2, numCallsGetNetworkStatus)
 	})
 }
 

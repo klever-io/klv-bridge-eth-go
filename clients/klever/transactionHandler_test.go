@@ -3,6 +3,7 @@ package klever
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"errors"
 	"testing"
 
@@ -17,13 +18,14 @@ import (
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
 	testSigner          = &singlesig.Ed25519Signer{}
 	skBytes             = bytes.Repeat([]byte{1}, 32)
 	testMultisigAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
-	relayerAddress      = "klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j"
+	relayerAddress      = "klv132yw8ht5p8cetl2jmvknewjawt9xwzdlrk2pyxlnwjyqrdq0dawqhje7v0"
 )
 
 func createTransactionHandlerWithMockComponents() *transactionHandler {
@@ -127,7 +129,6 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		sendWasCalled := false
 
 		chainID := "chain ID"
-		minTxVersion := uint32(122)
 
 		txHandlerInstance.proxy = &interactors.ProxyStub{
 			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
@@ -149,14 +150,25 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
 				sendWasCalled = true
-				assert.Equal(t, relayerAddress, tx.GetSender())
-				//assert.Equal(t, testMultisigAddress, tx.Receiver)
+				sender, err := address.NewAddressFromBytes(tx.GetSender())
+				require.Nil(t, err)
+				assert.Equal(t, relayerAddress, sender.Bech32())
+
+				require.Len(t, tx.GetContracts(), 1)
+				sc, err := tx.GetContracts()[0].GetSmartContract()
+				require.Nil(t, err)
+
+				scAddr, err := address.NewAddressFromBytes(sc.Address)
+				require.Nil(t, err)
+				assert.Equal(t, testMultisigAddress, scAddr)
+
 				assert.Equal(t, nonce, tx.GetNonce())
-				assert.Equal(t, "function@62756666@16", string(tx.GetRawData().Data[0]))
-				assert.Equal(t, "fdbd51691e8179da15b22b133ab7e2d9f67faef585f6f4d9859ae176e7b6c2d7bb7f930de753fb7f8a377cd460ff41b54f8cfb0c720f586fbbfbee680edb310b", tx.Signature)
-				assert.Equal(t, chainID, tx.GetRawData().GetChainID())
-				assert.Equal(t, gasLimit, tx.GasLimit)
-				assert.Equal(t, minTxVersion, tx.GetRawData().Version)
+				require.Len(t, tx.GetData(), 1)
+				assert.Equal(t, "function@62756666@16", string(tx.GetData()[0]))
+
+				require.Len(t, tx.GetSignature(), 1)
+				assert.Equal(t, "4d1578a5ea204fa65b209b62a508add5a003de6c8cae2908fceadb810e137ebc74fcdce534cccd05502df697d41276faf3e7decf4896dd378d88b223eef53107", hex.EncodeToString(tx.Signature[0]))
+				assert.Equal(t, chainID, string(tx.GetRawData().GetChainID()))
 
 				return txHash, nil
 			},

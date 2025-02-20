@@ -18,7 +18,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 )
 
 const (
@@ -143,7 +142,7 @@ func checkArgs(args ArgsScCallExecutor) error {
 		return err
 	}
 
-	_, err = data.NewAddressFromBech32String(args.ScProxyBech32Address)
+	_, err = address.NewAddress(args.ScProxyBech32Address)
 
 	return err
 }

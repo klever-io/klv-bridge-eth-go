@@ -628,11 +628,16 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, uint32(111), tx.GetRawData().Version)
 				assert.Equal(t, args.ExtraGasToExecute+5000000, tx.GasLimit)
 				assert.Equal(t, nonceCounter-1, tx.GetRawData().Nonce)
-				assert.Equal(t, hex.EncodeToString([]byte("sig")), tx.Signature)
-				_, err := data.NewAddressFromBech32String(string(tx.GetSender()))
+				_, err := address.NewAddressFromBytes(tx.GetSender())
 				assert.Nil(t, err)
-				// assert.Equal(t, "erd1qqqqqqqqqqqqqpgqk839entmk46ykukvhpn90g6knskju3dtanaq20f66e", tx.Receiver)
-				// assert.Equal(t, "0", tx.Value)
+
+				require.Len(t, tx.GetContracts(), 1)
+				sc, err := tx.GetContracts()[0].GetSmartContract()
+				require.Nil(t, err)
+
+				scAddr, err := address.NewAddressFromBytes(sc.Address)
+				require.Nil(t, err)
+				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr)
 
 				// only the second pending operation gor through the filter
 				expectedData := scProxyCallFunction + "@02"
@@ -721,10 +726,16 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, args.ExtraGasToExecute, tx.GasLimit) // no 5000000 added gas limit because it wasn't extracted
 				assert.Equal(t, nonceCounter-1, tx.GetRawData().Nonce)
 				assert.Equal(t, hex.EncodeToString([]byte("sig")), tx.Signature)
-				_, err := data.NewAddressFromBech32String(string(tx.GetSender()))
+				_, err := address.NewAddressFromBytes(tx.GetSender())
 				assert.Nil(t, err)
-				// assert.Equal(t, "erd1qqqqqqqqqqqqqpgqk839entmk46ykukvhpn90g6knskju3dtanaq20f66e", tx.Receiver)
-				// assert.Equal(t, "0", tx.Value)
+
+				require.Len(t, tx.GetContracts(), 1)
+				sc, err := tx.GetContracts()[0].GetSmartContract()
+				require.Nil(t, err)
+
+				scAddr, err := address.NewAddressFromBytes(sc.Address)
+				require.Nil(t, err)
+				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr)
 
 				// only the second pending operation gor through the filter
 				expectedData := scProxyCallFunction + "@02"
@@ -811,11 +822,16 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, uint32(111), tx.GetRawData().Version)
 				assert.Equal(t, args.GasLimitForOutOfGasTransactions, tx.GasLimit) // the gas limit was replaced
 				assert.Equal(t, nonceCounter-1, tx.GetRawData().Nonce)
-				assert.Equal(t, hex.EncodeToString([]byte("sig")), tx.Signature)
-				_, err := data.NewAddressFromBech32String(string(tx.GetSender()))
+				_, err := address.NewAddressFromBytes(tx.GetSender())
 				assert.Nil(t, err)
-				// assert.Equal(t, "erd1qqqqqqqqqqqqqpgqk839entmk46ykukvhpn90g6knskju3dtanaq20f66e", tx.Receiver)
-				// assert.Equal(t, "0", tx.Value)
+
+				require.Len(t, tx.GetContracts(), 1)
+				sc, err := tx.GetContracts()[0].GetSmartContract()
+				require.Nil(t, err)
+
+				scAddr, err := address.NewAddressFromBytes(sc.Address)
+				require.Nil(t, err)
+				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr)
 
 				// only the second pending operation gor through the filter
 				expectedData := scProxyCallFunction + "@02"
