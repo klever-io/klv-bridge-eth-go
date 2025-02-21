@@ -19,7 +19,7 @@ func NewNodeEndpointProvider() *nodeEndpointProvider {
 }
 
 // GetNodeStatus returns the node status endpoint
-func (node *nodeEndpointProvider) GetNodeStatus(_ uint32) string {
+func (node *nodeEndpointProvider) GetNodeStatus() string {
 	return nodeGetNodeStatusEndpoint
 }
 

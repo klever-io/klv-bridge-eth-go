@@ -12,9 +12,6 @@ var ErrInvalidAddress = errors.New("invalid address")
 // ErrNilAddress signals that the provided address is nil
 var ErrNilAddress = errors.New("nil address")
 
-// ErrNilShardCoordinator signals that the provided shard coordinator is nil
-var ErrNilShardCoordinator = errors.New("nil shard coordinator")
-
 // ErrNilNetworkConfigs signals that the provided network configs is nil
 var ErrNilNetworkConfigs = errors.New("nil network configs")
 
@@ -36,15 +33,6 @@ var ErrNilEndpointProvider = errors.New("nil endpoint provider")
 // ErrInvalidEndpointProvider signals that an invalid endpoint provider was provided
 var ErrInvalidEndpointProvider = errors.New("invalid endpoint provider")
 
-// ErrShardIDMismatch signals that a shard ID mismatch has occurred
-var ErrShardIDMismatch = errors.New("shard ID mismatch")
-
-// ErrNoShardOrAddressesProvided signals that no shard ID or addresses were provided, therefore shard ID cannot be computed
-var ErrNoShardOrAddressesProvided = errors.New("cannot compute shardID")
-
-// ErrAddressesFromDifferentShards signals that the provided addresses belong to different shards
-var ErrAddressesFromDifferentShards = errors.New("addresses belong to different shards")
-
 // ErrNilNetworkStatus signals that nil network status was received
 var ErrNilNetworkStatus = errors.New("nil network status")
 
@@ -56,12 +44,6 @@ var ErrNilProxy = errors.New("nil proxy")
 
 // ErrNotUint64Bytes signals that the provided bytes do not represent a valid uint64 number
 var ErrNotUint64Bytes = errors.New("provided bytes do not represent a valid uint64 number")
-
-// ErrInvalidBlockRange signals that the provided block range is invalid
-var ErrInvalidBlockRange = errors.New("invalid block range: too many blocks to process")
-
-// ErrNoBlockRangeProvided signals that no block range was provided
-var ErrNoBlockRangeProvided = errors.New("no block range specified")
 
 func createHTTPStatusError(httpStatusCode int, err error) error {
 	if err == nil {

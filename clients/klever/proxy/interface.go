@@ -18,8 +18,8 @@ type Proxy interface {
 	GetAccount(ctx context.Context, address address.Address) (*models.Account, error)
 	GetNetworkStatus(ctx context.Context, shardID uint32) (*data.NetworkStatus, error)
 	GetESDTTokenData(ctx context.Context, address address.Address, tokenIdentifier string) (*data.ESDTFungibleTokenData, error)
-	// GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error)
-	// ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.TxStatus, error)
+	GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error)
+	ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error)
 	EstimateTransactionFees(ctx context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error)
 	IsInterfaceNil() bool
 }

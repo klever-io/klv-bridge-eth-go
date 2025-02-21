@@ -4,9 +4,6 @@ import "fmt"
 
 const (
 	networkConfig              = "network/config"
-	networkEconomics           = "network/economics"
-	ratingsConfig              = "network/ratings"
-	enableEpochsConfig         = "network/enable-epochs"
 	account                    = "address/%s"
 	estimateTransactionFees    = "transaction/estimate-fee"
 	sendTransaction            = "transaction/send"
@@ -15,11 +12,7 @@ const (
 	processedTransactionStatus = "transaction/%s/process-status"
 	transactionInfo            = "transaction/%s"
 	vmValues                   = "vm-values/query"
-	genesisNodesConfig         = "network/genesis-nodes"
-	rawStartOfEpochMetaBlock   = "internal/raw/startofepoch/metablock/by-epoch/%d"
-	rawStartOfEpochValidators  = "internal/json/startofepoch/validators/by-epoch/%d"
 	esdt                       = "address/%s/esdt/%s"
-	nft                        = "address/%s/nft/%s/nonce/%d"
 )
 
 type baseEndpointProvider struct{}
@@ -27,16 +20,6 @@ type baseEndpointProvider struct{}
 // GetNetworkConfig returns the network config endpoint
 func (base *baseEndpointProvider) GetNetworkConfig() string {
 	return networkConfig
-}
-
-// GetNetworkEconomics returns the network economics endpoint
-func (base *baseEndpointProvider) GetNetworkEconomics() string {
-	return networkEconomics
-}
-
-// GetEnableEpochsConfig returns the enable epochs config endpoint
-func (base *baseEndpointProvider) GetEnableEpochsConfig() string {
-	return enableEpochsConfig
 }
 
 // GetAccount returns the account endpoint
@@ -47,11 +30,6 @@ func (base *baseEndpointProvider) GetAccount(addressAsBech32 string) string {
 // GetESDTTokenData returns the esdt endpoint
 func (base *baseEndpointProvider) GetESDTTokenData(addressAsBech32 string, tokenIdentifier string) string {
 	return fmt.Sprintf(esdt, addressAsBech32, tokenIdentifier)
-}
-
-// GetNFTTokenData returns the NFT/SFT/MetaESDT endpoint
-func (base *baseEndpointProvider) GetNFTTokenData(addressAsBech32 string, tokenIdentifier string, nonce uint64) string {
-	return fmt.Sprintf(nft, addressAsBech32, tokenIdentifier, nonce)
 }
 
 // GetCostTransaction returns the transaction cost endpoint
