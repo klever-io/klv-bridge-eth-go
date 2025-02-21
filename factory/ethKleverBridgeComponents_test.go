@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/status"
@@ -18,8 +19,6 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-go/testscommon/statusHandler"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/blockchain"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -89,12 +88,9 @@ func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 		},
 	}
 
-	argsProxy := blockchain.ArgsProxy{
-		ProxyURL:            cfg.Klever.NetworkAddress,
-		CacheExpirationTime: time.Minute,
-		EntityType:          sdkCore.ObserverNode,
-	}
-	proxy, _ := blockchain.NewProxy(argsProxy)
+	// TODO: change to real klever proxy when available
+	proxy := mock.CreateMockProxyKLV()
+
 	return ArgsEthereumToKleverBridge{
 		Configs:                   configs,
 		Messenger:                 &p2pMocks.MessengerStub{},
@@ -425,7 +421,7 @@ func TestEthKleverBridgeComponents_RelayerAddresses(t *testing.T) {
 	args := createMockEthKleverBridgeArgs()
 	components, _ := NewEthKleverBridgeComponents(args)
 
-	bech32Address, _ := components.MultiversXRelayerAddress().AddressAsBech32String()
+	bech32Address := components.KleverRelayerAddress().Bech32()
 	assert.Equal(t, "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede", bech32Address)
 	assert.Equal(t, "0x3FE464Ac5aa562F7948322F92020F2b668D543d8", components.EthereumRelayerAddress().String())
 }

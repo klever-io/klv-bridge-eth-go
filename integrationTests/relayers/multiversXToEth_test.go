@@ -94,7 +94,7 @@ func TestRelayersShouldExecuteSimpleTransfersFromMultiversXToEth(t *testing.T) {
 		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
-		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
+		multiversXChainMock.AddRelayer(relayer.KleverRelayerAddress())
 		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
 
 		go func() {
@@ -206,7 +206,7 @@ func testRelayersShouldExecuteTransfersFromMultiversXToEthIfTransactionsAppearIn
 		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
-		multiversXChainMock.AddRelayer(relayer.MultiversXRelayerAddress())
+		multiversXChainMock.AddRelayer(relayer.KleverRelayerAddress())
 		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
 
 		go func() {

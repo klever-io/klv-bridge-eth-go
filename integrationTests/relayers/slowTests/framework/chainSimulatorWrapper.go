@@ -2,7 +2,6 @@ package framework
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,18 +9,21 @@ import (
 	"testing"
 	"time"
 
+	factoryHasher "github.com/klever-io/klever-go/crypto/hashing/factory"
+	"github.com/klever-io/klever-go/crypto/signing"
+	"github.com/klever-io/klever-go/crypto/signing/ed25519"
+	"github.com/klever-io/klever-go/crypto/signing/ed25519/singlesig"
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klever-go/tools"
+	"github.com/klever-io/klever-go/tools/marshal/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
-	apiCore "github.com/multiversx/mx-chain-core-go/data/api"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
-	"github.com/multiversx/mx-chain-crypto-go/signing"
-	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
-	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	"github.com/multiversx/mx-chain-go/integrationTests/vm/wasm"
 	"github.com/multiversx/mx-chain-go/node/chainSimulator/dtos"
-	"github.com/multiversx/mx-sdk-go/blockchain"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	sdkHttp "github.com/multiversx/mx-sdk-go/core/http"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/require"
@@ -60,17 +62,8 @@ type chainSimulatorWrapper struct {
 
 // CreateChainSimulatorWrapper creates a new instance of the chain simulator wrapper
 func CreateChainSimulatorWrapper(args ArgChainSimulatorWrapper) *chainSimulatorWrapper {
-	argsProxy := blockchain.ArgsProxy{
-		ProxyURL:            proxyURL,
-		SameScState:         false,
-		ShouldBeSynced:      false,
-		FinalityCheck:       false,
-		AllowedDeltaToFinal: args.ProxyMaxNoncesDelta,
-		CacheExpirationTime: time.Second * time.Duration(args.ProxyCacherExpirationSeconds),
-		EntityType:          sdkCore.Proxy,
-	}
-	proxyInstance, err := blockchain.NewProxy(argsProxy)
-	require.Nil(args.TB, err)
+	// TODO: change this to use the real klever proxy when available
+	proxyInstance := mock.NewKleverChainMock()
 
 	pubKeyConverter, err := pubkeyConverter.NewBech32PubkeyConverter(32, "erd")
 	require.Nil(args.TB, err)
@@ -133,19 +126,14 @@ func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePat
 	params = append(params, parameters...)
 	txData := strings.Join(params, "@")
 
-	ftx := &transaction.FrontendTransaction{
-		Nonce:    nonce,
-		Value:    "0",
-		Receiver: emptyAddress,
-		Sender:   ownerPK,
-		GasPrice: networkConfig.MinGasPrice,
-		GasLimit: gasLimit,
-		Data:     []byte(txData),
-		ChainID:  networkConfig.ChainID,
-		Version:  1,
-	}
+	ownerAddr, err := address.NewAddress(ownerPK)
+	require.Nil(instance, err)
 
-	hash := instance.signAndSend(ctx, ownerSK, ftx, 1)
+	tx := transaction.NewBaseTransaction(ownerAddr.Bytes(), nonce, [][]byte{[]byte(txData)}, 0, 0)
+	err = tx.SetChainID([]byte(networkConfig.ChainID))
+	require.Nil(instance, err)
+
+	hash := instance.signAndSend(ctx, ownerSK, tx, 1)
 	txResult := instance.GetTransactionResult(ctx, hash)
 
 	return NewMvxAddressFromBech32(instance.TB, txResult.Logs.Events[0].Address), hash, txResult
@@ -163,7 +151,7 @@ func (instance *chainSimulatorWrapper) GetTransactionResult(ctx context.Context,
 
 	jsonData, err := json.MarshalIndent(txResult.Data.Transaction, "", "  ")
 	require.Nil(instance, err)
-	require.Equal(instance, transaction.TxStatusSuccess, txStatus, fmt.Sprintf("tx hash: %s,\n tx: %s", hash, string(jsonData)))
+	require.Equal(instance, transaction.Transaction_SUCCESS, txStatus, fmt.Sprintf("tx hash: %s,\n tx: %s", hash, string(jsonData)))
 
 	return &txResult.Data.Transaction
 }
@@ -235,19 +223,14 @@ func (instance *chainSimulatorWrapper) SendTxWithoutGenerateBlocks(ctx context.C
 	nonce, err := instance.getNonce(ctx, senderPK)
 	require.Nil(instance, err)
 
-	ftx := &transaction.FrontendTransaction{
-		Nonce:    nonce,
-		Value:    value,
-		Receiver: receiver.Bech32(),
-		Sender:   senderPK,
-		GasPrice: networkConfig.MinGasPrice,
-		GasLimit: gasLimit,
-		Data:     dataField,
-		ChainID:  networkConfig.ChainID,
-		Version:  1,
-	}
+	sender, err := address.NewAddress(senderPK)
+	require.Nil(instance, err)
 
-	hash := instance.signAndSend(ctx, senderSK, ftx, 0)
+	tx := transaction.NewBaseTransaction(sender.Bytes(), nonce, [][]byte{dataField}, 0, 0)
+	err = tx.SetChainID([]byte(networkConfig.ChainID))
+	require.Nil(instance, err)
+
+	hash := instance.signAndSend(ctx, senderSK, tx, 0)
 
 	return hash
 }
@@ -278,9 +261,7 @@ func (instance *chainSimulatorWrapper) FundWallets(ctx context.Context, wallets 
 
 // GetESDTBalance returns the balance of the esdt token for the provided address
 func (instance *chainSimulatorWrapper) GetESDTBalance(ctx context.Context, address *MvxAddress, token string) string {
-	tokenData, err := instance.proxyInstance.GetESDTTokenData(ctx, address, token, apiCore.AccountQueryOptions{
-		OnFinalBlock: true,
-	})
+	tokenData, err := instance.proxyInstance.GetESDTTokenData(ctx, address, token)
 	require.Nil(instance, err)
 
 	return tokenData.Balance
@@ -308,7 +289,7 @@ func (instance *chainSimulatorWrapper) GetBlockchainTimeStamp(ctx context.Contex
 }
 
 func (instance *chainSimulatorWrapper) getNonce(ctx context.Context, bech32Address string) (uint64, error) {
-	address, err := data.NewAddressFromBech32String(bech32Address)
+	address, err := address.NewAddress(bech32Address)
 	if err != nil {
 		return 0, err
 	}
@@ -321,11 +302,11 @@ func (instance *chainSimulatorWrapper) getNonce(ctx context.Context, bech32Addre
 	return account.Nonce, nil
 }
 
-func (instance *chainSimulatorWrapper) signAndSend(ctx context.Context, senderSK []byte, ftx *transaction.FrontendTransaction, numBlocksToGenerate int) string {
+func (instance *chainSimulatorWrapper) signAndSend(ctx context.Context, senderSK []byte, ftx *transaction.Transaction, numBlocksToGenerate int) string {
 	sig, err := computeTransactionSignature(senderSK, ftx)
 	require.Nil(instance, err)
 
-	ftx.Signature = hex.EncodeToString(sig)
+	ftx.AddSignature(sig)
 
 	hash, err := instance.proxyInstance.SendTransaction(ctx, ftx)
 	require.Nil(instance, err)
@@ -349,18 +330,28 @@ func (instance *chainSimulatorWrapper) getPublicKey(privateKeyBytes []byte) stri
 	return pkString
 }
 
-func computeTransactionSignature(senderSk []byte, tx *transaction.FrontendTransaction) ([]byte, error) {
+func computeTransactionSignature(senderSk []byte, tx *transaction.Transaction) ([]byte, error) {
 	privateKey, err := keyGenerator.PrivateKeyFromByteArray(senderSk)
 	if err != nil {
 		return nil, err
 	}
 
-	dataToSign, err := json.Marshal(tx)
+	hasher, err := factoryHasher.NewHasher("blake2b")
 	if err != nil {
 		return nil, err
 	}
 
-	return signer.Sign(privateKey, dataToSign)
+	internalMarshalizer, err := factory.NewMarshalizer(factory.ProtoMarshalizer)
+	if err != nil {
+		return nil, err
+	}
+
+	hash, err := tools.CalculateHash(internalMarshalizer, hasher, tx.GetRawData())
+	if err != nil {
+		return nil, err
+	}
+
+	return signer.Sign(privateKey, hash)
 }
 
 // ExecuteVMQuery will try to execute a VM query and return the results
@@ -370,7 +361,7 @@ func (instance *chainSimulatorWrapper) ExecuteVMQuery(
 	function string,
 	hexParams []string,
 ) [][]byte {
-	vmRequest := &data.VmValueRequest{
+	vmRequest := &models.VmValueRequest{
 		Address:  scAddress.Bech32(),
 		FuncName: function,
 		Args:     hexParams,

@@ -10,7 +10,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klever-io/klever-go/data/vm"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
@@ -18,11 +22,9 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/testsCommon/roleProviders"
 	"github.com/multiversx/mx-chain-core-go/core/check"
-	"github.com/multiversx/mx-chain-core-go/data/vm"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/builders"
 	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -33,8 +35,8 @@ var pausedBytes = []byte{1}
 
 func createMockClientArgs() ClientArgs {
 	privateKey, _ := testKeyGen.PrivateKeyFromByteArray(bytes.Repeat([]byte{1}, 32))
-	multisigContractAddress, _ := data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf")
-	safeContractAddress, _ := data.NewAddressFromBech32String("erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus")
+	multisigContractAddress, _ := address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	safeContractAddress, _ := address.NewAddress("klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc")
 
 	return ClientArgs{
 		GasMapConfig: config.KleverGasMapConfig{
@@ -59,7 +61,7 @@ func createMockClientArgs() ClientArgs {
 				return append([]byte("converted "), sourceBytes...), nil
 			},
 		},
-		RoleProvider:                 &roleproviders.MultiversXRoleProviderStub{},
+		RoleProvider:                 &roleproviders.KleverRoleProviderStub{},
 		StatusHandler:                &testsCommon.StatusHandlerStub{},
 		ClientAvailabilityAllowDelta: 5,
 	}
@@ -237,7 +239,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -352,7 +354,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{2}, 20),
 					DisplayableTo:         "0x0202020202020202020202020202020202020202",
 					FromBytes:             bytes.Repeat([]byte{1}, 32),
-					DisplayableFrom:       "erd1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsl6e0p7",
+					DisplayableFrom:       "klv1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsy6zanq",
 					SourceTokenBytes:      tokenBytes1,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes1...),
 					DisplayableToken:      string(tokenBytes1),
@@ -363,7 +365,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{5}, 20),
 					DisplayableTo:         "0x0505050505050505050505050505050505050505",
 					FromBytes:             bytes.Repeat([]byte{4}, 32),
-					DisplayableFrom:       "erd1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqxjfvxn",
+					DisplayableFrom:       "klv1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqajj75d",
 					SourceTokenBytes:      tokenBytes2,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes2...),
 					DisplayableToken:      string(tokenBytes2),
@@ -394,7 +396,7 @@ func TestClient_GetBatch(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -509,7 +511,7 @@ func TestClient_GetBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{2}, 20),
 					DisplayableTo:         "0x0202020202020202020202020202020202020202",
 					FromBytes:             bytes.Repeat([]byte{1}, 32),
-					DisplayableFrom:       "erd1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsl6e0p7",
+					DisplayableFrom:       "klv1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsy6zanq",
 					SourceTokenBytes:      tokenBytes1,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes1...),
 					DisplayableToken:      string(tokenBytes1),
@@ -520,7 +522,7 @@ func TestClient_GetBatch(t *testing.T) {
 					ToBytes:               bytes.Repeat([]byte{5}, 20),
 					DisplayableTo:         "0x0505050505050505050505050505050505050505",
 					FromBytes:             bytes.Repeat([]byte{4}, 32),
-					DisplayableFrom:       "erd1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqxjfvxn",
+					DisplayableFrom:       "klv1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqajj75d",
 					SourceTokenBytes:      tokenBytes2,
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes2...),
 					DisplayableToken:      string(tokenBytes2),
@@ -561,7 +563,7 @@ func TestClient_ProposeSetStatus(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -576,8 +578,8 @@ func TestClient_ProposeSetStatus(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
-				return &data.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{pausedBytes},
@@ -650,7 +652,7 @@ func TestClient_ProposeTransfer(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -665,8 +667,8 @@ func TestClient_ProposeTransfer(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
-				return &data.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{pausedBytes},
@@ -791,7 +793,7 @@ func TestClient_Sign(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -806,8 +808,8 @@ func TestClient_Sign(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
-				return &data.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{pausedBytes},
@@ -870,7 +872,7 @@ func TestClient_PerformAction(t *testing.T) {
 		args := createMockClientArgs()
 		expectedErr := errors.New("expected error")
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 				return nil, expectedErr
 			},
 		}
@@ -885,8 +887,8 @@ func TestClient_PerformAction(t *testing.T) {
 
 		args := createMockClientArgs()
 		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
-				return &data.VmValuesResponseData{
+			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+				return &models.VmValuesResponseData{
 					Data: &vm.VMOutputApi{
 						ReturnCode: okCodeAfterExecution,
 						ReturnData: [][]byte{pausedBytes},

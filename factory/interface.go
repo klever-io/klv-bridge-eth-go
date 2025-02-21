@@ -3,8 +3,8 @@ package factory
 import (
 	"context"
 
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/core"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 )
 
 type dataGetter interface {
@@ -14,10 +14,10 @@ type dataGetter interface {
 	IsInterfaceNil() bool
 }
 
-// MultiversXRoleProvider defines the operations for the MultiversX role provider
-type MultiversXRoleProvider interface {
+// KleverRoleProvider defines the operations for the klever role provider
+type KleverRoleProvider interface {
 	Execute(ctx context.Context) error
-	IsWhitelisted(address sdkCore.AddressHandler) bool
+	IsWhitelisted(address address.Address) bool
 	SortedPublicKeys() [][]byte
 	IsInterfaceNil() bool
 }

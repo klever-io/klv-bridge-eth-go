@@ -1,14 +1,16 @@
 package roleproviders
 
-import "github.com/multiversx/mx-sdk-go/core"
+import (
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+)
 
 // MultiversXRoleProviderStub -
-type MultiversXRoleProviderStub struct {
-	IsWhitelistedCalled func(address core.AddressHandler) bool
+type KleverRoleProviderStub struct {
+	IsWhitelistedCalled func(address address.Address) bool
 }
 
 // IsWhitelisted -
-func (stub *MultiversXRoleProviderStub) IsWhitelisted(address core.AddressHandler) bool {
+func (stub *KleverRoleProviderStub) IsWhitelisted(address address.Address) bool {
 	if stub.IsWhitelistedCalled != nil {
 		return stub.IsWhitelistedCalled(address)
 	}
@@ -17,6 +19,6 @@ func (stub *MultiversXRoleProviderStub) IsWhitelisted(address core.AddressHandle
 }
 
 // IsInterfaceNil -
-func (stub *MultiversXRoleProviderStub) IsInterfaceNil() bool {
+func (stub *KleverRoleProviderStub) IsInterfaceNil() bool {
 	return stub == nil
 }

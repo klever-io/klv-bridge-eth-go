@@ -91,8 +91,8 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 		},
 		Klever: config.KleverConfig{
 			NetworkAddress:                  "mock",
-			MultisigContractAddress:         "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf",
-			SafeContractAddress:             "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus",
+			MultisigContractAddress:         "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
+			SafeContractAddress:             "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
 			PrivateKeyFile:                  path.Join(workingDir, fmt.Sprintf("multiversx%d.pem", index)),
 			IntervalToResendTxsInSeconds:    10,
 			GasMap:                          testsCommon.CreateTestKleverGasMap(),

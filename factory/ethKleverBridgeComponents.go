@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klever-go/tools"
 	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX"
 	"github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/disabled"
 	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethMultiversX/steps/ethToMultiversX"
@@ -20,6 +21,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement"
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mappers"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/clients/roleProviders"
 	"github.com/klever-io/klv-bridge-eth-go/config"
@@ -38,10 +40,7 @@ import (
 	chainConfig "github.com/multiversx/mx-chain-go/config"
 	antifloodFactory "github.com/multiversx/mx-chain-go/process/throttle/antiflood/factory"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/core/polling"
-	"github.com/multiversx/mx-sdk-go/data"
-	"github.com/multiversx/mx-sdk-go/interactors"
 )
 
 const (
@@ -70,26 +69,26 @@ type ArgsEthereumToKleverBridge struct {
 }
 
 type ethKleverBridgeComponents struct {
-	baseLogger                        logger.Logger
-	messenger                         p2p.NetMessenger
-	statusStorer                      core.Storer
-	multiversXClient                  ethklever.MultiversXClient
-	ethClient                         ethklever.EthereumClient
-	evmCompatibleChain                chain.Chain
-	multiversXMultisigContractAddress sdkCore.AddressHandler
-	multiversXSafeContractAddress     sdkCore.AddressHandler
-	kleverRelayerPrivateKey           crypto.PrivateKey
-	multiversXRelayerAddress          sdkCore.AddressHandler
-	ethereumRelayerAddress            common.Address
-	mxDataGetter                      dataGetter
-	proxy                             klever.Proxy
-	multiversXRoleProvider            MultiversXRoleProvider
-	ethereumRoleProvider              EthereumRoleProvider
-	broadcaster                       Broadcaster
-	timer                             core.Timer
-	timeForBootstrap                  time.Duration
-	metricsHolder                     core.MetricsHolder
-	addressConverter                  core.AddressConverter
+	baseLogger                    logger.Logger
+	messenger                     p2p.NetMessenger
+	statusStorer                  core.Storer
+	multiversXClient              ethklever.MultiversXClient
+	ethClient                     ethklever.EthereumClient
+	evmCompatibleChain            chain.Chain
+	kleverMultisigContractAddress address.Address
+	kleverSafeContractAddress     address.Address
+	kleverRelayerPrivateKey       crypto.PrivateKey
+	kleverRelayerAddress          address.Address
+	ethereumRelayerAddress        common.Address
+	mxDataGetter                  dataGetter
+	proxy                         klever.Proxy
+	kleverRoleProvider            KleverRoleProvider
+	ethereumRoleProvider          EthereumRoleProvider
+	broadcaster                   Broadcaster
+	timer                         core.Timer
+	timeForBootstrap              time.Duration
+	metricsHolder                 core.MetricsHolder
+	addressConverter              core.AddressConverter
 
 	ethtoKleverMachineStates    core.MachineStates
 	ethtoKleverStepDuration     time.Duration
@@ -235,8 +234,7 @@ func checkArgsEthereumToKleverBridge(args ArgsEthereumToKleverBridge) error {
 }
 
 func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainConfigs config.KleverConfig) error {
-	wallet := interactors.NewWallet()
-	kleverPrivateKeyBytes, err := wallet.LoadPrivateKeyFromPemFile(chainConfigs.PrivateKeyFile)
+	kleverPrivateKeyBytes, pbkString, err := tools.LoadSkPkFromPemFile(chainConfigs.PrivateKeyFile, 0, "")
 	if err != nil {
 		return err
 	}
@@ -246,19 +244,19 @@ func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainC
 		return err
 	}
 
-	components.multiversXRelayerAddress, err = wallet.GetAddressFromPrivateKey(kleverPrivateKeyBytes)
+	components.kleverRelayerAddress, err = address.NewAddress(pbkString)
 	if err != nil {
 		return err
 	}
 
 	// TODO: change decoder to use klever from string to hex
-	components.multiversXMultisigContractAddress, err = data.NewAddressFromBech32String(chainConfigs.MultisigContractAddress)
+	components.kleverMultisigContractAddress, err = address.NewAddress(chainConfigs.MultisigContractAddress)
 	if err != nil {
 		return fmt.Errorf("%w for chainConfigs.MultisigContractAddress", err)
 	}
 
 	// TODO: change decoder to use klever from string to hex
-	components.multiversXSafeContractAddress, err = data.NewAddressFromBech32String(chainConfigs.SafeContractAddress)
+	components.kleverSafeContractAddress, err = address.NewAddress(chainConfigs.SafeContractAddress)
 	if err != nil {
 		return fmt.Errorf("%w for chainConfigs.SafeContractAddress", err)
 	}
@@ -269,9 +267,9 @@ func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainC
 func (components *ethKleverBridgeComponents) createDataGetter() error {
 	multiversXDataGetterLogId := components.evmCompatibleChain.MultiversXDataGetterLogId()
 	argsKLVClientDataGetter := klever.ArgsKLVClientDataGetter{
-		MultisigContractAddress: components.multiversXMultisigContractAddress,
-		SafeContractAddress:     components.multiversXSafeContractAddress,
-		RelayerAddress:          components.multiversXRelayerAddress,
+		MultisigContractAddress: components.kleverMultisigContractAddress,
+		SafeContractAddress:     components.kleverSafeContractAddress,
+		RelayerAddress:          components.kleverRelayerAddress,
 		Proxy:                   components.proxy,
 		Log:                     core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXDataGetterLogId), multiversXDataGetterLogId),
 	}
@@ -295,11 +293,11 @@ func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEth
 		Proxy:                        args.Proxy,
 		Log:                          core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXClientLogId), multiversXClientLogId),
 		RelayerPrivateKey:            components.kleverRelayerPrivateKey,
-		MultisigContractAddress:      components.multiversXMultisigContractAddress,
-		SafeContractAddress:          components.multiversXSafeContractAddress,
+		MultisigContractAddress:      components.kleverMultisigContractAddress,
+		SafeContractAddress:          components.kleverSafeContractAddress,
 		IntervalToResendTxsInSeconds: chainConfigs.IntervalToResendTxsInSeconds,
 		TokensMapper:                 tokensMapper,
-		RoleProvider:                 components.multiversXRoleProvider,
+		RoleProvider:                 components.kleverRoleProvider,
 		StatusHandler:                args.KleverClientStatusHandler,
 		ClientAvailabilityAllowDelta: chainConfigs.ClientAvailabilityAllowDelta,
 	}
@@ -351,7 +349,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 	argsBroadcaster := p2p.ArgsBroadcaster{
 		Messenger:              args.Messenger,
 		Log:                    core.NewLoggerWithIdentifier(logger.GetOrCreate(broadcasterLogId), broadcasterLogId),
-		MultiversXRoleProvider: components.multiversXRoleProvider,
+		MultiversXRoleProvider: components.kleverRoleProvider,
 		SignatureProcessor:     components.ethereumRoleProvider,
 		KeyGen:                 keyGen,
 		SingleSigner:           singleSigner,
@@ -421,7 +419,7 @@ func (components *ethKleverBridgeComponents) createKleverRoleProvider(args ArgsE
 	}
 
 	var err error
-	components.multiversXRoleProvider, err = roleproviders.NewMultiversXRoleProvider(argsRoleProvider)
+	components.kleverRoleProvider, err = roleproviders.NewMultiversXRoleProvider(argsRoleProvider)
 	if err != nil {
 		return err
 	}
@@ -431,7 +429,7 @@ func (components *ethKleverBridgeComponents) createKleverRoleProvider(args ArgsE
 		Name:             "MultiversX role provider",
 		PollingInterval:  time.Duration(configs.Relayer.RoleProvider.PollingIntervalInMillis) * time.Millisecond,
 		PollingWhenError: pollingDurationOnError,
-		Executor:         components.multiversXRoleProvider,
+		Executor:         components.kleverRoleProvider,
 	}
 
 	pollingHandler, err := polling.NewPollingHandler(argsPollingHandler)
@@ -491,10 +489,10 @@ func (components *ethKleverBridgeComponents) createEthereumToMultiversXBridge(ar
 	components.ethtoKleverStepDuration = time.Duration(configs.StepDurationInMillis) * time.Millisecond
 
 	argsTopologyHandler := topology.ArgsTopologyHandler{
-		PublicKeysProvider: components.multiversXRoleProvider,
+		PublicKeysProvider: components.kleverRoleProvider,
 		Timer:              components.timer,
 		IntervalForLeader:  time.Second * time.Duration(configs.IntervalForLeaderInSeconds),
-		AddressBytes:       components.multiversXRelayerAddress.AddressBytes(),
+		AddressBytes:       components.kleverRelayerAddress.Bytes(),
 		Log:                log,
 		AddressConverter:   components.addressConverter,
 	}
@@ -559,10 +557,10 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(ar
 
 	components.multiversXToEthStepDuration = time.Duration(configs.StepDurationInMillis) * time.Millisecond
 	argsTopologyHandler := topology.ArgsTopologyHandler{
-		PublicKeysProvider: components.multiversXRoleProvider,
+		PublicKeysProvider: components.kleverRoleProvider,
 		Timer:              components.timer,
 		IntervalForLeader:  time.Second * time.Duration(configs.IntervalForLeaderInSeconds),
-		AddressBytes:       components.multiversXRelayerAddress.AddressBytes(),
+		AddressBytes:       components.kleverRelayerAddress.Bytes(),
 		Log:                log,
 		AddressConverter:   components.addressConverter,
 	}
@@ -805,9 +803,9 @@ func (components *ethKleverBridgeComponents) Close() error {
 	return lastError
 }
 
-// MultiversXRelayerAddress returns the MultiversX's address associated to this relayer
-func (components *ethKleverBridgeComponents) MultiversXRelayerAddress() sdkCore.AddressHandler {
-	return components.multiversXRelayerAddress
+// KleverRelayerAddress returns the Klever's address associated to this relayer
+func (components *ethKleverBridgeComponents) KleverRelayerAddress() address.Address {
+	return components.kleverRelayerAddress
 }
 
 // EthereumRelayerAddress returns the Ethereum's address associated to this relayer

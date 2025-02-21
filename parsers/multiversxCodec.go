@@ -6,8 +6,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
 )
 
 const lenEthAddress = 20
@@ -123,7 +123,13 @@ func (codec *MultiversxCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxyS
 	if len(buff) < lenMvxAddress {
 		return ProxySCCompleteCallData{}, errBufferTooShortForMvxAddress
 	}
-	result.To = data.NewAddressFromBytes(buff[:lenMvxAddress])
+
+	toAddress, err := address.NewAddressFromBytes(buff[:lenMvxAddress])
+	if err != nil {
+		return ProxySCCompleteCallData{}, fmt.Errorf("%w for token", err)
+	}
+	result.To = toAddress
+
 	buff = buff[lenMvxAddress:]
 
 	buff, token, err := ExtractString(buff)

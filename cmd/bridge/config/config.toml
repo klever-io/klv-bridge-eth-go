@@ -23,9 +23,9 @@
 
 [Klever]
     NetworkAddress = "http://localhost:8080" # the network address
-    MultisigContractAddress = "erd1qqqqqqqqqqqqqpgqzyuaqg3dl7rqlkudrsnm5ek0j3a97qevd8sszj0glf" # the multiversx address for the bridge contract
-    SafeContractAddress = "erd1qqqqqqqqqqqqqpgqtvnswnzxxz8susupesys0hvg7q2z5nawrcjq06qdus" # the multiversx address for the safe contract
-    PrivateKeyFile = "keys/walletKey.pem" # the path to the pem file containing the relayer multiversx wallet
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the KleverChain address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the KleverChain address for the safe contract
+    PrivateKeyFile = "keys/walletKey.pem" # the path to the pem file containing the relayer KleverChain wallet
     IntervalToResendTxsInSeconds = 60 # the time in seconds between nonce reads
     MaxRetriesOnQuorumReached = 3
     MaxRetriesOnWasTransferProposed = 3
@@ -122,8 +122,8 @@
             Type = "LRU"
         [P2P.AntifloodConfig.Topic]
             DefaultMaxMessagesPerSec = 300 # default number of messages per interval for a topic
-            MaxMessages = [{ Topic = "EthereumToMultiversX_join", NumMessagesPerSec = 100 },
-                           { Topic = "EthereumToMultiversX_sign", NumMessagesPerSec = 100 }]
+            MaxMessages = [{ Topic = "EthereumToKleverChain_join", NumMessagesPerSec = 100 },
+                           { Topic = "EthereumToKleverChain_sign", NumMessagesPerSec = 100 }]
 
 [Relayer]
     [Relayer.Marshalizer]
@@ -144,11 +144,11 @@
             MaxOpenFiles = 10
 
 [StateMachine]
-    [StateMachine.EthereumToMultiversX]
+    [StateMachine.EthereumToKleverChain]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 120 #2 minutes
 
-    [StateMachine.MultiversXToEthereum]
+    [StateMachine.KleverChainToEthereum]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 720 #12 minutes
 

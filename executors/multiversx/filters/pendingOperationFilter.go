@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 )
 
 const (
@@ -160,7 +160,7 @@ func (filter *pendingOperationFilter) checkList(list []string, checkItem func(it
 }
 
 func checkMvxItemValid(item string) error {
-	_, errNewAddr := data.NewAddressFromBech32String(item)
+	_, errNewAddr := address.NewAddress(item)
 	return errNewAddr
 }
 
@@ -178,11 +178,7 @@ func (filter *pendingOperationFilter) ShouldExecute(callData parsers.ProxySCComp
 		return false
 	}
 
-	toAddress, err := callData.To.AddressAsBech32String()
-	if err != nil {
-		return false
-	}
-
+	toAddress := callData.To.Bech32()
 	isSpecificallyDenied := filter.stringExistsInList(callData.From.String(), filter.deniedEthAddresses, ethWildcardString) ||
 		filter.stringExistsInList(toAddress, filter.deniedMvxAddresses, wildcardString) ||
 		filter.stringExistsInList(callData.Token, filter.deniedTokens, wildcardString)

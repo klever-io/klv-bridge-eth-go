@@ -3,42 +3,45 @@ package klever
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"errors"
 	"testing"
 
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	cryptoMock "github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/testsCommon/roleProviders"
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
-	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
 	testSigner          = &singlesig.Ed25519Signer{}
 	skBytes             = bytes.Repeat([]byte{1}, 32)
-	testMultisigAddress = "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede"
-	relayerAddress      = "erd132yw8ht5p8cetl2jmvknewjawt9xwzdlrk2pyxlnwjyqrdq0dawqvjzv73"
+	testMultisigAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
+	relayerAddress      = "klv132yw8ht5p8cetl2jmvknewjawt9xwzdlrk2pyxlnwjyqrdq0dawqhje7v0"
 )
 
 func createTransactionHandlerWithMockComponents() *transactionHandler {
 	sk, _ := testKeyGen.PrivateKeyFromByteArray(skBytes)
 	pk := sk.GeneratePublic()
 	pkBytes, _ := pk.ToByteArray()
+	relayerAddress, _ := address.NewAddressFromBytes(pkBytes)
 
 	return &transactionHandler{
 		proxy:                   &interactors.ProxyStub{},
-		relayerAddress:          data.NewAddressFromBytes(pkBytes),
+		relayerAddress:          relayerAddress,
 		multisigAddressAsBech32: testMultisigAddress,
 		nonceTxHandler:          &bridgeTests.NonceTransactionsHandlerStub{},
 		relayerPrivateKey:       sk,
 		singleSigner:            testSigner,
-		roleProvider:            &roleproviders.MultiversXRoleProviderStub{},
+		roleProvider:            &roleproviders.KleverRoleProviderStub{},
 	}
 }
 
@@ -52,7 +55,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		expectedErr := errors.New("expected error in get network configs")
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
 		txHandlerInstance.proxy = &interactors.ProxyStub{
-			GetNetworkConfigCalled: func(ctx context.Context) (*data.NetworkConfig, error) {
+			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
 				return nil, expectedErr
 			},
 		}
@@ -65,7 +68,7 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		expectedErr := errors.New("expected error in get nonce")
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				return expectedErr
 			},
 		}
@@ -100,14 +103,14 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		wasWhiteListedCalled := false
 		wasSendTransactionCalled := false
 		txHandlerInstance := createTransactionHandlerWithMockComponents()
-		txHandlerInstance.roleProvider = &roleproviders.MultiversXRoleProviderStub{
-			IsWhitelistedCalled: func(address core.AddressHandler) bool {
+		txHandlerInstance.roleProvider = &roleproviders.KleverRoleProviderStub{
+			IsWhitelistedCalled: func(address address.Address) bool {
 				wasWhiteListedCalled = true
 				return false
 			},
 		}
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			SendTransactionCalled: func(ctx context.Context, tx *transaction.FrontendTransaction) (string, error) {
+			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
 				wasSendTransactionCalled = true
 				return "", nil
 			},
@@ -126,42 +129,46 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 		sendWasCalled := false
 
 		chainID := "chain ID"
-		minGasPrice := uint64(12234)
-		minTxVersion := uint32(122)
 
 		txHandlerInstance.proxy = &interactors.ProxyStub{
-			GetNetworkConfigCalled: func(ctx context.Context) (*data.NetworkConfig, error) {
-				return &data.NetworkConfig{
-					ChainID:               chainID,
-					MinGasPrice:           minGasPrice,
-					MinTransactionVersion: minTxVersion,
+			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
+				return &models.NetworkConfig{
+					ChainID: chainID,
 				}, nil
 			},
 		}
 
 		txHandlerInstance.nonceTxHandler = &bridgeTests.NonceTransactionsHandlerStub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				if getBech32Address(address) == relayerAddress {
-					tx.Nonce = nonce
-					tx.GasPrice = minGasPrice
+					tx.GetRawData().Nonce = nonce
 
 					return nil
 				}
 
 				return errors.New("unexpected address to fetch the nonce")
 			},
-			SendTransactionCalled: func(ctx context.Context, tx *transaction.FrontendTransaction) (string, error) {
+			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
 				sendWasCalled = true
-				assert.Equal(t, relayerAddress, tx.Sender)
-				assert.Equal(t, testMultisigAddress, tx.Receiver)
-				assert.Equal(t, nonce, tx.Nonce)
-				assert.Equal(t, "0", tx.Value)
-				assert.Equal(t, "function@62756666@16", string(tx.Data))
-				assert.Equal(t, "fdbd51691e8179da15b22b133ab7e2d9f67faef585f6f4d9859ae176e7b6c2d7bb7f930de753fb7f8a377cd460ff41b54f8cfb0c720f586fbbfbee680edb310b", tx.Signature)
-				assert.Equal(t, chainID, tx.ChainID)
-				assert.Equal(t, gasLimit, tx.GasLimit)
-				assert.Equal(t, minGasPrice, tx.GasPrice)
-				assert.Equal(t, minTxVersion, tx.Version)
+				sender, err := address.NewAddressFromBytes(tx.GetSender())
+				require.Nil(t, err)
+				assert.Equal(t, relayerAddress, sender.Bech32())
+
+				require.Len(t, tx.GetContracts(), 1)
+				sc, err := tx.GetContracts()[0].GetSmartContract()
+				require.Nil(t, err)
+
+				scAddr, err := address.NewAddressFromBytes(sc.Address)
+				require.Nil(t, err)
+				assert.Equal(t, testMultisigAddress, scAddr)
+
+				assert.Equal(t, nonce, tx.GetNonce())
+				require.Len(t, tx.GetData(), 1)
+				assert.Equal(t, "function@62756666@16", string(tx.GetData()[0]))
+
+				require.Len(t, tx.GetSignature(), 1)
+				assert.Equal(t, "4d1578a5ea204fa65b209b62a508add5a003de6c8cae2908fceadb810e137ebc74fcdce534cccd05502df697d41276faf3e7decf4896dd378d88b223eef53107", hex.EncodeToString(tx.Signature[0]))
+				assert.Equal(t, chainID, string(tx.GetRawData().GetChainID()))
 
 				return txHash, nil
 			},

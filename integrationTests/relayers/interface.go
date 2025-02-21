@@ -2,11 +2,11 @@ package relayers
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 )
 
 type bridgeComponents interface {
-	MultiversXRelayerAddress() sdkCore.AddressHandler
+	KleverRelayerAddress() address.Address
 	EthereumRelayerAddress() common.Address
 	Start() error
 	Close() error

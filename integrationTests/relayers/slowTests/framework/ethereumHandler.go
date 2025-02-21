@@ -17,9 +17,9 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,7 +50,7 @@ type EthereumHandler struct {
 	*KeysStore
 	TokensRegistry        TokensRegistry
 	Quorum                string
-	MvxTestCallerAddress  core.AddressHandler
+	KlvTestCallerAddress  address.Address
 	SimulatedChain        *simulated.Backend
 	SimulatedChainWrapper EthereumBlockchainClient
 	ChainID               *big.Int
@@ -395,11 +395,11 @@ func (handler *EthereumHandler) mintTokens(
 // CreateBatchOnEthereum will create a batch on Ethereum using the provided tokens parameters list
 func (handler *EthereumHandler) CreateBatchOnEthereum(
 	ctx context.Context,
-	mvxTestCallerAddress core.AddressHandler,
+	klvTestCallerAddress address.Address,
 	tokensParams ...TestTokenParams,
 ) {
 	for _, params := range tokensParams {
-		handler.createDepositsOnEthereumForToken(ctx, params, handler.TestKeys.EthSK, mvxTestCallerAddress)
+		handler.createDepositsOnEthereumForToken(ctx, params, handler.TestKeys.EthSK, klvTestCallerAddress)
 	}
 
 	// wait until batch is settled
@@ -413,7 +413,7 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 	ctx context.Context,
 	params TestTokenParams,
 	from *ecdsa.PrivateKey,
-	mvxTestCallerAddress core.AddressHandler,
+	klvTestCallerAddress address.Address,
 ) {
 	// add allowance for the sender
 	auth, _ := bind.NewKeyedTransactorWithChainID(from, handler.ChainID)
@@ -450,7 +450,7 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 				auth,
 				token.EthErc20Address,
 				operation.ValueToTransferToMvx,
-				mvxTestCallerAddress.AddressSlice(),
+				klvTestCallerAddress.AddressSlice(),
 				operation.MvxSCCallData,
 			)
 		} else {
@@ -466,11 +466,11 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 // SendFromEthereumToMultiversX will create the deposit transactions on the Ethereum side
 func (handler *EthereumHandler) SendFromEthereumToMultiversX(
 	ctx context.Context,
-	mvxTestCallerAddress core.AddressHandler,
+	klvTestCallerAddress address.Address,
 	tokensParams ...TestTokenParams,
 ) {
 	for _, params := range tokensParams {
-		handler.createDepositsOnEthereumForToken(ctx, params, handler.TestKeys.EthSK, mvxTestCallerAddress)
+		handler.createDepositsOnEthereumForToken(ctx, params, handler.TestKeys.EthSK, klvTestCallerAddress)
 	}
 }
 

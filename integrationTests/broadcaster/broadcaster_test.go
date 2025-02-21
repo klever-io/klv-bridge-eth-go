@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/klever-io/klv-bridge-eth-go/p2p"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
@@ -18,7 +19,6 @@ import (
 	chainP2P "github.com/multiversx/mx-chain-go/p2p"
 	"github.com/multiversx/mx-chain-go/process/throttle/antiflood/factory"
 	"github.com/multiversx/mx-chain-go/testscommon/statusHandler"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,10 +35,10 @@ func TestNetworkOfBroadcastersShouldPassTheSignatures(t *testing.T) {
 
 	privateKeys, publicKeysBytes := createKeys(t, numBroadcasters)
 
-	roleProvider := &mockRoleProviders.MultiversXRoleProviderStub{
-		IsWhitelistedCalled: func(address core.AddressHandler) bool {
+	roleProvider := &mockRoleProviders.KleverRoleProviderStub{
+		IsWhitelistedCalled: func(address address.Address) bool {
 			for _, pkBytes := range publicKeysBytes {
-				if bytes.Equal(address.AddressBytes(), pkBytes) {
+				if bytes.Equal(address.Bytes(), pkBytes) {
 					return true
 				}
 			}
@@ -89,10 +89,10 @@ func TestNetworkOfBroadcastersShouldBootstrapOnLateBroadcasterWhenNotJoining(t *
 
 	privateKeys, publicKeysBytes := createKeys(t, numBroadcasters)
 
-	roleProvider := &mockRoleProviders.MultiversXRoleProviderStub{
-		IsWhitelistedCalled: func(address core.AddressHandler) bool {
+	roleProvider := &mockRoleProviders.KleverRoleProviderStub{
+		IsWhitelistedCalled: func(address address.Address) bool {
 			for _, pkBytes := range publicKeysBytes {
-				if bytes.Equal(address.AddressBytes(), pkBytes) {
+				if bytes.Equal(address.Bytes(), pkBytes) {
 					return true
 				}
 			}
@@ -131,10 +131,10 @@ func TestNetworkOfBroadcastersShouldBootstrapOnLateBroadcasterWhenLateConnecting
 
 	privateKeys, publicKeysBytes := createKeys(t, numBroadcasters)
 
-	roleProvider := &mockRoleProviders.MultiversXRoleProviderStub{
-		IsWhitelistedCalled: func(address core.AddressHandler) bool {
+	roleProvider := &mockRoleProviders.KleverRoleProviderStub{
+		IsWhitelistedCalled: func(address address.Address) bool {
 			for _, pkBytes := range publicKeysBytes {
-				if bytes.Equal(address.AddressBytes(), pkBytes) {
+				if bytes.Equal(address.Bytes(), pkBytes) {
 					return true
 				}
 			}
@@ -175,7 +175,7 @@ func createBroadcasters(
 	t *testing.T,
 	numBroadcasters int,
 	messengers []chainP2P.Messenger,
-	roleProvider *mockRoleProviders.MultiversXRoleProviderStub,
+	roleProvider *mockRoleProviders.KleverRoleProviderStub,
 	privateKeys []crypto.PrivateKey,
 ) ([]integrationTests.Broadcaster, []*testsCommon.SignaturesHolderMock) {
 	broadcasters := make([]integrationTests.Broadcaster, 0, numBroadcasters)
@@ -193,7 +193,7 @@ func createBroadcasters(
 func createBroadcaster(
 	t *testing.T,
 	messenger chainP2P.Messenger,
-	roleProvider *mockRoleProviders.MultiversXRoleProviderStub,
+	roleProvider *mockRoleProviders.KleverRoleProviderStub,
 	privateKey crypto.PrivateKey,
 ) (integrationTests.Broadcaster, *testsCommon.SignaturesHolderMock) {
 	cfg := chainConfig.Config{

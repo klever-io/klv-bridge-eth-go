@@ -10,9 +10,9 @@ import (
 	"sync"
 
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/core"
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
@@ -96,7 +96,7 @@ func (erp *multiversXRoleProvider) processResults(results [][]byte) error {
 }
 
 // IsWhitelisted returns true if the non-nil address provided is whitelisted or not
-func (erp *multiversXRoleProvider) IsWhitelisted(address core.AddressHandler) bool {
+func (erp *multiversXRoleProvider) IsWhitelisted(address address.Address) bool {
 	if check.IfNil(address) {
 		return false
 	}
@@ -104,7 +104,7 @@ func (erp *multiversXRoleProvider) IsWhitelisted(address core.AddressHandler) bo
 	erp.mut.RLock()
 	defer erp.mut.RUnlock()
 
-	_, exists := erp.whitelistedAddresses[string(address.AddressBytes())]
+	_, exists := erp.whitelistedAddresses[string(address.Bytes())]
 
 	return exists
 }

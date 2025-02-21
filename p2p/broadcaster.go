@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -14,7 +15,6 @@ import (
 	"github.com/multiversx/mx-chain-go/p2p"
 	"github.com/multiversx/mx-chain-go/process/throttle/antiflood/factory"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 )
 
 const (
@@ -28,7 +28,7 @@ const (
 type ArgsBroadcaster struct {
 	Messenger              NetMessenger
 	Log                    logger.Logger
-	MultiversXRoleProvider MultiversXRoleProvider
+	MultiversXRoleProvider KleverChainRoleProvider
 	SignatureProcessor     SignatureProcessor
 	KeyGen                 crypto.KeyGenerator
 	SingleSigner           crypto.SingleSigner
@@ -42,7 +42,7 @@ type broadcaster struct {
 	*noncesOfPublicKeys
 	messenger             NetMessenger
 	log                   logger.Logger
-	multiversRoleProvider MultiversXRoleProvider
+	multiversRoleProvider KleverChainRoleProvider
 	signatureProcessor    SignatureProcessor
 	name                  string
 	mutClients            sync.RWMutex
@@ -146,13 +146,18 @@ func (b *broadcaster) ProcessReceivedMessage(message p2p.MessageP2P, fromConnect
 		return err
 	}
 
-	addr := data.NewAddressFromBytes(msg.PublicKeyBytes)
+	addr, err := address.NewAddressFromBytes(msg.PublicKeyBytes)
+	if err != nil {
+		b.log.Debug("got error when parsing public key", "error", err)
+		return err
+	}
+
 	hexPkBytes := hex.EncodeToString(msg.PublicKeyBytes)
 	if !b.multiversRoleProvider.IsWhitelisted(addr) {
 		return fmt.Errorf("%w for peer: %s", ErrPeerNotWhitelisted, hexPkBytes)
 	}
 
-	address, _ := addr.AddressAsBech32String()
+	address := addr.Bech32()
 	b.log.Trace("got message", "topic", message.Topic(),
 		"msg.Payload", msg.Payload, "msg.Nonce", msg.Nonce, "msg.PublicKey", address)
 

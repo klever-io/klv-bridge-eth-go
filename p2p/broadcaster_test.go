@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	cryptoMocks "github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
@@ -20,7 +21,6 @@ import (
 	"github.com/multiversx/mx-chain-go/process/throttle/antiflood/factory"
 	"github.com/multiversx/mx-chain-go/testscommon/statusHandler"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,7 +33,7 @@ func createMockArgsBroadcaster() ArgsBroadcaster {
 	return ArgsBroadcaster{
 		Messenger:              &p2pMocks.MessengerStub{},
 		Log:                    logger.GetOrCreate("test"),
-		MultiversXRoleProvider: &roleProvidersMock.MultiversXRoleProviderStub{},
+		MultiversXRoleProvider: &roleProvidersMock.KleverRoleProviderStub{},
 		KeyGen:                 &cryptoMocks.KeyGenStub{},
 		SingleSigner:           &cryptoMocks.SingleSignerStub{},
 		PrivateKey:             &cryptoMocks.PrivateKeyStub{},
@@ -221,9 +221,9 @@ func TestBroadcaster_ProcessReceivedMessage(t *testing.T) {
 		isWhiteListedCalled := false
 		msg, buff := createSignedMessageAndMarshaledBytes(0)
 
-		args.MultiversXRoleProvider = &roleProvidersMock.MultiversXRoleProviderStub{
-			IsWhitelistedCalled: func(address sdkCore.AddressHandler) bool {
-				assert.Equal(t, msg.PublicKeyBytes, address.AddressBytes())
+		args.MultiversXRoleProvider = &roleProvidersMock.KleverRoleProviderStub{
+			IsWhitelistedCalled: func(address address.Address) bool {
+				assert.Equal(t, msg.PublicKeyBytes, address.Bytes())
 				isWhiteListedCalled = true
 				return false
 			},
@@ -242,7 +242,7 @@ func TestBroadcaster_ProcessReceivedMessage(t *testing.T) {
 		args := createMockArgsBroadcaster()
 		msg, buff := createSignedMessageAndMarshaledBytes(0)
 
-		args.MultiversXRoleProvider = &roleProvidersMock.MultiversXRoleProviderStub{}
+		args.MultiversXRoleProvider = &roleProvidersMock.KleverRoleProviderStub{}
 
 		b, _ := NewBroadcaster(args)
 		b.nonces[string(msg.PublicKeyBytes)] = msg.Nonce + 1

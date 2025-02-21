@@ -10,18 +10,16 @@ import (
 	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
 	"github.com/multiversx/mx-chain-core-go/core/check"
-	"github.com/multiversx/mx-chain-core-go/data/api"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519/singlesig"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/builders"
-	"github.com/multiversx/mx-sdk-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
-	"github.com/multiversx/mx-sdk-go/interactors/nonceHandlerV2"
 )
 
 const (
@@ -40,8 +38,8 @@ type ClientArgs struct {
 	Proxy                        Proxy
 	Log                          logger.Logger
 	RelayerPrivateKey            crypto.PrivateKey
-	MultisigContractAddress      core.AddressHandler
-	SafeContractAddress          core.AddressHandler
+	MultisigContractAddress      address.Address
+	SafeContractAddress          address.Address
 	IntervalToResendTxsInSeconds uint64
 	TokensMapper                 TokensMapper
 	RoleProvider                 roleProvider
@@ -55,9 +53,9 @@ type client struct {
 	txHandler                    txHandler
 	tokensMapper                 TokensMapper
 	relayerPublicKey             crypto.PublicKey
-	relayerAddress               core.AddressHandler
-	multisigContractAddress      core.AddressHandler
-	safeContractAddress          core.AddressHandler
+	relayerAddress               address.Address
+	multisigContractAddress      address.Address
+	safeContractAddress          address.Address
 	log                          logger.Logger
 	gasMapConfig                 config.KleverGasMapConfig
 	addressPublicKeyConverter    bridgeCore.AddressConverter
@@ -91,7 +89,10 @@ func NewClient(args ClientArgs) (*client, error) {
 		return nil, err
 	}
 
-	relayerAddress := data.NewAddressFromBytes(publicKeyBytes)
+	relayerAddress, err := address.NewAddressFromBytes(publicKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("%w to get relayer address from bytes", err)
+	}
 
 	argsKLVClientDataGetter := ArgsKLVClientDataGetter{
 		MultisigContractAddress: args.MultisigContractAddress,
@@ -110,15 +111,9 @@ func NewClient(args ClientArgs) (*client, error) {
 		return nil, clients.ErrNilAddressConverter
 	}
 
-	bech23MultisigAddress, err := args.MultisigContractAddress.AddressAsBech32String()
-	if err != nil {
-		return nil, fmt.Errorf("%w for %x", err, args.MultisigContractAddress.AddressBytes())
-	}
+	bech23MultisigAddress := args.MultisigContractAddress.Bech32()
 
-	bech23SafeAddress, err := args.SafeContractAddress.AddressAsBech32String()
-	if err != nil {
-		return nil, fmt.Errorf("%w for %x", err, args.SafeContractAddress.AddressBytes())
-	}
+	bech23SafeAddress := args.SafeContractAddress.Bech32()
 
 	c := &client{
 		txHandler: &transactionHandler{
@@ -143,7 +138,7 @@ func NewClient(args ClientArgs) (*client, error) {
 		clientAvailabilityAllowDelta: args.ClientAvailabilityAllowDelta,
 	}
 
-	bech32RelayerAddress, _ := relayerAddress.AddressAsBech32String()
+	bech32RelayerAddress := relayerAddress.Bech32()
 	c.log.Info("NewMultiversXClient",
 		"relayer address", bech32RelayerAddress,
 		"multisig contract address", bech23MultisigAddress,
@@ -465,11 +460,9 @@ func (c *client) CheckRequiredBalance(ctx context.Context, token []byte, value *
 	if isMintBurn {
 		return nil
 	}
-	safeAddress, err := c.safeContractAddress.AddressAsBech32String()
-	if err != nil {
-		return fmt.Errorf("%w for safe address %s", err, c.safeContractAddress.AddressBytes())
-	}
-	esdt, err := c.proxy.GetESDTTokenData(ctx, c.safeContractAddress, string(token), api.AccountQueryOptions{})
+	safeAddress := c.safeContractAddress.Bech32()
+
+	esdt, err := c.proxy.GetESDTTokenData(ctx, c.safeContractAddress, string(token))
 	if err != nil {
 		return fmt.Errorf("%w for address %s for ESDT token %s", err, safeAddress, string(token))
 	}

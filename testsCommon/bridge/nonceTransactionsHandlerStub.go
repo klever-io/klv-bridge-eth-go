@@ -3,19 +3,19 @@ package bridge
 import (
 	"context"
 
-	"github.com/multiversx/mx-chain-core-go/data/transaction"
-	"github.com/multiversx/mx-sdk-go/core"
+	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 )
 
 // NonceTransactionsHandlerStub -
 type NonceTransactionsHandlerStub struct {
-	ApplyNonceAndGasPriceCalled func(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error
-	SendTransactionCalled       func(ctx context.Context, tx *transaction.FrontendTransaction) (string, error)
+	ApplyNonceAndGasPriceCalled func(ctx context.Context, address address.Address, tx *transaction.Transaction) error
+	SendTransactionCalled       func(ctx context.Context, tx *transaction.Transaction) (string, error)
 	CloseCalled                 func() error
 }
 
 // ApplyNonceAndGasPrice -
-func (stub *NonceTransactionsHandlerStub) ApplyNonceAndGasPrice(ctx context.Context, address core.AddressHandler, tx *transaction.FrontendTransaction) error {
+func (stub *NonceTransactionsHandlerStub) ApplyNonceAndGasPrice(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 	if stub.ApplyNonceAndGasPriceCalled != nil {
 		return stub.ApplyNonceAndGasPriceCalled(ctx, address, tx)
 	}
@@ -24,7 +24,7 @@ func (stub *NonceTransactionsHandlerStub) ApplyNonceAndGasPrice(ctx context.Cont
 }
 
 // SendTransaction -
-func (stub *NonceTransactionsHandlerStub) SendTransaction(ctx context.Context, tx *transaction.FrontendTransaction) (string, error) {
+func (stub *NonceTransactionsHandlerStub) SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error) {
 	if stub.SendTransactionCalled != nil {
 		return stub.SendTransactionCalled(ctx, tx)
 	}

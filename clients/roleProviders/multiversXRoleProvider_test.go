@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/klever-io/klv-bridge-eth-go/clients"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -108,11 +108,14 @@ func testMultiversXExecuteShouldWork(whitelistedAddresses [][]byte, expectedSort
 		assert.Nil(t, err)
 
 		for _, addr := range whitelistedAddresses {
-			addressHandler := data.NewAddressFromBytes(addr)
+			addressHandler, err := address.NewAddressFromBytes(addr)
+			assert.Nil(t, err)
 			assert.True(t, erp.IsWhitelisted(addressHandler))
 		}
 
-		randomAddress := data.NewAddressFromBytes([]byte("random address"))
+		// TODO: check if error should be verified
+		randomAddress, _ := address.NewAddressFromBytes([]byte("random address"))
+
 		assert.False(t, erp.IsWhitelisted(randomAddress))
 		assert.False(t, erp.IsWhitelisted(nil))
 		erp.mut.RLock()

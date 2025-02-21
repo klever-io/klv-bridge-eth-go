@@ -3,12 +3,14 @@ module github.com/klever-io/klv-bridge-eth-go
 go 1.22.1
 
 require (
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/btcsuite/websocket v0.0.0-20150119174127-31079b680792
 	github.com/ethereum/go-ethereum v1.13.15
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/klever-io/klever-go v1.7.8
+	github.com/klever-io/klever-go v1.7.9-0.20250131153227-05cadef1bba7
+	github.com/klever-io/klever-go-logger v1.3.1
 	github.com/multiversx/mx-chain-communication-go v1.0.14
 	github.com/multiversx/mx-chain-core-go v1.2.20
 	github.com/multiversx/mx-chain-crypto-go v1.2.11
@@ -16,7 +18,7 @@ require (
 	github.com/multiversx/mx-chain-logger-go v1.0.14
 	github.com/multiversx/mx-sdk-go v1.4.1
 	github.com/pelletier/go-toml v1.9.3
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli v1.22.10
 )
 
@@ -32,7 +34,6 @@ require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.4 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
-	github.com/btcsuite/btcutil v1.0.2 // indirect
 	github.com/bytedance/sonic v1.11.2 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
@@ -92,7 +93,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.5 // indirect
-	github.com/herumi/bls-go-binary v1.28.2 // indirect
+	github.com/herumi/bls-go-binary v1.31.0 // indirect
 	github.com/holiman/billy v0.0.0-20240216141850-2abb0c79d3c4 // indirect
 	github.com/holiman/bloomfilter/v2 v2.0.3 // indirect
 	github.com/holiman/uint256 v1.2.4 // indirect
@@ -109,7 +110,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
-	github.com/klever-io/klever-go-logger v1.3.1 // indirect
 	github.com/koron/go-ssdp v0.0.4 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -158,7 +158,7 @@ require (
 	github.com/multiversx/mx-chain-scenario-go v1.4.3 // indirect
 	github.com/multiversx/mx-chain-storage-go v1.0.15 // indirect
 	github.com/multiversx/mx-chain-vm-common-go v1.5.12 // indirect
-	github.com/multiversx/mx-chain-vm-go v1.5.29 // indirect
+	github.com/multiversx/mx-chain-vm-go v1.5.29-patch2 // indirect
 	github.com/multiversx/mx-chain-vm-v1_2-go v1.2.67 // indirect
 	github.com/multiversx/mx-chain-vm-v1_3-go v1.3.68 // indirect
 	github.com/multiversx/mx-chain-vm-v1_4-go v1.4.97 // indirect
@@ -168,7 +168,6 @@ require (
 	github.com/opencontainers/runtime-spec v1.2.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
-	github.com/pborman/uuid v1.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -213,17 +212,17 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.10.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
 	gonum.org/v1/gonum v0.13.0 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

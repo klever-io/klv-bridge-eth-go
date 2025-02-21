@@ -1,32 +1,32 @@
 package mock
 
 import (
-	"github.com/multiversx/mx-sdk-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
 
 type kleverAccountsMock struct {
-	accounts map[string]*data.Account
+	accounts map[string]*models.Account
 }
 
 func newKleverAccountsMock() *kleverAccountsMock {
 	return &kleverAccountsMock{
-		accounts: make(map[string]*data.Account),
+		accounts: make(map[string]*models.Account),
 	}
 }
 
-func (mock *kleverAccountsMock) getOrCreate(address core.AddressHandler) *data.Account {
-	addrAsString := string(address.AddressBytes())
+func (mock *kleverAccountsMock) getOrCreate(address address.Address) *models.Account {
+	addrAsString := string(address.Bytes())
 	acc, found := mock.accounts[addrAsString]
 	if !found {
-		acc = &data.Account{}
+		acc = &models.Account{}
 		mock.accounts[addrAsString] = acc
 	}
 
 	return acc
 }
 
-func (mock *kleverAccountsMock) updateNonce(address core.AddressHandler, nonce uint64) {
+func (mock *kleverAccountsMock) updateNonce(address address.Address, nonce uint64) {
 	acc := mock.getOrCreate(address)
 	acc.Nonce = nonce
 }

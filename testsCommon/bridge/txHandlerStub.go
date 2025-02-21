@@ -3,7 +3,7 @@ package bridge
 import (
 	"context"
 
-	"github.com/multiversx/mx-sdk-go/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 )
 
 // TxHandlerStub -

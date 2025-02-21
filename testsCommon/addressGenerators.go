@@ -4,8 +4,7 @@ import (
 	"crypto/rand"
 
 	"github.com/ethereum/go-ethereum/common"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 )
 
 // CreateRandomEthereumAddress will create a random Ethereum address
@@ -17,19 +16,22 @@ func CreateRandomEthereumAddress() common.Address {
 }
 
 // CreateRandomMultiversXAddress will create a random MultiversX address
-func CreateRandomMultiversXAddress() sdkCore.AddressHandler {
+func CreateRandomMultiversXAddress() address.Address {
 	buff := make([]byte, 32)
 	_, _ = rand.Read(buff)
 
-	return data.NewAddressFromBytes(buff)
+	addr, _ := address.NewAddressFromBytes(buff)
+
+	return addr
 }
 
 // CreateRandomMultiversXSCAddress will create a random MultiversX smart contract address
-func CreateRandomMultiversXSCAddress() sdkCore.AddressHandler {
+func CreateRandomMultiversXSCAddress() address.Address {
 	buff := make([]byte, 22)
 	_, _ = rand.Read(buff)
 
 	firstPart := append(make([]byte, 8), []byte{5, 0}...)
 
-	return data.NewAddressFromBytes(append(firstPart, buff...))
+	addr, _ := address.NewAddressFromBytes(append(firstPart, buff...))
+	return addr
 }
