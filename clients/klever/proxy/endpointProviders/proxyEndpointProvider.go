@@ -15,7 +15,9 @@ type proxyEndpointProvider struct {
 
 // NewProxyEndpointProvider returns a new instance of a proxyEndpointProvider
 func NewProxyEndpointProvider() *proxyEndpointProvider {
-	return &proxyEndpointProvider{}
+	return &proxyEndpointProvider{
+		baseEndpointProvider: &baseEndpointProvider{},
+	}
 }
 
 // GetNodeStatus returns the node status endpoint

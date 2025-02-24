@@ -14,7 +14,7 @@ type SendBulkTransactionsResponse struct {
 
 // EstimateTransactionFeesResponse defines the structure of responses on EstimateTransactionFees API endpoint
 type EstimateTransactionFeesResponse struct {
-	Data  *transaction.FeesResponse `json:"txHashes"`
+	Data  *transaction.FeesResponse `json:"fees"`
 	Error string                    `json:"error"`
 	Code  string                    `json:"code"`
 }

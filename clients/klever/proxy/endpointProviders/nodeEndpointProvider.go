@@ -15,7 +15,9 @@ type nodeEndpointProvider struct {
 
 // NewNodeEndpointProvider returns a new instance of a nodeEndpointProvider
 func NewNodeEndpointProvider() *nodeEndpointProvider {
-	return &nodeEndpointProvider{}
+	return &nodeEndpointProvider{
+		baseEndpointProvider: &baseEndpointProvider{},
+	}
 }
 
 // GetNodeStatus returns the node status endpoint
