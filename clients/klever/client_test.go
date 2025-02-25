@@ -25,7 +25,6 @@ import (
 	"github.com/multiversx/mx-chain-crypto-go/signing"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -1021,9 +1020,9 @@ func TestClient_CheckClientAvailability(t *testing.T) {
 		GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 			return 0, nil
 		},
-		GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
+		GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*models.NodeOverview, error) {
 			currentNonce += incrementor
-			return &data.NetworkStatus{
+			return &models.NodeOverview{
 				Nonce: currentNonce,
 			}, nil
 		},
@@ -1094,7 +1093,7 @@ func TestClient_CheckClientAvailability(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*data.NetworkStatus, error) {
+			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*models.NodeOverview, error) {
 				return nil, expectedErr
 			},
 		}

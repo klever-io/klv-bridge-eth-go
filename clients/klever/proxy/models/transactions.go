@@ -1,6 +1,9 @@
 package models
 
-import "github.com/klever-io/klever-go/data/transaction"
+import (
+	"github.com/klever-io/klever-go/data/transaction"
+	idata "github.com/klever-io/klever-go/indexer/data"
+)
 
 // TxHashes represents a colection of hashs of each transaction returned by a SendBulkTransactions
 type TxHashes []string
@@ -17,4 +20,37 @@ type EstimateTransactionFeesResponse struct {
 	Data  *transaction.FeesResponse `json:"fees"`
 	Error string                    `json:"error"`
 	Code  string                    `json:"code"`
+}
+
+// KDAFungibleResponse holds the KDA (fungible) token data endpoint response
+type KDAFungibleResponse struct {
+	Data struct {
+		TokenData *KDAFungibleTokenData `json:"tokenData"`
+	} `json:"data"`
+	Error string `json:"error"`
+	Code  string `json:"code"`
+}
+
+// KDAFungibleTokenData holds the KDA (fungible) token data definition
+type KDAFungibleTokenData struct {
+	TokenIdentifier string `json:"tokenIdentifier"`
+	Balance         string `json:"balance"`
+	Properties      string `json:"properties"`
+}
+
+// TransactionData represents the structure that maps and validates user input for publishing a new transaction
+type TransactionData struct {
+	*idata.Transaction
+}
+
+// GetTransactionResponseData follows the format of the data field of get transaction response
+type GetTransactionResponseData struct {
+	Transaction TransactionData `json:"transaction"`
+}
+
+// GetTransactionResponse defines a response from the node holding the transaction sent from the chain
+type GetTransactionResponse struct {
+	Data  GetTransactionResponseData `json:"data"`
+	Error string                     `json:"error"`
+	Code  string                     `json:"code"`
 }

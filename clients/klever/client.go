@@ -463,7 +463,7 @@ func (c *client) CheckRequiredBalance(ctx context.Context, token []byte, value *
 	}
 	safeAddress := c.safeContractAddress.Bech32()
 
-	esdt, err := c.proxy.GetESDTTokenData(ctx, c.safeContractAddress, string(token))
+	esdt, err := c.proxy.GetKDATokenData(ctx, c.safeContractAddress, string(token))
 	if err != nil {
 		return fmt.Errorf("%w for address %s for ESDT token %s", err, safeAddress, string(token))
 	}

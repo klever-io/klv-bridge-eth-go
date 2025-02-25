@@ -14,7 +14,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 	"github.com/multiversx/mx-chain-core-go/core"
 	logger "github.com/multiversx/mx-chain-logger-go"
-	"github.com/multiversx/mx-sdk-go/data"
 )
 
 var log = logger.GetOrCreate("integrationTests/mock")
@@ -44,8 +43,8 @@ func (mock *KleverChainMock) GetNetworkConfig(_ context.Context) (*models.Networ
 }
 
 // GetNetworkStatus -
-func (mock *KleverChainMock) GetNetworkStatus(_ context.Context, _ uint32) (*data.NetworkStatus, error) {
-	return &data.NetworkStatus{}, nil
+func (mock *KleverChainMock) GetNetworkStatus(_ context.Context, _ uint32) (*models.NodeOverview, error) {
+	return &models.NodeOverview{}, nil
 }
 
 // GetShardOfAddress -
@@ -130,8 +129,8 @@ func (mock *KleverChainMock) GetAccount(_ context.Context, address address.Addre
 }
 
 // GetTransactionInfoWithResults -
-func (mock *KleverChainMock) GetTransactionInfoWithResults(_ context.Context, _ string) (*data.TransactionInfo, error) {
-	return &data.TransactionInfo{}, nil
+func (mock *KleverChainMock) GetTransactionInfoWithResults(_ context.Context, _ string) (*models.TransactionData, error) {
+	return &models.TransactionData{}, nil
 }
 
 // ProcessTransactionStatus -
@@ -219,8 +218,8 @@ func (mock *KleverChainMock) AddDepositToCurrentBatch(deposit KleverDeposit) {
 	mock.mutState.Unlock()
 }
 
-// GetESDTTokenData -
-func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Address, tokenIdentifier string) (*data.ESDTFungibleTokenData, error) {
+// GetKDATokenData -
+func (mock *KleverChainMock) GetKDATokenData(_ context.Context, _ address.Address, tokenIdentifier string) (*models.KDAFungibleTokenData, error) {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
@@ -230,7 +229,7 @@ func (mock *KleverChainMock) GetESDTTokenData(_ context.Context, _ address.Addre
 		balance = big.NewInt(0)
 	}
 
-	return &data.ESDTFungibleTokenData{
+	return &models.KDAFungibleTokenData{
 		TokenIdentifier: tokenIdentifier,
 		Balance:         balance.String(),
 	}, nil
