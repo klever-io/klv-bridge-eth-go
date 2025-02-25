@@ -13,14 +13,15 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
-	sdkHttp "github.com/multiversx/mx-sdk-go/core/http"
-	"github.com/multiversx/mx-sdk-go/data"
+	sdkHttp "github.com/klever-io/klv-bridge-eth-go/core/http"
 )
 
 const (
 	withResultsQueryParam = "?withResults=true"
 	withTxsAndLogs        = "?withTxs=true&withLogs=true"
+
+	// MinAllowedDeltaToFinal is the minimum value between nonces allowed when checking finality on a shard
+	MinAllowedDeltaToFinal = 1
 )
 
 var (
@@ -94,9 +95,9 @@ func NewProxy(args ArgsProxy) (*proxy, error) {
 
 func checkArgsProxy(args ArgsProxy) error {
 	if args.FinalityCheck {
-		if args.AllowedDeltaToFinal < sdkCore.MinAllowedDeltaToFinal {
+		if args.AllowedDeltaToFinal < MinAllowedDeltaToFinal {
 			return fmt.Errorf("%w, provided: %d, minimum: %d",
-				ErrInvalidAllowedDeltaToFinal, args.AllowedDeltaToFinal, sdkCore.MinAllowedDeltaToFinal)
+				ErrInvalidAllowedDeltaToFinal, args.AllowedDeltaToFinal, MinAllowedDeltaToFinal)
 		}
 	}
 
@@ -171,7 +172,7 @@ func (ep *proxy) SendTransaction(ctx context.Context, tx *transaction.Transactio
 		return "", createHTTPStatusError(code, err)
 	}
 
-	response := &data.SendTransactionResponse{}
+	response := &models.SendTransactionResponse{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return "", err
@@ -214,7 +215,7 @@ func (ep *proxy) GetTransactionStatus(ctx context.Context, hash string) (string,
 		return "", createHTTPStatusError(code, err)
 	}
 
-	response := &data.TransactionStatus{}
+	response := &models.TransactionStatus{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return "", err
@@ -227,16 +228,16 @@ func (ep *proxy) GetTransactionStatus(ctx context.Context, hash string) (string,
 }
 
 // GetTransactionInfo retrieves a transaction's details from the network
-func (ep *proxy) GetTransactionInfo(ctx context.Context, hash string) (*data.TransactionInfo, error) {
+func (ep *proxy) GetTransactionInfo(ctx context.Context, hash string) (*models.GetTransactionResponse, error) {
 	return ep.getTransactionInfo(ctx, hash, false)
 }
 
 // GetTransactionInfoWithResults retrieves a transaction's details from the network with events
-func (ep *proxy) GetTransactionInfoWithResults(ctx context.Context, hash string) (*data.TransactionInfo, error) {
+func (ep *proxy) GetTransactionInfoWithResults(ctx context.Context, hash string) (*models.GetTransactionResponse, error) {
 	return ep.getTransactionInfo(ctx, hash, true)
 }
 
-func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResults bool) (*data.TransactionInfo, error) {
+func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResults bool) (*models.GetTransactionResponse, error) {
 	endpoint := ep.endpointProvider.GetTransactionInfo(hash)
 	if withResults {
 		endpoint += withResultsQueryParam
@@ -247,7 +248,7 @@ func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResult
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	response := &data.TransactionInfo{}
+	response := &models.GetTransactionResponse{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
@@ -282,12 +283,12 @@ func (ep *proxy) EstimateTransactionFees(ctx context.Context, tx *transaction.Tr
 	return response.Data, nil
 }
 
-// GetESDTTokenData returns the address' fungible token data
-func (ep *proxy) GetESDTTokenData(
+// GetKDATokenData returns the address' fungible token data
+func (ep *proxy) GetKDATokenData(
 	ctx context.Context,
 	address address.Address,
 	tokenIdentifier string,
-) (*data.ESDTFungibleTokenData, error) {
+) (*models.KDAFungibleTokenData, error) {
 	if check.IfNil(address) {
 		return nil, ErrNilAddress
 	}
@@ -301,7 +302,7 @@ func (ep *proxy) GetESDTTokenData(
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	response := &data.ESDTFungibleResponse{}
+	response := &models.KDAFungibleResponse{}
 	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err

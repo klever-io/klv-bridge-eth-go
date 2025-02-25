@@ -54,3 +54,21 @@ type GetTransactionResponse struct {
 	Error string                     `json:"error"`
 	Code  string                     `json:"code"`
 }
+
+// SendTransactionResponse holds the response received from the network when broadcasting a transaction
+type SendTransactionResponse struct {
+	Data struct {
+		TxHash string `json:"txHash"`
+	} `json:"data"`
+	Error string `json:"error"`
+	Code  string `json:"code"`
+}
+
+// TransactionStatus holds a transaction's status response from the network
+type TransactionStatus struct {
+	Data struct {
+		Status string `json:"status"`
+	} `json:"data"`
+	Error string `json:"error"`
+	Code  string `json:"code"`
+}
