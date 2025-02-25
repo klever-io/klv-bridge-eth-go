@@ -9,6 +9,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
@@ -49,7 +50,7 @@ type ArgsKLVClientDataGetter struct {
 	MultisigContractAddress address.Address
 	SafeContractAddress     address.Address
 	RelayerAddress          address.Address
-	Proxy                   Proxy
+	Proxy                   proxy.Proxy
 	Log                     logger.Logger
 }
 
@@ -58,7 +59,7 @@ type klvClientDataGetter struct {
 	safeContractAddress           address.Address
 	bech32MultisigContractAddress string
 	relayerAddress                address.Address
-	proxy                         Proxy
+	proxy                         proxy.Proxy
 	log                           logger.Logger
 }
 

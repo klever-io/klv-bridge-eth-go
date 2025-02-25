@@ -7,11 +7,12 @@ import (
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 )
 
 type transactionHandler struct {
-	proxy                   Proxy
+	proxy                   proxy.Proxy
 	relayerAddress          address.Address
 	multisigAddressAsBech32 string
 	nonceTxHandler          NonceTransactionsHandler

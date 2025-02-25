@@ -23,6 +23,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mappers"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	roleproviders "github.com/klever-io/klv-bridge-eth-go/clients/roleProviders"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
@@ -58,7 +59,7 @@ type ArgsEthereumToKleverBridge struct {
 	Configs                   config.Configs
 	Messenger                 p2p.NetMessenger
 	StatusStorer              core.Storer
-	Proxy                     klever.Proxy
+	Proxy                     proxy.Proxy
 	KleverClientStatusHandler core.StatusHandler
 	Erc20ContractsHolder      ethereum.Erc20ContractsHolder
 	ClientWrapper             ethereum.ClientWrapper
@@ -81,7 +82,7 @@ type ethKleverBridgeComponents struct {
 	kleverRelayerAddress          address.Address
 	ethereumRelayerAddress        common.Address
 	mxDataGetter                  dataGetter
-	proxy                         klever.Proxy
+	proxy                         proxy.Proxy
 	kleverRoleProvider            KleverRoleProvider
 	ethereumRoleProvider          EthereumRoleProvider
 	broadcaster                   Broadcaster

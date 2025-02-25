@@ -13,6 +13,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/converters"
@@ -35,7 +36,7 @@ const (
 // ClientArgs represents the argument for the NewClient constructor function
 type ClientArgs struct {
 	GasMapConfig                 config.KleverGasMapConfig
-	Proxy                        Proxy
+	Proxy                        proxy.Proxy
 	Log                          logger.Logger
 	RelayerPrivateKey            crypto.PrivateKey
 	MultisigContractAddress      address.Address
@@ -462,7 +463,7 @@ func (c *client) CheckRequiredBalance(ctx context.Context, token []byte, value *
 	}
 	safeAddress := c.safeContractAddress.Bech32()
 
-	esdt, err := c.proxy.GetESDTTokenData(ctx, c.safeContractAddress, string(token))
+	esdt, err := c.proxy.GetKDATokenData(ctx, c.safeContractAddress, string(token))
 	if err != nil {
 		return fmt.Errorf("%w for address %s for ESDT token %s", err, safeAddress, string(token))
 	}

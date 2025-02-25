@@ -1,4 +1,4 @@
-package multiversx
+package kleverchain
 
 import (
 	"bytes"
@@ -23,7 +23,6 @@ import (
 	testCrypto "github.com/klever-io/klv-bridge-eth-go/testsCommon/crypto"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon/interactors"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -1102,8 +1101,8 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
 				return transaction.Transaction_FAILED, nil
 			},
-			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*data.TransactionInfo, error) {
-				return &data.TransactionInfo{}, nil
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*models.TransactionData, error) {
+				return &models.TransactionData{}, nil
 			},
 		}
 		args.TransactionChecks = createMockCheckConfigs()
@@ -1137,7 +1136,7 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
 				return transaction.Transaction_FAILED, nil
 			},
-			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*data.TransactionInfo, error) {
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*models.TransactionData, error) {
 				return nil, fmt.Errorf("random error")
 			},
 		}

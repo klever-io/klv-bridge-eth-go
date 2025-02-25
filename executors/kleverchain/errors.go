@@ -1,4 +1,4 @@
-package multiversx
+package kleverchain
 
 import "errors"
 

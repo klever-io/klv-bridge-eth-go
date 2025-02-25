@@ -7,8 +7,8 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
 	"github.com/klever-io/klv-bridge-eth-go/config"
-	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx"
-	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx/filters"
+	kleverChain "github.com/klever-io/klv-bridge-eth-go/executors/kleverchain"
+	"github.com/klever-io/klv-bridge-eth-go/executors/kleverchain/filters"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 	"github.com/multiversx/mx-chain-crypto-go/signing"
 	"github.com/multiversx/mx-chain-crypto-go/signing/ed25519"
@@ -59,7 +59,7 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 		return nil, err
 	}
 
-	argsExecutor := multiversx.ArgsScCallExecutor{
+	argsExecutor := kleverChain.ArgsScCallExecutor{
 		ScProxyBech32Address:            cfg.ScProxyBech32Address,
 		Proxy:                           proxy,
 		Codec:                           &parsers.MultiversxCodec{},
@@ -74,7 +74,7 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 		CloseAppChan:                    chCloseApp,
 		TransactionChecks:               cfg.TransactionChecks,
 	}
-	module.executorInstance, err = multiversx.NewScCallExecutor(argsExecutor)
+	module.executorInstance, err = kleverChain.NewScCallExecutor(argsExecutor)
 	if err != nil {
 		return nil, err
 	}
