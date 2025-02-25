@@ -15,6 +15,6 @@ type EndpointProvider interface {
 	GetNodeStatus() string
 	GetRestAPIEntityType() models.RestAPIEntityType
 	GetProcessedTransactionStatus(hexHash string) string
-	GetESDTTokenData(addressAsBech32 string, tokenIdentifier string) string
+	GetKDATokenData(addressAsBech32 string, tokenIdentifier string) string
 	IsInterfaceNil() bool
 }

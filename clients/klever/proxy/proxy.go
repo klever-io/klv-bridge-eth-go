@@ -295,7 +295,7 @@ func (ep *proxy) GetESDTTokenData(
 		return nil, ErrInvalidAddress
 	}
 
-	endpoint := ep.endpointProvider.GetESDTTokenData(address.Bech32(), tokenIdentifier)
+	endpoint := ep.endpointProvider.GetKDATokenData(address.Bech32(), tokenIdentifier)
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
 		return nil, createHTTPStatusError(code, err)
