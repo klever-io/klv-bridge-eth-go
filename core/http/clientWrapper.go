@@ -49,20 +49,7 @@ func (wrapper *clientWrapper) GetHTTP(ctx context.Context, endpoint string) ([]b
 
 	applyGetHeaderParams(request)
 
-	response, err := wrapper.client.Do(request)
-	if err != nil {
-		return nil, http.StatusBadRequest, err
-	}
-	defer func() {
-		_ = response.Body.Close()
-	}()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, response.StatusCode, err
-	}
-
-	return body, response.StatusCode, nil
+	return wrapper.doRequest(request)
 }
 
 // PostHTTP does a POST method operation on the specified endpoint with the provided raw data bytes
@@ -75,6 +62,10 @@ func (wrapper *clientWrapper) PostHTTP(ctx context.Context, endpoint string, dat
 
 	applyPostHeaderParams(request)
 
+	return wrapper.doRequest(request)
+}
+
+func (wrapper *clientWrapper) doRequest(request *http.Request) ([]byte, int, error) {
 	response, err := wrapper.client.Do(request)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
