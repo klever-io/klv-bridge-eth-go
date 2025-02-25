@@ -1,4 +1,4 @@
-package multiversx
+package kleverchain
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klever-go/tools/check"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
@@ -16,7 +17,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
-	"github.com/multiversx/mx-chain-core-go/core/check"
 	crypto "github.com/multiversx/mx-chain-crypto-go"
 	logger "github.com/multiversx/mx-chain-logger-go"
 )

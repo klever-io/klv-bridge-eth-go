@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/klever-io/klv-bridge-eth-go/config"
-	"github.com/klever-io/klv-bridge-eth-go/executors/multiversx/module"
+	"github.com/klever-io/klv-bridge-eth-go/executors/kleverchain/module"
 	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/require"
 )

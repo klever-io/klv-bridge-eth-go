@@ -3,9 +3,9 @@ package module
 import (
 	"testing"
 
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
-	sdkCore "github.com/multiversx/mx-sdk-go/core"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func createTestConfigs() config.ScCallsModuleConfig {
 		ProxyMaxNoncesDelta:             5,
 		ProxyFinalityCheck:              false,
 		ProxyCacherExpirationSeconds:    60,
-		ProxyRestAPIEntityType:          string(sdkCore.ObserverNode),
+		ProxyRestAPIEntityType:          string(models.ObserverNode),
 		IntervalToResendTxsInSeconds:    1,
 		PrivateKeyFile:                  "testdata/grace.pem",
 		PollingIntervalInMillis:         10000,
