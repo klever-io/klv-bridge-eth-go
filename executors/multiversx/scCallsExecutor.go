@@ -11,6 +11,7 @@ import (
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/errors"
@@ -33,7 +34,7 @@ const (
 // ArgsScCallExecutor represents the DTO struct for creating a new instance of type scCallExecutor
 type ArgsScCallExecutor struct {
 	ScProxyBech32Address            string
-	Proxy                           Proxy
+	Proxy                           proxy.Proxy
 	Codec                           Codec
 	Filter                          ScCallsExecuteFilter
 	Log                             logger.Logger
@@ -49,7 +50,7 @@ type ArgsScCallExecutor struct {
 
 type scCallExecutor struct {
 	scProxyBech32Address            string
-	proxy                           Proxy
+	proxy                           proxy.Proxy
 	codec                           Codec
 	filter                          ScCallsExecuteFilter
 	log                             logger.Logger
@@ -453,7 +454,7 @@ func (executor *scCallExecutor) logFullTransaction(ctx context.Context, hash str
 		return
 	}
 
-	txDataString, err := json.MarshalIndent(txData.Data.Transaction, "", "  ")
+	txDataString, err := json.MarshalIndent(txData, "", "  ")
 	if err != nil {
 		executor.log.Error("error preparing transaction for display", "error", err)
 		return
