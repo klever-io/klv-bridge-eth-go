@@ -17,7 +17,7 @@ import (
 	"github.com/klever-io/klever-go/tools/check"
 	kleverAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
-	sdkHttp "github.com/multiversx/mx-sdk-go/core/http"
+	sdkHttp "github.com/klever-io/klv-bridge-eth-go/core/http"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -50,7 +50,7 @@ func createMockClientRespondingBytes(responseBytes []byte) *mockHTTPClient {
 	}
 }
 
-func createMockArgsProxy(httpClient sdkHttp.Client) ArgsProxy {
+func createMockArgsProxy(httpClient sdkHttp.Client, entity models.RestAPIEntityType) ArgsProxy {
 	return ArgsProxy{
 		ProxyURL:            testHttpURL,
 		Client:              httpClient,
@@ -59,7 +59,7 @@ func createMockArgsProxy(httpClient sdkHttp.Client) ArgsProxy {
 		FinalityCheck:       false,
 		AllowedDeltaToFinal: 1,
 		CacheExpirationTime: time.Second,
-		EntityType:          models.ObserverNode,
+		EntityType:          entity,
 	}
 }
 
@@ -112,7 +112,7 @@ func TestNewProxy(t *testing.T) {
 	t.Run("invalid time cache should error", func(t *testing.T) {
 		t.Parallel()
 
-		args := createMockArgsProxy(nil)
+		args := createMockArgsProxy(nil, models.ObserverNode)
 		args.CacheExpirationTime = time.Second - time.Nanosecond
 		proxyInstance, err := NewProxy(args)
 
@@ -122,7 +122,7 @@ func TestNewProxy(t *testing.T) {
 	t.Run("invalid nonce delta should error", func(t *testing.T) {
 		t.Parallel()
 
-		args := createMockArgsProxy(nil)
+		args := createMockArgsProxy(nil, models.ObserverNode)
 		args.FinalityCheck = true
 		args.AllowedDeltaToFinal = 0
 		proxyInstance, err := NewProxy(args)
@@ -133,7 +133,7 @@ func TestNewProxy(t *testing.T) {
 	t.Run("should work with finality check", func(t *testing.T) {
 		t.Parallel()
 
-		args := createMockArgsProxy(nil)
+		args := createMockArgsProxy(nil, models.ObserverNode)
 		args.FinalityCheck = true
 		proxyInstance, err := NewProxy(args)
 
@@ -143,7 +143,7 @@ func TestNewProxy(t *testing.T) {
 	t.Run("should work without finality check", func(t *testing.T) {
 		t.Parallel()
 
-		args := createMockArgsProxy(nil)
+		args := createMockArgsProxy(nil, models.ObserverNode)
 		proxyInstance, err := NewProxy(args)
 
 		assert.False(t, check.IfNil(proxyInstance))
@@ -152,6 +152,20 @@ func TestNewProxy(t *testing.T) {
 }
 
 func TestGetAccount(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil address should error", func(t *testing.T) {
+		t.Parallel()
+		args := createMockArgsProxy(nil, models.Proxy)
+		proxyInstance, _ := NewProxy(args)
+
+		response, errGet := proxyInstance.GetAccount(context.Background(), nil)
+		require.Equal(t, ErrNilAddress, errGet)
+		require.Nil(t, response)
+	})
+}
+
+func TestGetAccount_FromProxy(t *testing.T) {
 	t.Parallel()
 
 	numAccountQueries := uint32(0)
@@ -163,8 +177,8 @@ func TestGetAccount(t *testing.T) {
 			}
 
 			account := models.AccountApiResponse{
-				Data: models.ResponseAccount{
-					AccountData: models.Account{
+				Data: models.ResponseProxyAccount{
+					AccountData: models.ProxyAccountData{
 						AccountInfo: &idata.AccountInfo{
 							Nonce:   37,
 							Balance: 10,
@@ -181,20 +195,55 @@ func TestGetAccount(t *testing.T) {
 			}, nil
 		},
 	}
-	args := createMockArgsProxy(httpClient)
-	args.FinalityCheck = true
+	args := createMockArgsProxy(httpClient, models.Proxy)
 	proxyInstance, _ := NewProxy(args)
 
 	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
 	require.NoError(t, err)
 
-	t.Run("nil address should error", func(t *testing.T) {
-		t.Parallel()
-
-		response, errGet := proxyInstance.GetAccount(context.Background(), nil)
-		require.Equal(t, ErrNilAddress, errGet)
-		require.Nil(t, response)
+	t.Run("should work and return account", func(t *testing.T) {
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.NotNil(t, account)
+		assert.Equal(t, uint64(37), account.Nonce)
+		assert.Nil(t, errGet)
+		assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
 	})
+}
+
+func TestGetAccount_FromNode(t *testing.T) {
+	t.Parallel()
+
+	numAccountQueries := uint32(0)
+	httpClient := &mockHTTPClient{
+		doCalled: func(req *http.Request) (*http.Response, error) {
+			response, handled, err := handleRequestNetworkConfigAndStatus(req, 9170526)
+			if handled {
+				return response, err
+			}
+
+			account := models.AccountNodeResponse{
+				Data: models.ResponseNodeAccount{
+					AccountData: models.Account{
+						Nonce:   37,
+						Balance: 10,
+					},
+				},
+			}
+
+			accountBytes, _ := json.Marshal(account)
+			atomic.AddUint32(&numAccountQueries, 1)
+			return &http.Response{
+				Body:       io.NopCloser(bytes.NewReader(accountBytes)),
+				StatusCode: http.StatusOK,
+			}, nil
+		},
+	}
+
+	args := createMockArgsProxy(httpClient, models.ObserverNode)
+	proxyInstance, _ := NewProxy(args)
+
+	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	require.NoError(t, err)
 
 	t.Run("should work and return account", func(t *testing.T) {
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
@@ -211,7 +260,7 @@ func TestProxy_GetTransactionInfoWithResults(t *testing.T) {
 	txHash := "824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f"
 	responseBytes := []byte(`{"data":{"transaction":{"hash":"824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f","blockNum":61,"sender":"klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j","nonce":1,"timestamp":1739292140,"kAppFee":500000,"bandwidthFee":1000000,"status":"success","resultCode":"Ok","version":1,"chainID":"420420","signature":["6f22d23cfd70337cc97cd0153551ccd53bb72e16533723bff3831ddb4c73139f3683db203d2f8a095a845e77bab4319b69afc36ee7b3cfee84005c389de76203"],"searchOrder":0,"receipts":[{"cID":255,"signer":"klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j","type":19,"typeString":"SignedBy","weight":"1"},{"assetId":"KLV","assetType":"Fungible","cID":0,"from":"klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j","marketplaceId":"","orderId":"","to":"klv1mge94r8n3q44hcwu2tk9afgjcxcawmutycu0cwkap7m6jnktjlvq58355l","type":0,"typeString":"Transfer","value":10000000}],"contract":[{"type":0,"typeString":"TransferContractType","parameter":{"amount":10000000,"assetId":"KLV","assetType":{"collection":"KLV","type":"Fungible"},"toAddress":"klv1mge94r8n3q44hcwu2tk9afgjcxcawmutycu0cwkap7m6jnktjlvq58355l"}}]}}, "error":"","code":"successful"}`)
 	httpClient := createMockClientRespondingBytes(responseBytes)
-	args := createMockArgsProxy(httpClient)
+	args := createMockArgsProxy(httpClient, models.Proxy)
 	ep, _ := NewProxy(args)
 
 	tx, err := ep.GetTransactionInfoWithResults(context.Background(), txHash)

@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/klever-io/klever-go/data/transaction"
-	idata "github.com/klever-io/klever-go/indexer/data"
 	chainModels "github.com/klever-io/klever-go/network/api/models"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors"
@@ -155,9 +154,7 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &idata.AccountInfo{
-						Nonce: blockchainNonce,
-					},
+					Nonce: blockchainNonce,
 				}, nil
 			},
 		}
@@ -176,9 +173,7 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &idata.AccountInfo{
-						Nonce: blockchainNonce,
-					},
+					Nonce: blockchainNonce,
 				}, nil
 			},
 		}
@@ -263,9 +258,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &idata.AccountInfo{
-						Nonce: blockchainNonce - 1,
-					},
+					Nonce: blockchainNonce - 1,
 				}, nil
 			},
 			SendTransactionsCalled: func(_ context.Context, txs []*transaction.Transaction) ([]string, error) {
@@ -292,9 +285,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &idata.AccountInfo{
-						Nonce: blockchainNonce,
-					},
+					Nonce: blockchainNonce,
 				}, nil
 			},
 		}
@@ -334,9 +325,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &idata.AccountInfo{
-						Nonce: blockchainNonce - 1,
-					},
+					Nonce: blockchainNonce - 1,
 				}, nil
 			},
 		}
@@ -361,9 +350,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		proxy := &testsCommon.ProxyStub{
 			GetAccountCalled: func(_ context.Context, address address.Address) (*models.Account, error) {
 				return &models.Account{
-					AccountInfo: &idata.AccountInfo{
-						Nonce: blockchainNonce - 1,
-					},
+					Nonce: blockchainNonce - 1,
 				}, nil
 			},
 			SendTransactionsCalled: func(_ context.Context, txs []*transaction.Transaction) ([]string, error) {

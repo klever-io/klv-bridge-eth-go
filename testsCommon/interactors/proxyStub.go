@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/klever-io/klever-go/data/transaction"
-	idata "github.com/klever-io/klever-go/indexer/data"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
@@ -67,10 +66,7 @@ func (eps *ProxyStub) GetAccount(ctx context.Context, address address.Address) (
 		return eps.GetAccountCalled(ctx, address)
 	}
 
-	return &models.Account{
-		AccountInfo: &idata.AccountInfo{},
-		Assets:      make(map[string]*idata.AccountKDA),
-	}, nil
+	return &models.Account{}, nil
 }
 
 // GetNetworkStatus -
