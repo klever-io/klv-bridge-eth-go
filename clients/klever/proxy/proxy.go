@@ -142,6 +142,39 @@ func (ep *proxy) GetAccount(ctx context.Context, address address.Address) (*mode
 		return nil, ErrInvalidAddress
 	}
 
+	endpointProviderType := ep.endpointProvider.GetRestAPIEntityType()
+	switch endpointProviderType {
+	case models.Proxy:
+		return ep.getAccountProxy(ctx, address)
+	case models.ObserverNode:
+		return ep.getAccountNode(ctx, address)
+	}
+
+	return &models.Account{}, ErrInvalidEndpointProvider
+}
+
+func (ep *proxy) getAccountNode(ctx context.Context, address address.Address) (*models.Account, error) {
+	endpoint := ep.endpointProvider.GetAccount(address.Bech32())
+
+	buff, code, err := ep.GetHTTP(ctx, endpoint)
+	if err != nil || code != http.StatusOK {
+		return nil, createHTTPStatusError(code, err)
+	}
+
+	response := &models.AccountNodeResponse{}
+	err = json.Unmarshal(buff, response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != "" {
+		return nil, errors.New(response.Error)
+	}
+
+	return &response.Data.AccountData, nil
+}
+
+func (ep *proxy) getAccountProxy(ctx context.Context, address address.Address) (*models.Account, error) {
 	endpoint := ep.endpointProvider.GetAccount(address.Bech32())
 
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
@@ -158,7 +191,12 @@ func (ep *proxy) GetAccount(ctx context.Context, address address.Address) (*mode
 		return nil, errors.New(response.Error)
 	}
 
-	return &response.Data.AccountData, nil
+	return &models.Account{
+		Address:  response.Data.AccountData.Address,
+		Balance:  uint64(response.Data.AccountData.Balance),
+		Nonce:    response.Data.AccountData.Nonce,
+		RootHash: response.Data.AccountData.RootHash,
+	}, nil
 }
 
 // SendTransaction broadcasts a transaction to the network and returns the txhash if successful
