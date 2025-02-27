@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"io"
 	"net/http"
@@ -273,9 +272,6 @@ func TestProxy_GetTransactionInfoWithResults(t *testing.T) {
 
 	tx, err := ep.GetTransactionInfoWithResults(context.Background(), txHash)
 	require.Nil(t, err)
-
-	txBytes, _ := json.MarshalIndent(tx, "", " ")
-	fmt.Println(string(txBytes))
 
 	require.Equal(t, txHash, tx.Data.Transaction.Hash)
 	require.Equal(t, uint64(61), tx.Data.Transaction.BlockNum)
