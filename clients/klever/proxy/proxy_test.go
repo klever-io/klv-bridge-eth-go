@@ -22,10 +22,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const testHttpURL = "https://test.org"
-const networkConfigEndpoint = "network/config"
-const getNodeStatusEndpoint = "node/status"
-const chainID = "chainID"
+const (
+	// Test URLs
+	testHttpURL = "https://test.org"
+)
 
 type mockHTTPClient struct {
 	doCalled func(req *http.Request) (*http.Response, error)
@@ -63,47 +63,17 @@ func createMockArgsProxy(httpClient sdkHttp.Client, entity models.RestAPIEntityT
 	}
 }
 
-func handleRequestNetworkConfigAndStatus(
-	req *http.Request,
-	currentNonce uint64,
-) (*http.Response, bool, error) {
-
-	handled := false
-	url := req.URL.String()
-	var response interface{}
-	switch url {
-	case fmt.Sprintf("%s/%s", testHttpURL, networkConfigEndpoint):
-		handled = true
-		response = models.NetworkConfigResponse{
-			Data: &models.NetworkConfig{
-				ChainID: chainID,
-			},
-		}
-
-	case fmt.Sprintf("%s/%s", testHttpURL, getNodeStatusEndpoint):
-		handled = true
-		response = models.NodeOverviewResponse{
-			Data: struct {
-				NodeOverview *models.NodeOverview `json:"overview"`
-			}{
-				NodeOverview: &models.NodeOverview{
-					Nonce: currentNonce,
-				},
-			},
-			Error: "",
-			Code:  "",
-		}
+func createMockDoCalled(responseData interface{}, statusCode int, numQueries *uint32) *mockHTTPClient {
+	return &mockHTTPClient{
+		doCalled: func(req *http.Request) (*http.Response, error) {
+			accountBytes, _ := json.Marshal(responseData)
+			atomic.AddUint32(numQueries, 1)
+			return &http.Response{
+				Body:       io.NopCloser(bytes.NewReader(accountBytes)),
+				StatusCode: statusCode,
+			}, nil
+		},
 	}
-
-	if !handled {
-		return nil, handled, nil
-	}
-
-	buff, _ := json.Marshal(response)
-	return &http.Response{
-		Body:       io.NopCloser(bytes.NewReader(buff)),
-		StatusCode: http.StatusOK,
-	}, handled, nil
 }
 
 func TestNewProxy(t *testing.T) {
@@ -165,92 +135,167 @@ func TestGetAccount(t *testing.T) {
 	})
 }
 
-func TestGetAccount_FromProxy(t *testing.T) {
-	t.Parallel()
-
-	numAccountQueries := uint32(0)
-	httpClient := &mockHTTPClient{
-		doCalled: func(req *http.Request) (*http.Response, error) {
-			response, handled, err := handleRequestNetworkConfigAndStatus(req, 9170526)
-			if handled {
-				return response, err
-			}
-
-			account := models.AccountApiResponse{
-				Data: models.ResponseProxyAccount{
-					AccountData: models.ProxyAccountData{
-						AccountInfo: &idata.AccountInfo{
-							Nonce:   37,
-							Balance: 10,
-						},
-					},
-				},
-			}
-
-			accountBytes, _ := json.Marshal(account)
-			atomic.AddUint32(&numAccountQueries, 1)
-			return &http.Response{
-				Body:       io.NopCloser(bytes.NewReader(accountBytes)),
-				StatusCode: http.StatusOK,
-			}, nil
-		},
-	}
-	args := createMockArgsProxy(httpClient, models.Proxy)
-	proxyInstance, _ := NewProxy(args)
-
-	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-	require.NoError(t, err)
-
-	t.Run("should work and return account", func(t *testing.T) {
-		account, errGet := proxyInstance.GetAccount(context.Background(), address)
-		assert.NotNil(t, account)
-		assert.Equal(t, uint64(37), account.Nonce)
-		assert.Nil(t, errGet)
-		assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
-	})
-}
-
 func TestGetAccount_FromNode(t *testing.T) {
 	t.Parallel()
 
-	numAccountQueries := uint32(0)
-	httpClient := &mockHTTPClient{
-		doCalled: func(req *http.Request) (*http.Response, error) {
-			response, handled, err := handleRequestNetworkConfigAndStatus(req, 9170526)
-			if handled {
-				return response, err
-			}
+	t.Run("should fail account not found", func(t *testing.T) {
+		t.Parallel()
 
-			account := models.AccountNodeResponse{
-				Data: models.ResponseNodeAccount{
-					AccountData: models.Account{
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled(nil, http.StatusNotFound, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.ObserverNode)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.Nil(t, account)
+		assert.NotNil(t, errGet)
+		assert.True(t, errors.Is(errGet, ErrHTTPStatusCodeIsNotOK))
+	})
+
+	t.Run("should fail invalid json", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled([]byte(`{"data":{}`), http.StatusOK, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.ObserverNode)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.Nil(t, account)
+		assert.NotNil(t, errGet)
+	})
+
+	t.Run("should fail response data", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled(models.AccountNodeResponse{Error: "expected error"}, http.StatusOK, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.ObserverNode)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.Nil(t, account)
+		assert.NotNil(t, errGet)
+	})
+
+	t.Run("should work", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled(models.AccountNodeResponse{
+			Data: models.ResponseNodeAccount{
+				AccountData: models.Account{
+					Nonce:   37,
+					Balance: 10,
+				},
+			},
+		}, http.StatusOK, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.ObserverNode)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.NotNil(t, account)
+		assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
+		assert.Nil(t, errGet)
+		assert.Equal(t, uint64(37), account.Nonce)
+	})
+}
+
+func TestGetAccount_FromProxy(t *testing.T) {
+	t.Run("should fail account not found", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled(nil, http.StatusNotFound, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.Proxy)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.Nil(t, account)
+		assert.NotNil(t, errGet)
+		assert.True(t, errors.Is(errGet, ErrHTTPStatusCodeIsNotOK))
+	})
+
+	t.Run("should fail invalid json", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled([]byte(`{"data":{}`), http.StatusOK, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.Proxy)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.Nil(t, account)
+		assert.NotNil(t, errGet)
+	})
+
+	t.Run("should fail response data with error", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled(models.AccountNodeResponse{Error: "expected error"}, http.StatusOK, &numAccountQueries)
+
+		args := createMockArgsProxy(httpClient, models.Proxy)
+		proxyInstance, _ := NewProxy(args)
+
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
+
+		account, errGet := proxyInstance.GetAccount(context.Background(), address)
+		assert.Nil(t, account)
+		assert.NotNil(t, errGet)
+	})
+
+	t.Run("should work", func(t *testing.T) {
+		t.Parallel()
+
+		numAccountQueries := uint32(0)
+		httpClient := createMockDoCalled(models.AccountApiResponse{
+			Data: models.ResponseProxyAccount{
+				AccountData: models.ProxyAccountData{
+					AccountInfo: &idata.AccountInfo{
 						Nonce:   37,
 						Balance: 10,
 					},
 				},
-			}
+			},
+		}, http.StatusOK, &numAccountQueries)
 
-			accountBytes, _ := json.Marshal(account)
-			atomic.AddUint32(&numAccountQueries, 1)
-			return &http.Response{
-				Body:       io.NopCloser(bytes.NewReader(accountBytes)),
-				StatusCode: http.StatusOK,
-			}, nil
-		},
-	}
+		args := createMockArgsProxy(httpClient, models.Proxy)
+		proxyInstance, _ := NewProxy(args)
 
-	args := createMockArgsProxy(httpClient, models.ObserverNode)
-	proxyInstance, _ := NewProxy(args)
+		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+		require.NoError(t, err)
 
-	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-	require.NoError(t, err)
-
-	t.Run("should work and return account", func(t *testing.T) {
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.NotNil(t, account)
-		assert.Equal(t, uint64(37), account.Nonce)
-		assert.Nil(t, errGet)
 		assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
+		assert.Nil(t, errGet)
+		assert.Equal(t, uint64(37), account.Nonce)
 	})
 }
 
