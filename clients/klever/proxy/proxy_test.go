@@ -138,6 +138,9 @@ func TestGetAccount(t *testing.T) {
 func TestGetAccount_FromNode(t *testing.T) {
 	t.Parallel()
 
+	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	require.NoError(t, err)
+
 	t.Run("should fail account not found", func(t *testing.T) {
 		t.Parallel()
 
@@ -146,9 +149,6 @@ func TestGetAccount_FromNode(t *testing.T) {
 
 		args := createMockArgsProxy(httpClient, models.ObserverNode)
 		proxyInstance, _ := NewProxy(args)
-
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
 
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.Nil(t, account)
@@ -165,9 +165,6 @@ func TestGetAccount_FromNode(t *testing.T) {
 		args := createMockArgsProxy(httpClient, models.ObserverNode)
 		proxyInstance, _ := NewProxy(args)
 
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
-
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.Nil(t, account)
 		assert.NotNil(t, errGet)
@@ -181,9 +178,6 @@ func TestGetAccount_FromNode(t *testing.T) {
 
 		args := createMockArgsProxy(httpClient, models.ObserverNode)
 		proxyInstance, _ := NewProxy(args)
-
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
 
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.Nil(t, account)
@@ -206,9 +200,6 @@ func TestGetAccount_FromNode(t *testing.T) {
 		args := createMockArgsProxy(httpClient, models.ObserverNode)
 		proxyInstance, _ := NewProxy(args)
 
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
-
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.NotNil(t, account)
 		assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
@@ -218,6 +209,11 @@ func TestGetAccount_FromNode(t *testing.T) {
 }
 
 func TestGetAccount_FromProxy(t *testing.T) {
+	t.Parallel()
+
+	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	require.NoError(t, err)
+
 	t.Run("should fail account not found", func(t *testing.T) {
 		t.Parallel()
 
@@ -226,9 +222,6 @@ func TestGetAccount_FromProxy(t *testing.T) {
 
 		args := createMockArgsProxy(httpClient, models.Proxy)
 		proxyInstance, _ := NewProxy(args)
-
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
 
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.Nil(t, account)
@@ -245,9 +238,6 @@ func TestGetAccount_FromProxy(t *testing.T) {
 		args := createMockArgsProxy(httpClient, models.Proxy)
 		proxyInstance, _ := NewProxy(args)
 
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
-
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.Nil(t, account)
 		assert.NotNil(t, errGet)
@@ -261,9 +251,6 @@ func TestGetAccount_FromProxy(t *testing.T) {
 
 		args := createMockArgsProxy(httpClient, models.Proxy)
 		proxyInstance, _ := NewProxy(args)
-
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
 
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.Nil(t, account)
@@ -287,9 +274,6 @@ func TestGetAccount_FromProxy(t *testing.T) {
 
 		args := createMockArgsProxy(httpClient, models.Proxy)
 		proxyInstance, _ := NewProxy(args)
-
-		address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
-		require.NoError(t, err)
 
 		account, errGet := proxyInstance.GetAccount(context.Background(), address)
 		assert.NotNil(t, account)
