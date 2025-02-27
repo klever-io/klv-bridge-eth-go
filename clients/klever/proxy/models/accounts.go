@@ -24,13 +24,13 @@ type AccountNodeResponse struct {
 	Code  string              `json:"code"`
 }
 
-// Account defines the data structure for an account received from proxy
+// ProxyAccountData defines the data structure for an account received from proxy
 type ProxyAccountData struct {
 	*idata.AccountInfo
 	Assets map[string]*idata.AccountKDA `json:"assets"`
 }
 
-// ResponseAccount follows the format of the data field of an account response
+// ResponseProxyAccount follows the format of the data field of an account response
 type ResponseProxyAccount struct {
 	AccountData ProxyAccountData `json:"account"`
 }

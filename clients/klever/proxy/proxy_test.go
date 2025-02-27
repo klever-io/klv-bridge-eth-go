@@ -25,6 +25,8 @@ import (
 const (
 	// Test URLs
 	testHttpURL = "https://test.org"
+	// Test address
+	testAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
 )
 
 type mockHTTPClient struct {
@@ -138,7 +140,7 @@ func TestGetAccount(t *testing.T) {
 func TestGetAccount_FromNode(t *testing.T) {
 	t.Parallel()
 
-	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	address, err := kleverAddress.NewAddress(testAddress)
 	require.NoError(t, err)
 
 	t.Run("should fail account not found", func(t *testing.T) {
@@ -211,7 +213,7 @@ func TestGetAccount_FromNode(t *testing.T) {
 func TestGetAccount_FromProxy(t *testing.T) {
 	t.Parallel()
 
-	address, err := kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	address, err := kleverAddress.NewAddress(testAddress)
 	require.NoError(t, err)
 
 	t.Run("should fail account not found", func(t *testing.T) {
