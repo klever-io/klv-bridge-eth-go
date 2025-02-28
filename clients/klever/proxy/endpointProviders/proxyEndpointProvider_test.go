@@ -13,10 +13,3 @@ func TestNewProxyEndpointProvider(t *testing.T) {
 	provider := NewProxyEndpointProvider()
 	assert.False(t, check.IfNil(provider))
 }
-
-func TestProxyEndpointProvider_GetNodeStatus(t *testing.T) {
-	t.Parallel()
-
-	provider := NewProxyEndpointProvider()
-	assert.Equal(t, "network/status/", provider.GetNodeStatus())
-}

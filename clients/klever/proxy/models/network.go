@@ -32,12 +32,12 @@ type NodeOverview struct {
 	StartTime            time.Duration `json:"startTime"`
 }
 
-type nodeOverviewResponseData struct {
+type NodeOverviewResponseData struct {
 	NodeOverview *NodeOverview `json:"overview"`
 }
 
-type NodeOverviewResponse struct {
-	Data  nodeOverviewResponseData
+type NodeOverviewApiResponse struct {
+	Data  NodeOverviewResponseData
 	Error string `json:"error"`
 	Code  string `json:"code"`
 }

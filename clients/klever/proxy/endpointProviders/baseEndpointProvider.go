@@ -4,6 +4,7 @@ import "fmt"
 
 const (
 	networkConfig              = "network/config"
+	nodeStatus                 = "node/overview"
 	account                    = "address/%s"
 	estimateTransactionFees    = "transaction/estimate-fee"
 	sendTransaction            = "transaction/send"
@@ -20,6 +21,11 @@ type baseEndpointProvider struct{}
 // GetNetworkConfig returns the network config endpoint
 func (base *baseEndpointProvider) GetNetworkConfig() string {
 	return networkConfig
+}
+
+// GetNodeStatus returns the network status endpoint
+func (base *baseEndpointProvider) GetNodeStatus() string {
+	return nodeStatus
 }
 
 // GetAccount returns the account endpoint
