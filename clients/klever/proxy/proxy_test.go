@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"io"
 	"net/http"
@@ -125,86 +126,87 @@ func TestNewProxy(t *testing.T) {
 func TestGetAccount(t *testing.T) {
 	t.Parallel()
 
-	address, err := kleverAddress.NewAddress(testAddress)
-	require.NoError(t, err)
+	tests := []struct {
+		name        string
+		address     string
+		entityType  models.RestAPIEntityType
+		statusCode  int
+		response    interface{}
+		expectedErr error
+	}{
+		{
+			name:        "should fail account not found from node",
+			entityType:  models.ObserverNode,
+			expectedErr: ErrNilAddress,
+		},
+		{
+			name:        "should fail account not found from node",
+			entityType:  models.ObserverNode,
+			address:     testAddress,
+			statusCode:  http.StatusNotFound,
+			response:    nil,
+			expectedErr: ErrHTTPStatusCodeIsNotOK,
+		},
+		{
+			name:        "should fail account not found from proxy",
+			entityType:  models.Proxy,
+			address:     testAddress,
+			statusCode:  http.StatusNotFound,
+			response:    nil,
+			expectedErr: ErrHTTPStatusCodeIsNotOK,
+		},
+		{
+			name:        "should fail invalid json from proxy",
+			address:     testAddress,
+			entityType:  models.Proxy,
+			statusCode:  http.StatusOK,
+			response:    []byte(`{"data":{}`),
+			expectedErr: fmt.Errorf("json: cannot unmarshal string into Go value of type models.AccountApiResponse"),
+		},
+		{
+			name:        "should fail invalid json from node",
+			address:     testAddress,
+			entityType:  models.ObserverNode,
+			statusCode:  http.StatusOK,
+			response:    []byte(`{"data":{}`),
+			expectedErr: fmt.Errorf("json: cannot unmarshal string into Go value of type models.AccountNodeResponse"),
+		},
+		{
+			name:       "should fail response data from node",
+			address:    testAddress,
+			entityType: models.ObserverNode,
+			statusCode: http.StatusOK,
+			response:   models.AccountNodeResponse{Error: "expected error"},
+		},
+		{
+			name:       "should fail response data from proxy",
+			address:    testAddress,
+			entityType: models.Proxy,
+			statusCode: http.StatusOK,
+			response:   models.AccountNodeResponse{Error: "expected error"},
+		},
+	}
 
-	t.Run("nil address should error", func(t *testing.T) {
-		t.Parallel()
-		args := createMockArgsProxy(nil, models.Proxy)
-		proxyInstance, _ := NewProxy(args)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-		response, errGet := proxyInstance.GetAccount(context.Background(), nil)
-		require.Equal(t, ErrNilAddress, errGet)
-		require.Nil(t, response)
-	})
+			numAccountQueries := uint32(0)
+			httpClient := createMockDoCalled(tt.response, tt.statusCode, &numAccountQueries)
 
-	t.Run("getAccount common tests", func(t *testing.T) {
-		tests := []struct {
-			name        string
-			entityType  models.RestAPIEntityType
-			statusCode  int
-			response    interface{}
-			expectedErr error
-		}{
-			{
-				name:        "should fail account not found from node",
-				entityType:  models.ObserverNode,
-				statusCode:  http.StatusNotFound,
-				response:    nil,
-				expectedErr: ErrHTTPStatusCodeIsNotOK,
-			},
-			{
-				name:        "should fail account not found from proxy",
-				entityType:  models.Proxy,
-				statusCode:  http.StatusNotFound,
-				response:    nil,
-				expectedErr: ErrHTTPStatusCodeIsNotOK,
-			},
-			{
-				name:       "should fail invalid json from proxy",
-				entityType: models.Proxy,
-				statusCode: http.StatusOK,
-				response:   []byte(`{"data":{}`),
-			},
-			{
-				name:       "should fail invalid json from node",
-				entityType: models.ObserverNode,
-				statusCode: http.StatusOK,
-				response:   []byte(`{"data":{}`),
-			},
-			{
-				name:       "should fail response data from node",
-				entityType: models.ObserverNode,
-				statusCode: http.StatusOK,
-				response:   models.AccountNodeResponse{Error: "expected error"},
-			},
-			{
-				name:       "should fail response data from proxy",
-				entityType: models.Proxy,
-				statusCode: http.StatusOK,
-				response:   models.AccountNodeResponse{Error: "expected error"},
-			},
-		}
+			args := createMockArgsProxy(httpClient, tt.entityType)
+			proxyInstance, _ := NewProxy(args)
 
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				t.Parallel()
+			address, _ := kleverAddress.NewAddress(tt.address)
 
-				numAccountQueries := uint32(0)
-				httpClient := createMockDoCalled(tt.response, tt.statusCode, &numAccountQueries)
-
-				args := createMockArgsProxy(httpClient, tt.entityType)
-				proxyInstance, _ := NewProxy(args)
-
-				account, errGet := proxyInstance.GetAccount(context.Background(), address)
-				assert.Nil(t, account)
-				assert.NotNil(t, errGet)
-				if tt.expectedErr != nil {
-					assert.True(t, errors.Is(errGet, tt.expectedErr))
-				}
-			})
-		}
-	})
+			account, errGet := proxyInstance.GetAccount(context.Background(), address)
+			assert.Nil(t, account)
+			assert.NotNil(t, errGet)
+			if tt.expectedErr != nil {
+				assert.ErrorContains(t, errGet, tt.expectedErr.Error())
+			}
+		})
+	}
 }
 
 func TestGetAccount_FromNode(t *testing.T) {
