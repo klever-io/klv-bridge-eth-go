@@ -123,7 +123,7 @@ func TestNewProxy(t *testing.T) {
 	})
 }
 
-func TestGetAccount(t *testing.T) {
+func TestGetAccount_ShouldFailCases(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -172,14 +172,14 @@ func TestGetAccount(t *testing.T) {
 			expectedErr: fmt.Errorf("json: cannot unmarshal string into Go value of type models.AccountNodeResponse"),
 		},
 		{
-			name:       "should fail response data from node",
+			name:       "should fail data with error message from node",
 			address:    testAddress,
 			entityType: models.ObserverNode,
 			statusCode: http.StatusOK,
 			response:   models.AccountNodeResponse{Error: "expected error"},
 		},
 		{
-			name:       "should fail response data from proxy",
+			name:       "should fail data with error message from proxy",
 			address:    testAddress,
 			entityType: models.Proxy,
 			statusCode: http.StatusOK,
@@ -205,11 +205,24 @@ func TestGetAccount(t *testing.T) {
 			if tt.expectedErr != nil {
 				assert.ErrorContains(t, errGet, tt.expectedErr.Error())
 			}
+
+			switch tt.response.(type) {
+			case models.AccountNodeResponse:
+				response := tt.response.(models.AccountNodeResponse)
+				if response.Error != "" {
+					assert.ErrorContains(t, errGet, response.Error)
+				}
+			case models.AccountApiResponse:
+				response := tt.response.(models.AccountApiResponse)
+				if response.Error != "" {
+					assert.ErrorContains(t, errGet, response.Error)
+				}
+			}
 		})
 	}
 }
 
-func TestGetAccount_FromNode(t *testing.T) {
+func TestGetAccount_FromNode_ShouldWork(t *testing.T) {
 	t.Parallel()
 
 	address, err := kleverAddress.NewAddress(testAddress)
@@ -235,7 +248,7 @@ func TestGetAccount_FromNode(t *testing.T) {
 	assert.Equal(t, uint64(37), account.Nonce)
 }
 
-func TestGetAccount_FromProxy(t *testing.T) {
+func TestGetAccount_FromProxy_ShouldWork(t *testing.T) {
 	t.Parallel()
 
 	address, err := kleverAddress.NewAddress(testAddress)
