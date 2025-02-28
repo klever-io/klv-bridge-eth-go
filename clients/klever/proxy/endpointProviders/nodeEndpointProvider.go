@@ -4,10 +4,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
 
-const (
-	nodeGetNodeStatusEndpoint = "node/status"
-)
-
 // nodeEndpointProvider is suitable to work with a MultiversX node (observer)
 type nodeEndpointProvider struct {
 	*baseEndpointProvider
@@ -18,11 +14,6 @@ func NewNodeEndpointProvider() *nodeEndpointProvider {
 	return &nodeEndpointProvider{
 		baseEndpointProvider: &baseEndpointProvider{},
 	}
-}
-
-// GetNodeStatus returns the node status endpoint
-func (node *nodeEndpointProvider) GetNodeStatus() string {
-	return nodeGetNodeStatusEndpoint
 }
 
 // GetRestAPIEntityType returns the observer node constant
