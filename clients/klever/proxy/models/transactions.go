@@ -15,6 +15,25 @@ type SendBulkTransactionsResponse struct {
 	Code  string   `json:"code"`
 }
 
+// SendTransactionData holds the data of a transaction sent to the network
+type SendTransactionData struct {
+	TxHash  string `json:"txHash"`
+	TxCount int    `json:"txCount"`
+}
+
+type GenericResponse struct {
+	Data  interface{} `json:"data"`
+	Error string      `json:"error"`
+	Code  string      `json:"code"`
+}
+
+// SendTransactionResponse holds the response received from the network when broadcasting a transaction
+type SendTransactionResponse struct {
+	Data  *SendTransactionData `json:"data"`
+	Error string               `json:"error"`
+	Code  string               `json:"code"`
+}
+
 // EstimateTransactionFeesResponse defines the structure of responses on EstimateTransactionFees API endpoint
 type EstimateTransactionFeesResponse struct {
 	Data  *transaction.FeesResponse `json:"fees"`
@@ -53,15 +72,6 @@ type GetTransactionResponse struct {
 	Data  GetTransactionResponseData `json:"data"`
 	Error string                     `json:"error"`
 	Code  string                     `json:"code"`
-}
-
-// SendTransactionResponse holds the response received from the network when broadcasting a transaction
-type SendTransactionResponse struct {
-	Data struct {
-		TxHash string `json:"txHash"`
-	} `json:"data"`
-	Error string `json:"error"`
-	Code  string `json:"code"`
 }
 
 // TransactionStatus holds a transaction's status response from the network

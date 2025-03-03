@@ -206,7 +206,7 @@ func (ep *proxy) SendTransaction(ctx context.Context, tx *transaction.Transactio
 		return "", err
 	}
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetSendTransaction(), jsonTx)
-	if err != nil {
+	if err != nil || code != http.StatusOK {
 		return "", createHTTPStatusError(code, err)
 	}
 
