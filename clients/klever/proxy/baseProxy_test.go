@@ -13,7 +13,6 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/endpointProviders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -108,10 +107,8 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 	t.Run("response error - node endpoint provider", func(t *testing.T) {
 		t.Parallel()
 
-		resp := &data.NodeStatusResponse{
-			Data: struct {
-				Status *data.NetworkStatus `json:"metrics"`
-			}{},
+		resp := &models.NodeOverviewApiResponse{
+			Data:  models.NodeOverviewResponseData{},
 			Error: expectedErr.Error(),
 			Code:  "",
 		}
