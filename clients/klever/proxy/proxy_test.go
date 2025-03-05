@@ -306,14 +306,14 @@ func TestSendTransaction_ShouldWork(t *testing.T) {
 	t.Parallel()
 
 	txHash := "824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f"
-	reponse := models.SendTransactionResponse{
+	response := models.SendTransactionResponse{
 		Data: &models.SendTransactionData{
 			TxHash: txHash,
 		},
 		Code: "successful",
 	}
 
-	responseBytes, _ := json.Marshal(reponse)
+	responseBytes, _ := json.Marshal(response)
 	httpClient := createMockClientRespondingBytes(responseBytes)
 	args := createMockArgsProxy(httpClient, models.Proxy)
 	ep, _ := NewProxy(args)
