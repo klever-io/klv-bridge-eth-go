@@ -42,9 +42,6 @@ var ErrNilRequest = errors.New("nil request")
 // ErrNilProxy signals that a nil proxy has been provided
 var ErrNilProxy = errors.New("nil proxy")
 
-// ErrNilBuffer signals that expected buffer but received nil
-var ErrNilBuffer = errors.New("nil buffer")
-
 // ErrNotUint64Bytes signals that the provided bytes do not represent a valid uint64 number
 var ErrNotUint64Bytes = errors.New("provided bytes do not represent a valid uint64 number")
 
