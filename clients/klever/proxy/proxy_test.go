@@ -318,7 +318,13 @@ func TestSendTransaction_ShouldWork(t *testing.T) {
 	args := createMockArgsProxy(httpClient, models.Proxy)
 	ep, _ := NewProxy(args)
 
-	responseHash, err := ep.SendTransaction(context.Background(), nil)
+	addr, err := kleverAddress.NewAddress(testAddress)
+	require.Nil(t, err)
+
+	tx := transaction.NewBaseTransaction(addr.Bytes(), 10, nil, 0, 0)
+	tx.SetChainID([]byte("420420"))
+
+	responseHash, err := ep.SendTransaction(context.Background(), tx)
 	require.Nil(t, err)
 	require.Equal(t, txHash, responseHash)
 }

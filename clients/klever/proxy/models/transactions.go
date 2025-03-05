@@ -78,3 +78,13 @@ type TransactionStatus struct {
 	Error string `json:"error"`
 	Code  string `json:"code"`
 }
+
+// BroadcastTransactionData holds a transaction which is used to request a broadcast
+type BroadcastTransactionData struct {
+	Tx *transaction.Transaction `json:"tx"`
+}
+
+// BroadcastBulkTransactionData holds bulk transactions which are used to request a broadcast
+type BroadcastBulkTransactionData struct {
+	Txs []*transaction.Transaction `json:"txs"`
+}
