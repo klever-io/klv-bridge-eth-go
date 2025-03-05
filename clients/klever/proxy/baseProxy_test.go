@@ -24,6 +24,14 @@ func createMockArgsBaseProxy() argsBaseProxy {
 	}
 }
 
+func createGetHttpStub(expectedResponse []byte, expectedStatusCode int, expectedErr error) *testsCommon.HTTPClientWrapperStub {
+	return &testsCommon.HTTPClientWrapperStub{
+		GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			return expectedResponse, expectedStatusCode, expectedErr
+		},
+	}
+}
+
 func TestNewBaseProxy(t *testing.T) {
 	t.Parallel()
 
@@ -73,75 +81,56 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 
 	expectedErr := errors.New("expected error")
 	tests := []struct {
-		name           string
-		httpClientStub *testsCommon.HTTPClientWrapperStub
-		expectedResult *models.NodeOverview
-		expectedErr    error
+		name               string
+		httpClientStub     *testsCommon.HTTPClientWrapperStub
+		expectedResult     *models.NodeOverview
+		expectedStatusCode int
+		expectedErr        error
 	}{
 		{
-			name: "should receive expected error",
-			httpClientStub: &testsCommon.HTTPClientWrapperStub{
-				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-					return nil, http.StatusBadRequest, expectedErr
-				},
-			},
-			expectedResult: nil,
-			expectedErr:    expectedErr,
+			name:               "should receive expected error",
+			httpClientStub:     createGetHttpStub(nil, http.StatusBadRequest, expectedErr),
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResult:     nil,
+			expectedErr:        expectedErr,
 		},
 		{
-			name: "malformed response - node endpoint provider",
-			httpClientStub: &testsCommon.HTTPClientWrapperStub{
-				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-					return []byte("malformed response"), http.StatusOK, nil
-				},
-			},
-			expectedResult: nil,
-			expectedErr:    errors.New("invalid character 'm'"),
+			name:               "malformed response - node endpoint provider",
+			httpClientStub:     createGetHttpStub([]byte("malformed response"), http.StatusOK, nil),
+			expectedStatusCode: http.StatusOK,
+			expectedResult:     nil,
+			expectedErr:        errors.New("invalid character 'm'"),
 		},
 		{
-			name: "response error - node endpoint provider",
-			httpClientStub: &testsCommon.HTTPClientWrapperStub{
-				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-					resp := &models.NodeOverviewApiResponse{
-						Data:  models.NodeOverviewResponseData{},
-						Error: expectedErr.Error(),
-						Code:  "",
-					}
-					respBytes, _ := json.Marshal(resp)
-					return respBytes, http.StatusOK, nil
-				},
-			},
-			expectedResult: nil,
-			expectedErr:    expectedErr,
+			name:               "response error - node endpoint provider",
+			httpClientStub:     createGetHttpStub(getGenericResponseWithErrorMessage(expectedErr.Error()), http.StatusOK, nil),
+			expectedStatusCode: http.StatusOK,
+			expectedResult:     nil,
+			expectedErr:        expectedErr,
 		},
 		{
-			name: "GetNodeStatus returns nil network status - node endpoint provider",
-			httpClientStub: &testsCommon.HTTPClientWrapperStub{
-				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-					return getNodeStatusBytes(nil), http.StatusOK, nil
-				},
-			},
-			expectedResult: nil,
-			expectedErr:    ErrNilNetworkStatus,
+			name:               "GetNodeStatus returns nil network status - node endpoint provider",
+			httpClientStub:     createGetHttpStub(getNodeStatusBytes(nil), http.StatusOK, nil),
+			expectedStatusCode: http.StatusOK,
+			expectedResult:     nil,
+			expectedErr:        ErrNilNetworkStatus,
 		},
 		{
 			name: "should work",
-			httpClientStub: &testsCommon.HTTPClientWrapperStub{
-				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-					providedNetworkStatus := &models.NodeOverview{
-						EpochNumber:       2,
-						Nonce:             3,
-						NonceAtEpochStart: 4,
-					}
-					return getNodeStatusBytes(providedNetworkStatus), http.StatusOK, nil
-				},
-			},
+			httpClientStub: createGetHttpStub(
+				getNodeStatusBytes(&models.NodeOverview{
+					EpochNumber:       2,
+					Nonce:             3,
+					NonceAtEpochStart: 4,
+				}),
+				http.StatusOK, nil),
 			expectedResult: &models.NodeOverview{
 				EpochNumber:       2,
 				Nonce:             3,
 				NonceAtEpochStart: 4,
 			},
-			expectedErr: nil,
+			expectedStatusCode: http.StatusOK,
+			expectedErr:        nil,
 		},
 	}
 
@@ -163,6 +152,15 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getGenericResponseWithErrorMessage(errorMessage string) []byte {
+	resp := &models.GenericApiResponse{
+		Error: errorMessage,
+	}
+	respBytes, _ := json.Marshal(resp)
+
+	return respBytes
 }
 
 func getNodeStatusBytes(status *models.NodeOverview) []byte {
