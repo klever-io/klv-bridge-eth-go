@@ -6,11 +6,13 @@ import (
 )
 
 // TxHashes represents a colection of hashs of each transaction returned by a SendBulkTransactions
-type TxHashes []string
+type TxHashes struct {
+	Hashes []string `json:"txHashes"`
+}
 
 // SendBulkTransactionsResponse defines the structure of responses on SendBulkTransactions API endpoint
 type SendBulkTransactionsResponse struct {
-	Data  TxHashes `json:"txHashes"`
+	Data  TxHashes `json:"data"`
 	Error string   `json:"error"`
 	Code  string   `json:"code"`
 }

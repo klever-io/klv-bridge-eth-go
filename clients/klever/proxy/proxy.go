@@ -242,7 +242,7 @@ func (ep *proxy) SendTransactions(ctx context.Context, txs []*transaction.Transa
 		return nil, errors.New(response.Error)
 	}
 
-	return response.Data, nil
+	return response.Data.Hashes, nil
 }
 
 // GetTransactionStatus retrieves a transaction's status from the network
