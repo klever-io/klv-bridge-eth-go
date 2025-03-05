@@ -23,12 +23,6 @@ type SendTransactionData struct {
 	TxCount int    `json:"txCount"`
 }
 
-type GenericResponse struct {
-	Data  interface{} `json:"data"`
-	Error string      `json:"error"`
-	Code  string      `json:"code"`
-}
-
 // SendTransactionResponse holds the response received from the network when broadcasting a transaction
 type SendTransactionResponse struct {
 	Data  *SendTransactionData `json:"data"`
