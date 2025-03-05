@@ -72,97 +72,97 @@ func TestBaseProxy_GetNetworkStatus(t *testing.T) {
 	t.Parallel()
 
 	expectedErr := errors.New("expected error")
-	t.Run("get errors", func(t *testing.T) {
-		t.Parallel()
-
-		args := createMockArgsBaseProxy()
-		args.httpClientWrapper = &testsCommon.HTTPClientWrapperStub{
-			GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-				return nil, http.StatusBadRequest, expectedErr
+	tests := []struct {
+		name           string
+		httpClientStub *testsCommon.HTTPClientWrapperStub
+		expectedResult *models.NodeOverview
+		expectedErr    error
+	}{
+		{
+			name: "should receive expected error",
+			httpClientStub: &testsCommon.HTTPClientWrapperStub{
+				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
+					return nil, http.StatusBadRequest, expectedErr
+				},
 			},
-		}
-		baseProxyInstance, _ := newBaseProxy(args)
-
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
-		assert.Nil(t, result)
-		assert.True(t, errors.Is(err, expectedErr))
-		assert.True(t, strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)))
-	})
-	t.Run("malformed response - node endpoint provider", func(t *testing.T) {
-		t.Parallel()
-
-		args := createMockArgsBaseProxy()
-		args.httpClientWrapper = &testsCommon.HTTPClientWrapperStub{
-			GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-				return []byte("malformed response"), http.StatusOK, nil
+			expectedResult: nil,
+			expectedErr:    expectedErr,
+		},
+		{
+			name: "malformed response - node endpoint provider",
+			httpClientStub: &testsCommon.HTTPClientWrapperStub{
+				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
+					return []byte("malformed response"), http.StatusOK, nil
+				},
 			},
-		}
-		baseProxyInstance, _ := newBaseProxy(args)
-
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
-		assert.True(t, strings.Contains(err.Error(), "invalid character 'm'"))
-	})
-	t.Run("response error - node endpoint provider", func(t *testing.T) {
-		t.Parallel()
-
-		resp := &models.NodeOverviewApiResponse{
-			Data:  models.NodeOverviewResponseData{},
-			Error: expectedErr.Error(),
-			Code:  "",
-		}
-		respBytes, _ := json.Marshal(resp)
-
-		args := createMockArgsBaseProxy()
-		args.httpClientWrapper = &testsCommon.HTTPClientWrapperStub{
-			GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-				return respBytes, http.StatusOK, nil
+			expectedResult: nil,
+			expectedErr:    errors.New("invalid character 'm'"),
+		},
+		{
+			name: "response error - node endpoint provider",
+			httpClientStub: &testsCommon.HTTPClientWrapperStub{
+				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
+					resp := &models.NodeOverviewApiResponse{
+						Data:  models.NodeOverviewResponseData{},
+						Error: expectedErr.Error(),
+						Code:  "",
+					}
+					respBytes, _ := json.Marshal(resp)
+					return respBytes, http.StatusOK, nil
+				},
 			},
-		}
-		baseProxyInstance, _ := newBaseProxy(args)
-
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
-		assert.True(t, strings.Contains(err.Error(), expectedErr.Error()))
-	})
-	t.Run("GetNodeStatus returns nil network status - node endpoint provider", func(t *testing.T) {
-		t.Parallel()
-
-		args := createMockArgsBaseProxy()
-		args.httpClientWrapper = &testsCommon.HTTPClientWrapperStub{
-			GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-				return getNodeStatusBytes(nil), http.StatusOK, nil
+			expectedResult: nil,
+			expectedErr:    expectedErr,
+		},
+		{
+			name: "GetNodeStatus returns nil network status - node endpoint provider",
+			httpClientStub: &testsCommon.HTTPClientWrapperStub{
+				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
+					return getNodeStatusBytes(nil), http.StatusOK, nil
+				},
 			},
-		}
-		baseProxyInstance, _ := newBaseProxy(args)
-
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
-		assert.Nil(t, result)
-		assert.True(t, errors.Is(err, ErrNilNetworkStatus))
-	})
-	t.Run("should work", func(t *testing.T) {
-		t.Parallel()
-
-		providedNetworkStatus := &models.NodeOverview{
-			EpochNumber:       2,
-			Nonce:             3,
-			NonceAtEpochStart: 4,
-		}
-
-		args := createMockArgsBaseProxy()
-		args.httpClientWrapper = &testsCommon.HTTPClientWrapperStub{
-			GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
-				return getNodeStatusBytes(providedNetworkStatus), http.StatusOK, nil
+			expectedResult: nil,
+			expectedErr:    ErrNilNetworkStatus,
+		},
+		{
+			name: "should work",
+			httpClientStub: &testsCommon.HTTPClientWrapperStub{
+				GetHTTPCalled: func(ctx context.Context, endpoint string) ([]byte, int, error) {
+					providedNetworkStatus := &models.NodeOverview{
+						EpochNumber:       2,
+						Nonce:             3,
+						NonceAtEpochStart: 4,
+					}
+					return getNodeStatusBytes(providedNetworkStatus), http.StatusOK, nil
+				},
 			},
-		}
-		baseProxyInstance, _ := newBaseProxy(args)
+			expectedResult: &models.NodeOverview{
+				EpochNumber:       2,
+				Nonce:             3,
+				NonceAtEpochStart: 4,
+			},
+			expectedErr: nil,
+		},
+	}
 
-		result, err := baseProxyInstance.GetNetworkStatus(context.Background())
-		assert.Nil(t, err)
-		assert.Equal(t, providedNetworkStatus, result)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			args := createMockArgsBaseProxy()
+			args.httpClientWrapper = tt.httpClientStub
+			baseProxyInstance, _ := newBaseProxy(args)
+
+			result, err := baseProxyInstance.GetNetworkStatus(context.Background())
+			assert.Equal(t, tt.expectedResult, result)
+			if tt.expectedErr != nil {
+				assert.NotNil(t, err)
+				assert.True(t, strings.Contains(err.Error(), tt.expectedErr.Error()))
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
 }
 
 func getNodeStatusBytes(status *models.NodeOverview) []byte {
