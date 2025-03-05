@@ -302,7 +302,7 @@ func TestProxy_GetTransactionInfoWithResults(t *testing.T) {
 	require.Len(t, tx.Data.Transaction.Signature, 1)
 }
 
-func TestSendTrasaction_ShouldWork(t *testing.T) {
+func TestSendTransaction_ShouldWork(t *testing.T) {
 	t.Parallel()
 
 	txHash := "824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f"
