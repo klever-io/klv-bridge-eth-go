@@ -44,7 +44,7 @@ type NodeOverviewResponseData struct {
 }
 
 type NodeOverviewApiResponse struct {
-	Data  NodeOverviewResponseData
-	Error string `json:"error"`
-	Code  string `json:"code"`
+	Data  NodeOverviewResponseData `json:"data"`
+	Error string                   `json:"error"`
+	Code  string                   `json:"code"`
 }
