@@ -132,7 +132,7 @@ func (proxy *baseProxy) getNetworkConfigFromSource(ctx context.Context) (*models
 		return nil, errors.New(response.Error)
 	}
 
-	return response.Data, nil
+	return response.Data.NetworkConfig, nil
 }
 
 // GetNetworkStatus will return the network status of a provided shard

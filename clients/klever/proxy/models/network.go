@@ -18,11 +18,15 @@ type NetworkConfig struct {
 	StartTime          uint64 `json:"klv_start_time"`
 }
 
+type NetworkConfigResponseData struct {
+	NetworkConfig *NetworkConfig `json:"config"`
+}
+
 // NetworkConfigResponse defines the structure of responses on NetworkConfigResponse API endpoint
 type NetworkConfigResponse struct {
-	Data  *NetworkConfig `json:"config"`
-	Error string         `json:"error"`
-	Code  string         `json:"code"`
+	Data  NetworkConfigResponseData `json:"data"`
+	Error string                    `json:"error"`
+	Code  string                    `json:"code"`
 }
 
 type NodeOverview struct {
