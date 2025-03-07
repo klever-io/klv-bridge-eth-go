@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/klever-io/klever-go/data/transaction"
 	idata "github.com/klever-io/klever-go/indexer/data"
 	"github.com/klever-io/klever-go/tools/check"
 	kleverAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
@@ -299,4 +300,154 @@ func TestProxy_GetTransactionInfoWithResults(t *testing.T) {
 	require.Equal(t, uint32(1), tx.Data.Transaction.Version)
 	require.Equal(t, "420420", tx.Data.Transaction.ChainID)
 	require.Len(t, tx.Data.Transaction.Signature, 1)
+}
+
+func TestSendTransaction_ShouldWork(t *testing.T) {
+	t.Parallel()
+
+	txHash := "824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f"
+	response := models.SendTransactionResponse{
+		Data: &models.SendTransactionData{
+			TxHash: txHash,
+		},
+		Code: "successful",
+	}
+
+	responseBytes, _ := json.Marshal(response)
+	httpClient := createMockClientRespondingBytes(responseBytes)
+	args := createMockArgsProxy(httpClient, models.Proxy)
+	ep, _ := NewProxy(args)
+
+	addr, err := kleverAddress.NewAddress(testAddress)
+	require.Nil(t, err)
+
+	tx := transaction.NewBaseTransaction(addr.Bytes(), 10, nil, 0, 0)
+	tx.SetChainID([]byte("420420"))
+
+	responseHash, err := ep.SendTransaction(context.Background(), tx)
+	require.Nil(t, err)
+	require.Equal(t, txHash, responseHash)
+}
+
+func TestSendTransaction_FailCases(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		statusCode  int
+		txSend      *transaction.Transaction
+		response    interface{}
+		expectedErr error
+	}{
+		{
+			name:        "should fail with invalid json response",
+			statusCode:  http.StatusOK,
+			response:    []byte(`{"data":{}`),
+			expectedErr: fmt.Errorf("json: cannot unmarshal string into Go value of type models.SendTransactionResponse"),
+		},
+		{
+			name:        "should fail with error message in response",
+			statusCode:  http.StatusOK,
+			response:    models.SendTransactionResponse{Error: "expected error"},
+			expectedErr: errors.New("expected error"),
+		},
+		{
+			name:        "should fail with non-OK status code",
+			statusCode:  http.StatusInternalServerError,
+			response:    nil,
+			expectedErr: ErrHTTPStatusCodeIsNotOK,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			numAccountQueries := uint32(0)
+			httpClient := createMockDoCalled(tt.response, tt.statusCode, &numAccountQueries)
+			args := createMockArgsProxy(httpClient, models.Proxy)
+			ep, _ := NewProxy(args)
+
+			responseHash, err := ep.SendTransaction(context.Background(), tt.txSend)
+			assert.Empty(t, responseHash)
+			assert.NotNil(t, err)
+			if tt.expectedErr != nil {
+				assert.ErrorContains(t, err, tt.expectedErr.Error())
+			}
+
+			assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
+		})
+	}
+}
+
+func TestSendTransactions_ShouldWork(t *testing.T) {
+	t.Parallel()
+
+	txHashes := []string{"824933e032df87f25da6886d78186e306b2e31062a1b01c8918da10fe69b1c2f"}
+	response := models.SendBulkTransactionsResponse{
+		Data: models.TxHashes{
+			Hashes: txHashes,
+		},
+		Code: "successful",
+	}
+
+	responseBytes, _ := json.Marshal(response)
+	httpClient := createMockClientRespondingBytes(responseBytes)
+	args := createMockArgsProxy(httpClient, models.Proxy)
+	ep, _ := NewProxy(args)
+
+	responseHash, err := ep.SendTransactions(context.Background(), nil)
+	require.Nil(t, err)
+	require.Equal(t, txHashes, responseHash)
+}
+
+func TestSendTransactions_FailCases(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		statusCode  int
+		txSend      []*transaction.Transaction
+		response    interface{}
+		expectedErr error
+	}{
+		{
+			name:        "should fail with invalid json response",
+			statusCode:  http.StatusOK,
+			response:    []byte(`{"data":{}`),
+			expectedErr: fmt.Errorf("json: cannot unmarshal string into Go value of type models.SendBulkTransactionsResponse"),
+		},
+		{
+			name:        "should fail with error message in response",
+			statusCode:  http.StatusOK,
+			response:    models.SendBulkTransactionsResponse{Error: "expected error"},
+			expectedErr: errors.New("expected error"),
+		},
+		{
+			name:        "should fail with non-OK status code",
+			statusCode:  http.StatusInternalServerError,
+			response:    nil,
+			expectedErr: ErrHTTPStatusCodeIsNotOK,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			numAccountQueries := uint32(0)
+			httpClient := createMockDoCalled(tt.response, tt.statusCode, &numAccountQueries)
+			args := createMockArgsProxy(httpClient, models.Proxy)
+			ep, _ := NewProxy(args)
+
+			responseHashes, err := ep.SendTransactions(context.Background(), tt.txSend)
+			assert.Empty(t, responseHashes)
+			assert.NotNil(t, err)
+			if tt.expectedErr != nil {
+				assert.ErrorContains(t, err, tt.expectedErr.Error())
+			}
+
+			assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
+		})
+	}
 }

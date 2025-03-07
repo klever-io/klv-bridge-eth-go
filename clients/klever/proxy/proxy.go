@@ -201,12 +201,17 @@ func (ep *proxy) getAccountProxy(ctx context.Context, address address.Address) (
 
 // SendTransaction broadcasts a transaction to the network and returns the txhash if successful
 func (ep *proxy) SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error) {
-	jsonTx, err := json.Marshal(tx)
+	broadcast := models.BroadcastTransactionData{
+		Tx: tx,
+	}
+
+	jsonTx, err := json.Marshal(broadcast)
 	if err != nil {
 		return "", err
 	}
+
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetSendTransaction(), jsonTx)
-	if err != nil {
+	if err != nil || code != http.StatusOK {
 		return "", createHTTPStatusError(code, err)
 	}
 
@@ -224,10 +229,15 @@ func (ep *proxy) SendTransaction(ctx context.Context, tx *transaction.Transactio
 
 // SendTransactions broadcasts the provided transactions to the network and returns the txhashes if successful
 func (ep *proxy) SendTransactions(ctx context.Context, txs []*transaction.Transaction) ([]string, error) {
-	jsonTx, err := json.Marshal(txs)
+	broadcast := models.BroadcastBulkTransactionData{
+		Txs: txs,
+	}
+
+	jsonTx, err := json.Marshal(broadcast)
 	if err != nil {
 		return nil, err
 	}
+
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetSendMultipleTransactions(), jsonTx)
 	if err != nil || code != http.StatusOK {
 		return nil, createHTTPStatusError(code, err)
@@ -242,7 +252,7 @@ func (ep *proxy) SendTransactions(ctx context.Context, txs []*transaction.Transa
 		return nil, errors.New(response.Error)
 	}
 
-	return response.Data, nil
+	return response.Data.Hashes, nil
 }
 
 // GetTransactionStatus retrieves a transaction's status from the network
