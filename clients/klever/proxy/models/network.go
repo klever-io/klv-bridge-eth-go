@@ -2,6 +2,13 @@ package models
 
 import "time"
 
+// GenericApiResponse defines the structure of a generic response type
+type GenericApiResponse struct {
+	Data  interface{} `json:"data"`
+	Error string      `json:"error"`
+	Code  string      `json:"code"`
+}
+
 type NetworkConfig struct {
 	NumMetachainNodes  uint64 `json:"klv_num_metachain_nodes"`
 	ConsensusGroupSize uint64 `json:"klv_consensus_group_size"`
@@ -32,12 +39,12 @@ type NodeOverview struct {
 	StartTime            time.Duration `json:"startTime"`
 }
 
-type nodeOverviewResponseData struct {
+type NodeOverviewResponseData struct {
 	NodeOverview *NodeOverview `json:"overview"`
 }
 
-type NodeOverviewResponse struct {
-	Data  nodeOverviewResponseData
-	Error string `json:"error"`
-	Code  string `json:"code"`
+type NodeOverviewApiResponse struct {
+	Data  NodeOverviewResponseData `json:"data"`
+	Error string                   `json:"error"`
+	Code  string                   `json:"code"`
 }

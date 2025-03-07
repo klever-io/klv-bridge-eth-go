@@ -136,27 +136,15 @@ func (proxy *baseProxy) getNetworkConfigFromSource(ctx context.Context) (*models
 }
 
 // GetNetworkStatus will return the network status of a provided shard
-func (proxy *baseProxy) GetNetworkStatus(ctx context.Context) (*data.NetworkStatus, error) {
+func (proxy *baseProxy) GetNetworkStatus(ctx context.Context) (*models.NodeOverview, error) {
 	endpoint := proxy.endpointProvider.GetNodeStatus()
 	buff, code, err := proxy.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	endpointProviderType := proxy.endpointProvider.GetRestAPIEntityType()
-	switch endpointProviderType {
-	case models.Proxy:
-		return proxy.getNetworkStatus(buff)
-	case models.ObserverNode:
-		return proxy.getNodeStatus(buff)
-	}
-
-	return &data.NetworkStatus{}, ErrInvalidEndpointProvider
-}
-
-func (proxy *baseProxy) getNetworkStatus(buff []byte) (*data.NetworkStatus, error) {
-	response := &data.NetworkStatusResponse{}
-	err := json.Unmarshal(buff, response)
+	response := &models.NodeOverviewApiResponse{}
+	err = json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
 	}
@@ -164,28 +152,11 @@ func (proxy *baseProxy) getNetworkStatus(buff []byte) (*data.NetworkStatus, erro
 		return nil, errors.New(response.Error)
 	}
 
-	if response.Data.Status == nil {
+	if response.Data.NodeOverview == nil {
 		return nil, ErrNilNetworkStatus
 	}
 
-	return response.Data.Status, nil
-}
-
-func (proxy *baseProxy) getNodeStatus(buff []byte) (*data.NetworkStatus, error) {
-	response := &data.NodeStatusResponse{}
-	err := json.Unmarshal(buff, response)
-	if err != nil {
-		return nil, err
-	}
-	if response.Error != "" {
-		return nil, errors.New(response.Error)
-	}
-
-	if response.Data.Status == nil {
-		return nil, ErrNilNetworkStatus
-	}
-
-	return response.Data.Status, nil
+	return response.Data.NodeOverview, nil
 }
 
 // GetRestAPIEntityType returns the REST API entity type that this implementation works with
