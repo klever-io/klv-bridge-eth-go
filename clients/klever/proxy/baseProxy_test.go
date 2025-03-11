@@ -14,6 +14,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func createMockArgsBaseProxy() argsBaseProxy {
@@ -73,6 +74,174 @@ func TestNewBaseProxy(t *testing.T) {
 
 		assert.False(t, check.IfNil(baseProxyInstance))
 		assert.Nil(t, err)
+	})
+}
+
+func TestBaseProxy_GetNetworkConfig(t *testing.T) {
+	t.Parallel()
+
+	expectedReturnedNetworkConfig := models.NetworkConfigResponseData{
+		NetworkConfig: &models.NetworkConfig{
+			ChainID:            "test",
+			ConsensusGroupSize: 1,
+			NumMetachainNodes:  7,
+			SlotDuration:       4000,
+			SlotsPerEpoch:      20,
+			StartTime:          12,
+		},
+	}
+
+	response := &models.NetworkConfigResponse{
+		Data:  expectedReturnedNetworkConfig,
+		Error: "",
+		Code:  "",
+	}
+	networkConfigBytes, _ := json.Marshal(response)
+
+	t.Run("cache time expired", func(t *testing.T) {
+		t.Parallel()
+
+		mockWrapper := &testsCommon.HTTPClientWrapperStub{}
+		wasCalled := false
+		mockWrapper.GetHTTPCalled = func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			wasCalled = true
+			return networkConfigBytes, http.StatusOK, nil
+		}
+
+		args := createMockArgsBaseProxy()
+		args.httpClientWrapper = mockWrapper
+		args.expirationTime = minimumCachingInterval * 2
+		baseProxyInstance, _ := newBaseProxy(args)
+		baseProxyInstance.sinceTimeHandler = func(t time.Time) time.Duration {
+			return minimumCachingInterval
+		}
+
+		configs, err := baseProxyInstance.GetNetworkConfig(context.Background())
+
+		require.Nil(t, err)
+		require.True(t, wasCalled)
+		assert.Equal(t, expectedReturnedNetworkConfig.NetworkConfig, configs)
+	})
+	t.Run("fetchedConfigs is nil", func(t *testing.T) {
+		t.Parallel()
+
+		mockWrapper := &testsCommon.HTTPClientWrapperStub{}
+		wasCalled := false
+		mockWrapper.GetHTTPCalled = func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			wasCalled = true
+			return networkConfigBytes, http.StatusOK, nil
+		}
+
+		args := createMockArgsBaseProxy()
+		args.httpClientWrapper = mockWrapper
+		args.expirationTime = minimumCachingInterval * 2
+		baseProxyInstance, _ := newBaseProxy(args)
+		baseProxyInstance.sinceTimeHandler = func(t time.Time) time.Duration {
+			return minimumCachingInterval*2 + time.Millisecond
+		}
+
+		configs, err := baseProxyInstance.GetNetworkConfig(context.Background())
+
+		require.Nil(t, err)
+		require.True(t, wasCalled)
+		assert.Equal(t, expectedReturnedNetworkConfig.NetworkConfig, configs)
+	})
+	t.Run("Proxy.GetNetworkConfig returns error", func(t *testing.T) {
+		t.Parallel()
+
+		expectedErr := errors.New("expected error")
+		mockWrapper := &testsCommon.HTTPClientWrapperStub{}
+		wasCalled := false
+		mockWrapper.GetHTTPCalled = func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			wasCalled = true
+			return nil, http.StatusBadRequest, expectedErr
+		}
+
+		args := createMockArgsBaseProxy()
+		args.httpClientWrapper = mockWrapper
+		baseProxyInstance, _ := newBaseProxy(args)
+
+		configs, err := baseProxyInstance.GetNetworkConfig(context.Background())
+
+		require.Nil(t, configs)
+		require.True(t, wasCalled)
+		assert.True(t, errors.Is(err, expectedErr))
+		assert.True(t, strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)))
+	})
+	t.Run("and Proxy.GetNetworkConfig returns malformed data", func(t *testing.T) {
+		t.Parallel()
+
+		mockWrapper := &testsCommon.HTTPClientWrapperStub{}
+		wasCalled := false
+		mockWrapper.GetHTTPCalled = func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			wasCalled = true
+			return []byte("malformed data"), http.StatusOK, nil
+		}
+
+		args := createMockArgsBaseProxy()
+		args.httpClientWrapper = mockWrapper
+		baseProxyInstance, _ := newBaseProxy(args)
+
+		configs, err := baseProxyInstance.GetNetworkConfig(context.Background())
+
+		require.Nil(t, configs)
+		require.True(t, wasCalled)
+		assert.NotNil(t, err)
+		assert.True(t, strings.Contains(err.Error(), "invalid character"))
+	})
+	t.Run("and Proxy.GetNetworkConfig returns a response error", func(t *testing.T) {
+		t.Parallel()
+
+		errMessage := "error message"
+		erroredResponse := &models.NetworkConfigResponse{
+			Data:  models.NetworkConfigResponseData{},
+			Error: errMessage,
+			Code:  "",
+		}
+		erroredNetworkConfigBytes, _ := json.Marshal(erroredResponse)
+
+		mockWrapper := &testsCommon.HTTPClientWrapperStub{}
+		wasCalled := false
+		mockWrapper.GetHTTPCalled = func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			wasCalled = true
+			return erroredNetworkConfigBytes, http.StatusOK, nil
+		}
+
+		args := createMockArgsBaseProxy()
+		args.httpClientWrapper = mockWrapper
+		baseProxyInstance, _ := newBaseProxy(args)
+
+		configs, err := baseProxyInstance.GetNetworkConfig(context.Background())
+
+		require.Nil(t, configs)
+		require.True(t, wasCalled)
+		assert.NotNil(t, err)
+		assert.True(t, strings.Contains(err.Error(), errMessage))
+	})
+	t.Run("getCachedConfigs returns valid fetchedConfigs", func(t *testing.T) {
+		t.Parallel()
+
+		mockWrapper := &testsCommon.HTTPClientWrapperStub{}
+		wasCalled := false
+		mockWrapper.GetHTTPCalled = func(ctx context.Context, endpoint string) ([]byte, int, error) {
+			wasCalled = true
+			return nil, http.StatusOK, nil
+		}
+
+		args := createMockArgsBaseProxy()
+		args.httpClientWrapper = mockWrapper
+		args.expirationTime = minimumCachingInterval * 2
+		baseProxyInstance, _ := newBaseProxy(args)
+		baseProxyInstance.fetchedConfigs = expectedReturnedNetworkConfig.NetworkConfig
+		baseProxyInstance.sinceTimeHandler = func(t time.Time) time.Duration {
+			return minimumCachingInterval
+		}
+
+		configs, err := baseProxyInstance.GetNetworkConfig(context.Background())
+
+		require.Nil(t, err)
+		assert.False(t, wasCalled)
+		assert.Equal(t, expectedReturnedNetworkConfig.NetworkConfig, configs)
 	})
 }
 
