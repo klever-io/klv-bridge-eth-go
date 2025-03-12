@@ -122,7 +122,7 @@ func (ep *proxy) ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRe
 		return nil, err
 	}
 
-	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetVmValues(), jsonVMRequest)
+	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetVmQuery(), jsonVMRequest)
 	if err != nil || code != http.StatusOK {
 		return nil, createHTTPStatusError(code, err)
 	}
