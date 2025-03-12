@@ -20,11 +20,11 @@ type ResponseVmValue struct {
 // check if the struct needs to be separeted with VmValueRequestWithOptionalParameters
 // VmValueRequest defines the request struct for values available in a VM
 type VmValueRequest struct {
-	Address    string   `json:"scAddress"`
-	FuncName   string   `json:"funcName"`
-	CallerAddr string   `json:"caller"`
-	CallValue  string   `json:"value"`
-	Args       []string `json:"args"`
+	Address    string           `json:"scAddress"`
+	FuncName   string           `json:"funcName"`
+	CallerAddr string           `json:"caller"`
+	CallValue  map[string]int64 `json:"value"`
+	Args       []string         `json:"args"`
 }
 
 // VmValueRequestWithOptionalParameters defines the request struct for values available in a VM
