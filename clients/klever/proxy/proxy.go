@@ -106,11 +106,17 @@ func checkArgsProxy(args ArgsProxy) error {
 
 // ExecuteVMQuery retrieves data from existing SC trie through the use of a VM
 func (ep *proxy) ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+	// checks if the address is valid before sending the request
+	if _, err := address.NewAddress(vmRequest.Address); err != nil {
+		return nil, err
+	}
+
 	jsonVMRequestWithOptionalParams := models.VmValueRequestWithOptionalParameters{
 		VmValueRequest: vmRequest,
 		SameScState:    ep.sameScState,
 		ShouldBeSynced: ep.shouldBeSynced,
 	}
+
 	jsonVMRequest, err := json.Marshal(jsonVMRequestWithOptionalParams)
 	if err != nil {
 		return nil, err

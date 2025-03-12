@@ -27,7 +27,8 @@ const (
 	// Test URLs
 	testHttpURL = "https://test.org"
 	// Test address
-	testAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
+	testAddress     = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
+	contractAddress = "klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpgm89z"
 )
 
 type mockHTTPClient struct {
@@ -448,6 +449,68 @@ func TestSendTransactions_FailCases(t *testing.T) {
 			}
 
 			assert.Equal(t, uint32(1), atomic.LoadUint32(&numAccountQueries))
+		})
+	}
+}
+
+func TestProxy_ExecuteVmQuery(t *testing.T) {
+	t.Parallel()
+
+	validResponseBytes := []byte(`{"data":{"data":{"returnData":["MC41LjU="],"returnCode":"ok","returnMessage":"","gasRemaining":18446744073685949187,"gasRefund":0,"outputAccounts":{"0000000000000000050033bb65a91ee17ab84c6f8a01846ef8644e15fb76696a":{"address":"erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt","nonce":0,"balance":null,"balanceDelta":0,"storageUpdates":{},"code":null,"codeMetaData":null,"outputTransfers":[],"callType":0}},"deletedAccounts":[],"touchedAccounts":[],"logs":[]}}}`)
+	tests := []struct {
+		name        string
+		address     string
+		funcName    string
+		callerAddr  string
+		response    []byte
+		expectedErr string
+		expectedRes string
+	}{
+		{
+			name:        "should work",
+			address:     contractAddress,
+			funcName:    "version",
+			callerAddr:  contractAddress,
+			response:    validResponseBytes,
+			expectedErr: "",
+			expectedRes: "0.5.5",
+		},
+		{
+			name:        "should fail, invalid address",
+			address:     "invalid",
+			funcName:    "version",
+			callerAddr:  contractAddress,
+			expectedErr: "invalid bech32 string length 7",
+			expectedRes: "",
+		},
+		{
+			name:        "should fail with invalid json response",
+			address:     contractAddress,
+			response:    []byte(`{"data":[]}`),
+			expectedErr: "json: cannot unmarshal array into Go",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			httpClient := createMockClientRespondingBytes(tt.response)
+			args := createMockArgsProxy(httpClient, models.ObserverNode)
+			ep, _ := NewProxy(args)
+
+			response, err := ep.ExecuteVMQuery(context.Background(), &models.VmValueRequest{
+				Address:    tt.address,
+				FuncName:   tt.funcName,
+				CallerAddr: tt.callerAddr,
+			})
+
+			if tt.expectedErr != "" {
+				assert.NotNil(t, err)
+				assert.Contains(t, err.Error(), tt.expectedErr)
+				assert.Nil(t, response)
+			} else {
+				require.Nil(t, err)
+				require.Equal(t, tt.expectedRes, string(response.Data.ReturnData[0]))
+			}
 		})
 	}
 }
