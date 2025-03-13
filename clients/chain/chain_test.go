@@ -6,53 +6,53 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_ethToMultiversXName(t *testing.T) {
-	assert.Equal(t, "EthereumToMultiversX", Ethereum.EvmCompatibleChainToMultiversXName())
-	assert.Equal(t, "BscToMultiversX", Bsc.EvmCompatibleChainToMultiversXName())
+func Test_ethToKleverBlockchainName(t *testing.T) {
+	assert.Equal(t, "EthereumToKleverBlockchain", Ethereum.EvmCompatibleChainToKleverBlockchainName())
+	assert.Equal(t, "BscToKleverBlockchain", Bsc.EvmCompatibleChainToKleverBlockchainName())
 }
 
 func Test_multiversXToEthName(t *testing.T) {
-	assert.Equal(t, "MultiversXToEthereum", Ethereum.MultiversXToEvmCompatibleChainName())
-	assert.Equal(t, "MultiversXToBsc", Bsc.MultiversXToEvmCompatibleChainName())
+	assert.Equal(t, "KleverBlockchainToEthereum", Ethereum.KleverBlockchainToEvmCompatibleChainName())
+	assert.Equal(t, "KleverBlockchainToBsc", Bsc.KleverBlockchainToEvmCompatibleChainName())
 }
 
 func Test_baseLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-Base", Ethereum.BaseLogId())
-	assert.Equal(t, "BscMultiversX-Base", Bsc.BaseLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-Base", Ethereum.BaseLogId())
+	assert.Equal(t, "BscKleverBlockchain-Base", Bsc.BaseLogId())
 }
 
 func Test_multiversXClientLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-MultiversXClient", Ethereum.MultiversXClientLogId())
-	assert.Equal(t, "BscMultiversX-MultiversXClient", Bsc.MultiversXClientLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-KleverBlockchainClient", Ethereum.KleverBlockchainClientLogId())
+	assert.Equal(t, "BscKleverBlockchain-KleverBlockchainClient", Bsc.KleverBlockchainClientLogId())
 }
 
 func Test_multiversXDataGetterLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-MultiversXDataGetter", Ethereum.MultiversXDataGetterLogId())
-	assert.Equal(t, "BscMultiversX-MultiversXDataGetter", Bsc.MultiversXDataGetterLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-KleverBlockchainDataGetter", Ethereum.KleverBlockchainDataGetterLogId())
+	assert.Equal(t, "BscKleverBlockchain-KleverBlockchainDataGetter", Bsc.KleverBlockchainDataGetterLogId())
 }
 
 func Test_ethClientLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-EthereumClient", Ethereum.EvmCompatibleChainClientLogId())
-	assert.Equal(t, "BscMultiversX-BscClient", Bsc.EvmCompatibleChainClientLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-EthereumClient", Ethereum.EvmCompatibleChainClientLogId())
+	assert.Equal(t, "BscKleverBlockchain-BscClient", Bsc.EvmCompatibleChainClientLogId())
 }
 
 func Test_multiversXRoleProviderLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-MultiversXRoleProvider", Ethereum.MultiversXRoleProviderLogId())
-	assert.Equal(t, "BscMultiversX-MultiversXRoleProvider", Bsc.MultiversXRoleProviderLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-KleverBlockchainRoleProvider", Ethereum.KleverBlockchainRoleProviderLogId())
+	assert.Equal(t, "BscKleverBlockchain-KleverBlockchainRoleProvider", Bsc.KleverBlockchainRoleProviderLogId())
 }
 
 func Test_ethRoleProviderLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-EthereumRoleProvider", Ethereum.EvmCompatibleChainRoleProviderLogId())
-	assert.Equal(t, "BscMultiversX-BscRoleProvider", Bsc.EvmCompatibleChainRoleProviderLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-EthereumRoleProvider", Ethereum.EvmCompatibleChainRoleProviderLogId())
+	assert.Equal(t, "BscKleverBlockchain-BscRoleProvider", Bsc.EvmCompatibleChainRoleProviderLogId())
 }
 
 func Test_broadcasterLogId(t *testing.T) {
-	assert.Equal(t, "EthereumMultiversX-Broadcaster", Ethereum.BroadcasterLogId())
-	assert.Equal(t, "BscMultiversX-Broadcaster", Bsc.BroadcasterLogId())
+	assert.Equal(t, "EthereumKleverBlockchain-Broadcaster", Ethereum.BroadcasterLogId())
+	assert.Equal(t, "BscKleverBlockchain-Broadcaster", Bsc.BroadcasterLogId())
 }
 
 func TestToLower(t *testing.T) {
-	assert.Equal(t, "msx", MultiversX.ToLower())
+	assert.Equal(t, "klv", KleverBlockchain.ToLower())
 	assert.Equal(t, "ethereum", Ethereum.ToLower())
 	assert.Equal(t, "bsc", Bsc.ToLower())
 }
