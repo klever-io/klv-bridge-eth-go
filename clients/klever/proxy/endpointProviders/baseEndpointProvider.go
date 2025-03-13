@@ -12,7 +12,6 @@ const (
 	transactionStatus          = "transaction/%s/status"
 	processedTransactionStatus = "transaction/%s/process-status"
 	transactionInfo            = "transaction/%s"
-	vmValues                   = "vm-values/query"
 	kda                        = "address/%s/kda/%s"
 )
 
@@ -66,9 +65,4 @@ func (base *baseEndpointProvider) GetProcessedTransactionStatus(hexHash string) 
 // GetTransactionInfo returns the transaction info endpoint
 func (base *baseEndpointProvider) GetTransactionInfo(hexHash string) string {
 	return fmt.Sprintf(transactionInfo, hexHash)
-}
-
-// GetVmValues returns the VM values endpoint
-func (base *baseEndpointProvider) GetVmValues() string {
-	return vmValues
 }

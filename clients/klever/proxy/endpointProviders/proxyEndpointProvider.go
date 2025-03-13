@@ -4,6 +4,10 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
 
+const (
+	proxyVmQuery = "sc/query"
+)
+
 // proxyEndpointProvider is suitable to work with a MultiversX Proxy
 type proxyEndpointProvider struct {
 	*baseEndpointProvider
@@ -19,6 +23,11 @@ func NewProxyEndpointProvider() *proxyEndpointProvider {
 // GetRestAPIEntityType returns the proxy constant
 func (proxy *proxyEndpointProvider) GetRestAPIEntityType() models.RestAPIEntityType {
 	return models.Proxy
+}
+
+// GetVmQuery returns the proxy path constant for VM query endpoint
+func (proxy *proxyEndpointProvider) GetVmQuery() string {
+	return proxyVmQuery
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

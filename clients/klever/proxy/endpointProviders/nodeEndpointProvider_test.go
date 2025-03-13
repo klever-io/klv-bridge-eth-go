@@ -20,4 +20,5 @@ func TestNodeEndpointProvider_Getters(t *testing.T) {
 
 	provider := NewNodeEndpointProvider()
 	assert.Equal(t, models.ObserverNode, provider.GetRestAPIEntityType())
+	assert.Equal(t, nodeVmQuery, provider.GetVmQuery())
 }

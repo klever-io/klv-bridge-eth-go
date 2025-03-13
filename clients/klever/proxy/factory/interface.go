@@ -11,7 +11,7 @@ type EndpointProvider interface {
 	GetSendMultipleTransactions() string
 	GetTransactionStatus(hexHash string) string
 	GetTransactionInfo(hexHash string) string
-	GetVmValues() string
+	GetVmQuery() string
 	GetNodeStatus() string
 	GetRestAPIEntityType() models.RestAPIEntityType
 	GetProcessedTransactionStatus(hexHash string) string

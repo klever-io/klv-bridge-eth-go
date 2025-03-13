@@ -12,4 +12,5 @@ func TestNewProxyEndpointProvider(t *testing.T) {
 
 	provider := NewProxyEndpointProvider()
 	assert.False(t, check.IfNil(provider))
+	assert.Equal(t, proxyVmQuery, provider.GetVmQuery())
 }

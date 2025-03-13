@@ -106,31 +106,66 @@ func checkArgsProxy(args ArgsProxy) error {
 
 // ExecuteVMQuery retrieves data from existing SC trie through the use of a VM
 func (ep *proxy) ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
+	// checks if the address is valid before sending the request
+	if _, err := address.NewAddress(vmRequest.Address); err != nil {
+		return nil, err
+	}
+
 	jsonVMRequestWithOptionalParams := models.VmValueRequestWithOptionalParameters{
 		VmValueRequest: vmRequest,
 		SameScState:    ep.sameScState,
 		ShouldBeSynced: ep.shouldBeSynced,
 	}
+
 	jsonVMRequest, err := json.Marshal(jsonVMRequestWithOptionalParams)
 	if err != nil {
 		return nil, err
 	}
 
-	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetVmValues(), jsonVMRequest)
+	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetVmQuery(), jsonVMRequest)
 	if err != nil || code != http.StatusOK {
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	response := &models.ResponseVmValue{}
-	err = json.Unmarshal(buff, response)
+	endpointProviderType := ep.endpointProvider.GetRestAPIEntityType()
+	switch endpointProviderType {
+	case models.Proxy:
+		return ep.parseVmQueryProxy(buff)
+	case models.ObserverNode:
+		return ep.parseVmQueryNode(buff)
+	}
+
+	return &models.VmValuesResponseData{}, ErrInvalidEndpointProvider
+}
+
+func (ep *proxy) parseVmQueryNode(buff []byte) (*models.VmValuesResponseData, error) {
+	response := &models.NodeResponseVmValue{}
+	err := json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
 	}
+
 	if response.Error != "" {
 		return nil, errors.New(response.Error)
 	}
 
 	return &response.Data, nil
+}
+
+func (ep *proxy) parseVmQueryProxy(buff []byte) (*models.VmValuesResponseData, error) {
+	response := &models.ProxyResponseVmValue{}
+	err := json.Unmarshal(buff, response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != "" {
+		return nil, errors.New(response.Error)
+	}
+
+	return &models.VmValuesResponseData{
+		Data: &response.Data,
+	}, nil
 }
 
 // GetAccount retrieves an account info from the network (nonce, balance)
