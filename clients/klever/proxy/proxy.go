@@ -127,16 +127,45 @@ func (ep *proxy) ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRe
 		return nil, createHTTPStatusError(code, err)
 	}
 
-	response := &models.ResponseVmValue{}
-	err = json.Unmarshal(buff, response)
+	endpointProviderType := ep.endpointProvider.GetRestAPIEntityType()
+	switch endpointProviderType {
+	case models.Proxy:
+		return ep.parseVmQueryProxy(buff)
+	case models.ObserverNode:
+		return ep.parseVmQueryNode(buff)
+	}
+
+	return &models.VmValuesResponseData{}, ErrInvalidEndpointProvider
+}
+
+func (ep *proxy) parseVmQueryNode(buff []byte) (*models.VmValuesResponseData, error) {
+	response := &models.NodeResponseVmValue{}
+	err := json.Unmarshal(buff, response)
 	if err != nil {
 		return nil, err
 	}
+
 	if response.Error != "" {
 		return nil, errors.New(response.Error)
 	}
 
 	return &response.Data, nil
+}
+
+func (ep *proxy) parseVmQueryProxy(buff []byte) (*models.VmValuesResponseData, error) {
+	response := &models.ProxyResponseVmValue{}
+	err := json.Unmarshal(buff, response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != "" {
+		return nil, errors.New(response.Error)
+	}
+
+	return &models.VmValuesResponseData{
+		Data: &response.Data,
+	}, nil
 }
 
 // GetAccount retrieves an account info from the network (nonce, balance)

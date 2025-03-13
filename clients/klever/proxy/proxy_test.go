@@ -457,8 +457,10 @@ func TestProxy_ExecuteVmQuery(t *testing.T) {
 	t.Parallel()
 
 	validResponseBytes := []byte(`{"data":{"data":{"returnData":["MC41LjU="],"returnCode":"ok","returnMessage":"","gasRemaining":18446744073685949187,"gasRefund":0,"outputAccounts":{"0000000000000000050033bb65a91ee17ab84c6f8a01846ef8644e15fb76696a":{"address":"erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt","nonce":0,"balance":null,"balanceDelta":0,"storageUpdates":{},"code":null,"codeMetaData":null,"outputTransfers":[],"callType":0}},"deletedAccounts":[],"touchedAccounts":[],"logs":[]}}}`)
+	validProxyBytes := []byte(`{"data":{"returnData":["MC41LjU="],"returnCode":"ok","returnMessage":"","gasRemaining":18446744073685949187,"gasRefund":0,"outputAccounts":{"0000000000000000050033bb65a91ee17ab84c6f8a01846ef8644e15fb76696a":{"address":"erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt","nonce":0,"balance":null,"balanceDelta":0,"storageUpdates":{},"code":null,"codeMetaData":null,"outputTransfers":[],"callType":0}},"deletedAccounts":[],"touchedAccounts":[],"logs":[]}}`)
 	tests := []struct {
 		name        string
+		entityType  models.RestAPIEntityType
 		address     string
 		funcName    string
 		callerAddr  string
@@ -469,6 +471,7 @@ func TestProxy_ExecuteVmQuery(t *testing.T) {
 		{
 			name:        "should work",
 			address:     contractAddress,
+			entityType:  models.ObserverNode,
 			funcName:    "version",
 			callerAddr:  contractAddress,
 			response:    validResponseBytes,
@@ -476,7 +479,18 @@ func TestProxy_ExecuteVmQuery(t *testing.T) {
 			expectedRes: "0.5.5",
 		},
 		{
+			name:        "should work from proxy",
+			address:     contractAddress,
+			entityType:  models.Proxy,
+			funcName:    "version",
+			callerAddr:  contractAddress,
+			response:    validProxyBytes,
+			expectedErr: "",
+			expectedRes: "0.5.5",
+		},
+		{
 			name:        "should fail, invalid address",
+			entityType:  models.ObserverNode,
 			address:     "invalid",
 			funcName:    "version",
 			callerAddr:  contractAddress,
@@ -485,6 +499,14 @@ func TestProxy_ExecuteVmQuery(t *testing.T) {
 		},
 		{
 			name:        "should fail with invalid json response",
+			entityType:  models.ObserverNode,
+			address:     contractAddress,
+			response:    []byte(`{"data":[]}`),
+			expectedErr: "json: cannot unmarshal array into Go",
+		},
+		{
+			name:        "should fail with invalid json response from proxy",
+			entityType:  models.Proxy,
 			address:     contractAddress,
 			response:    []byte(`{"data":[]}`),
 			expectedErr: "json: cannot unmarshal array into Go",
@@ -494,7 +516,7 @@ func TestProxy_ExecuteVmQuery(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			httpClient := createMockClientRespondingBytes(tt.response)
-			args := createMockArgsProxy(httpClient, models.ObserverNode)
+			args := createMockArgsProxy(httpClient, tt.entityType)
 			ep, _ := NewProxy(args)
 
 			response, err := ep.ExecuteVMQuery(context.Background(), &models.VmValueRequest{

@@ -9,11 +9,18 @@ type VmValuesResponseData struct {
 	Data *vm.VMOutputApi `json:"data"`
 }
 
-// ResponseVmValue defines a wrapper over string containing returned data in hex format
-type ResponseVmValue struct {
+// NodeResponseVmValue defines a wrapper over string containing returned data in hex format from node
+type NodeResponseVmValue struct {
 	Data  VmValuesResponseData `json:"data"`
 	Error string               `json:"error"`
 	Code  string               `json:"code"`
+}
+
+// ProxyResponseVmValue defines a wrapper over string containing returned data in hex format from proxy
+type ProxyResponseVmValue struct {
+	Data  vm.VMOutputApi `json:"data"`
+	Error string         `json:"error"`
+	Code  string         `json:"code"`
 }
 
 // TODO: check if needed since there is one similar in klever-io/klever-go/network/api/vm/vmValuesGroup.go and also
