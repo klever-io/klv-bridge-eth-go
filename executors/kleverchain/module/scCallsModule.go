@@ -1,6 +1,8 @@
 package module
 
 import (
+	"encoding/hex"
+	"fmt"
 	"time"
 
 	"github.com/klever-io/klever-go/tools"
@@ -49,9 +51,14 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 	}
 
 	// Public key not used in this case
-	kleverChainPrivateKeyBytes, _, err := tools.LoadSkPkFromPemFile(cfg.PrivateKeyFile, 0, "")
+	encodedSk, _, err := tools.LoadSkPkFromPemFile(cfg.PrivateKeyFile, 0, "")
 	if err != nil {
 		return nil, err
+	}
+
+	kleverChainPrivateKeyBytes, err := hex.DecodeString(string(encodedSk))
+	if err != nil {
+		return nil, fmt.Errorf("%w for encoded secret key", err)
 	}
 
 	privateKey, err := keyGen.PrivateKeyFromByteArray(kleverChainPrivateKeyBytes)

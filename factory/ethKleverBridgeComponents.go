@@ -2,6 +2,7 @@ package factory
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"sync"
@@ -235,9 +236,14 @@ func checkArgsEthereumToKleverBridge(args ArgsEthereumToKleverBridge) error {
 }
 
 func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainConfigs config.KleverConfig) error {
-	kleverPrivateKeyBytes, pbkString, err := tools.LoadSkPkFromPemFile(chainConfigs.PrivateKeyFile, 0, "")
+	encodedSk, pbkString, err := tools.LoadSkPkFromPemFile(chainConfigs.PrivateKeyFile, 0, "")
 	if err != nil {
 		return err
+	}
+
+	kleverPrivateKeyBytes, err := hex.DecodeString(string(encodedSk))
+	if err != nil {
+		return fmt.Errorf("%w for encoded secret key", err)
 	}
 
 	components.kleverRelayerPrivateKey, err = keyGen.PrivateKeyFromByteArray(kleverPrivateKeyBytes)
