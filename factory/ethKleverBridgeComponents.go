@@ -2,6 +2,7 @@ package factory
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"sync"
@@ -119,7 +120,7 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 		return nil, err
 	}
 	evmCompatibleChain := args.Configs.GeneralConfig.Eth.Chain
-	ethtokleverName := evmCompatibleChain.EvmCompatibleChainToMultiversXName()
+	ethtokleverName := evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	baseLogId := evmCompatibleChain.BaseLogId()
 	components := &ethKleverBridgeComponents{
 		baseLogger:           core.NewLoggerWithIdentifier(logger.GetOrCreate(ethtokleverName), baseLogId),
@@ -235,9 +236,14 @@ func checkArgsEthereumToKleverBridge(args ArgsEthereumToKleverBridge) error {
 }
 
 func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainConfigs config.KleverConfig) error {
-	kleverPrivateKeyBytes, pbkString, err := tools.LoadSkPkFromPemFile(chainConfigs.PrivateKeyFile, 0, "")
+	encodedSk, pbkString, err := tools.LoadSkPkFromPemFile(chainConfigs.PrivateKeyFile, 0, "")
 	if err != nil {
 		return err
+	}
+
+	kleverPrivateKeyBytes, err := hex.DecodeString(string(encodedSk))
+	if err != nil {
+		return fmt.Errorf("%w for encoded secret key", err)
 	}
 
 	components.kleverRelayerPrivateKey, err = keyGen.PrivateKeyFromByteArray(kleverPrivateKeyBytes)
@@ -266,7 +272,7 @@ func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainC
 }
 
 func (components *ethKleverBridgeComponents) createDataGetter() error {
-	multiversXDataGetterLogId := components.evmCompatibleChain.MultiversXDataGetterLogId()
+	multiversXDataGetterLogId := components.evmCompatibleChain.KleverBlockchainDataGetterLogId()
 	argsKLVClientDataGetter := klever.ArgsKLVClientDataGetter{
 		MultisigContractAddress: components.kleverMultisigContractAddress,
 		SafeContractAddress:     components.kleverSafeContractAddress,
@@ -287,7 +293,7 @@ func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEth
 	if err != nil {
 		return err
 	}
-	multiversXClientLogId := components.evmCompatibleChain.MultiversXClientLogId()
+	multiversXClientLogId := components.evmCompatibleChain.KleverBlockchainClientLogId()
 
 	clientArgs := klever.ClientArgs{
 		GasMapConfig:                 chainConfigs.GasMap,
@@ -346,7 +352,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 	}
 
 	broadcasterLogId := components.evmCompatibleChain.BroadcasterLogId()
-	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToMultiversXName()
+	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	argsBroadcaster := p2p.ArgsBroadcaster{
 		Messenger:              args.Messenger,
 		Log:                    core.NewLoggerWithIdentifier(logger.GetOrCreate(broadcasterLogId), broadcasterLogId),
@@ -411,7 +417,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 
 func (components *ethKleverBridgeComponents) createKleverRoleProvider(args ArgsEthereumToKleverBridge) error {
 	configs := args.Configs.GeneralConfig
-	multiversXRoleProviderLogId := components.evmCompatibleChain.MultiversXRoleProviderLogId()
+	multiversXRoleProviderLogId := components.evmCompatibleChain.KleverBlockchainRoleProviderLogId()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXRoleProviderLogId), multiversXRoleProviderLogId)
 
 	argsRoleProvider := roleproviders.ArgsMultiversXRoleProvider{
@@ -427,7 +433,7 @@ func (components *ethKleverBridgeComponents) createKleverRoleProvider(args ArgsE
 
 	argsPollingHandler := polling.ArgsPollingHandler{
 		Log:              log,
-		Name:             "MultiversX role provider",
+		Name:             "KleverBlockchain role provider",
 		PollingInterval:  time.Duration(configs.Relayer.RoleProvider.PollingIntervalInMillis) * time.Millisecond,
 		PollingWhenError: pollingDurationOnError,
 		Executor:         components.kleverRoleProvider,
@@ -479,7 +485,7 @@ func (components *ethKleverBridgeComponents) createEthereumRoleProvider(args Arg
 }
 
 func (components *ethKleverBridgeComponents) createEthereumToMultiversXBridge(args ArgsEthereumToKleverBridge) error {
-	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToMultiversXName()
+	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(ethtokleverName), ethtokleverName)
 
 	configs, found := args.Configs.GeneralConfig.StateMachine[ethtokleverName]
@@ -548,7 +554,7 @@ func (components *ethKleverBridgeComponents) createEthereumToMultiversXBridge(ar
 }
 
 func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(args ArgsEthereumToKleverBridge) error {
-	multiversXToEthName := components.evmCompatibleChain.MultiversXToEvmCompatibleChainName()
+	multiversXToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXToEthName), multiversXToEthName)
 
 	configs, found := args.Configs.GeneralConfig.StateMachine[multiversXToEthName]
@@ -666,7 +672,7 @@ func (components *ethKleverBridgeComponents) createBalanceValidator() (ethklever
 }
 
 func (components *ethKleverBridgeComponents) createEthereumToMultiversXStateMachine() error {
-	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToMultiversXName()
+	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(ethtokleverName), ethtokleverName)
 
 	argsStateMachine := stateMachine.ArgsStateMachine{
@@ -703,7 +709,7 @@ func (components *ethKleverBridgeComponents) createEthereumToMultiversXStateMach
 }
 
 func (components *ethKleverBridgeComponents) createMultiversXToEthereumStateMachine() error {
-	multiversXToEthName := components.evmCompatibleChain.MultiversXToEvmCompatibleChainName()
+	multiversXToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXToEthName), multiversXToEthName)
 
 	argsStateMachine := stateMachine.ArgsStateMachine{
