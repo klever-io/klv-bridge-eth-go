@@ -7,12 +7,12 @@ import (
 
 const (
 	evmCompatibleChainToKleverBlockchainNameTemplate = "%sToKleverBlockchain"
-	multiversXToEvmCompatibleChainNameTemplate       = "KleverBlockchainTo%s"
+	kleverBlockchainToEvmCompatibleChainNameTemplate = "KleverBlockchainTo%s"
 	baseLogIdTemplate                                = "%sKleverBlockchain-Base"
-	multiversXClientLogIdTemplate                    = "%sKleverBlockchain-KleverBlockchainClient"
-	multiversXDataGetterLogIdTemplate                = "%sKleverBlockchain-KleverBlockchainDataGetter"
+	kleverBlockchainClientLogIdTemplate              = "%sKleverBlockchain-KleverBlockchainClient"
+	kleverBlockchainDataGetterLogIdTemplate          = "%sKleverBlockchain-KleverBlockchainDataGetter"
 	evmCompatibleChainClientLogIdTemplate            = "%sKleverBlockchain-%sClient"
-	multiversXRoleProviderLogIdTemplate              = "%sKleverBlockchain-KleverBlockchainRoleProvider"
+	kleverBlockchainRoleProviderLogIdTemplate        = "%sKleverBlockchain-KleverBlockchainRoleProvider"
 	evmCompatibleChainRoleProviderLogIdTemplate      = "%sKleverBlockchain-%sRoleProvider"
 	broadcasterLogIdTemplate                         = "%sKleverBlockchain-Broadcaster"
 )
@@ -44,9 +44,9 @@ func (c Chain) EvmCompatibleChainToKleverBlockchainName() string {
 	return fmt.Sprintf(evmCompatibleChainToKleverBlockchainNameTemplate, c)
 }
 
-// KleverBlockchainToEvmCompatibleChainName returns the string using chain value and multiversXToEvmCompatibleChainNameTemplate
+// KleverBlockchainToEvmCompatibleChainName returns the string using chain value and kleverBlockchainToEvmCompatibleChainNameTemplate
 func (c Chain) KleverBlockchainToEvmCompatibleChainName() string {
-	return fmt.Sprintf(multiversXToEvmCompatibleChainNameTemplate, c)
+	return fmt.Sprintf(kleverBlockchainToEvmCompatibleChainNameTemplate, c)
 }
 
 // BaseLogId returns the string using chain value and baseLogIdTemplate
@@ -54,14 +54,14 @@ func (c Chain) BaseLogId() string {
 	return fmt.Sprintf(baseLogIdTemplate, c)
 }
 
-// KleverBlockchainClientLogId returns the string using chain value and multiversXClientLogIdTemplate
+// KleverBlockchainClientLogId returns the string using chain value and kleverBlockchainClientLogIdTemplate
 func (c Chain) KleverBlockchainClientLogId() string {
-	return fmt.Sprintf(multiversXClientLogIdTemplate, c)
+	return fmt.Sprintf(kleverBlockchainClientLogIdTemplate, c)
 }
 
-// KleverBlockchainDataGetterLogId returns the string using chain value and multiversXDataGetterLogIdTemplate
+// KleverBlockchainDataGetterLogId returns the string using chain value and kleverBlockchainDataGetterLogIdTemplate
 func (c Chain) KleverBlockchainDataGetterLogId() string {
-	return fmt.Sprintf(multiversXDataGetterLogIdTemplate, c)
+	return fmt.Sprintf(kleverBlockchainDataGetterLogIdTemplate, c)
 }
 
 // EvmCompatibleChainClientLogId returns the string using chain value and evmCompatibleChainClientLogIdTemplate
@@ -69,9 +69,9 @@ func (c Chain) EvmCompatibleChainClientLogId() string {
 	return fmt.Sprintf(evmCompatibleChainClientLogIdTemplate, c, c)
 }
 
-// KleverBlockchainRoleProviderLogId returns the string using chain value and multiversXRoleProviderLogIdTemplate
+// KleverBlockchainRoleProviderLogId returns the string using chain value and kleverBlockchainRoleProviderLogIdTemplate
 func (c Chain) KleverBlockchainRoleProviderLogId() string {
-	return fmt.Sprintf(multiversXRoleProviderLogIdTemplate, c)
+	return fmt.Sprintf(kleverBlockchainRoleProviderLogIdTemplate, c)
 }
 
 // EvmCompatibleChainRoleProviderLogId returns the string using chain value and evmCompatibleChainRoleProviderLogIdTemplate

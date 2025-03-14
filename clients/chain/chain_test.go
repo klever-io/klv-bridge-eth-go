@@ -11,7 +11,7 @@ func Test_ethToKleverBlockchainName(t *testing.T) {
 	assert.Equal(t, "BscToKleverBlockchain", Bsc.EvmCompatibleChainToKleverBlockchainName())
 }
 
-func Test_multiversXToEthName(t *testing.T) {
+func Test_kleverBlockchainToEthName(t *testing.T) {
 	assert.Equal(t, "KleverBlockchainToEthereum", Ethereum.KleverBlockchainToEvmCompatibleChainName())
 	assert.Equal(t, "KleverBlockchainToBsc", Bsc.KleverBlockchainToEvmCompatibleChainName())
 }
@@ -21,12 +21,12 @@ func Test_baseLogId(t *testing.T) {
 	assert.Equal(t, "BscKleverBlockchain-Base", Bsc.BaseLogId())
 }
 
-func Test_multiversXClientLogId(t *testing.T) {
+func Test_kleverBlockchainClientLogId(t *testing.T) {
 	assert.Equal(t, "EthereumKleverBlockchain-KleverBlockchainClient", Ethereum.KleverBlockchainClientLogId())
 	assert.Equal(t, "BscKleverBlockchain-KleverBlockchainClient", Bsc.KleverBlockchainClientLogId())
 }
 
-func Test_multiversXDataGetterLogId(t *testing.T) {
+func Test_kleverBlockchainDataGetterLogId(t *testing.T) {
 	assert.Equal(t, "EthereumKleverBlockchain-KleverBlockchainDataGetter", Ethereum.KleverBlockchainDataGetterLogId())
 	assert.Equal(t, "BscKleverBlockchain-KleverBlockchainDataGetter", Bsc.KleverBlockchainDataGetterLogId())
 }
@@ -36,7 +36,7 @@ func Test_ethClientLogId(t *testing.T) {
 	assert.Equal(t, "BscKleverBlockchain-BscClient", Bsc.EvmCompatibleChainClientLogId())
 }
 
-func Test_multiversXRoleProviderLogId(t *testing.T) {
+func Test_kleverBlockchainRoleProviderLogId(t *testing.T) {
 	assert.Equal(t, "EthereumKleverBlockchain-KleverBlockchainRoleProvider", Ethereum.KleverBlockchainRoleProviderLogId())
 	assert.Equal(t, "BscKleverBlockchain-KleverBlockchainRoleProvider", Bsc.KleverBlockchainRoleProviderLogId())
 }
