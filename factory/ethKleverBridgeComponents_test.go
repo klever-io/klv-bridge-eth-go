@@ -76,8 +76,8 @@ func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 			},
 		},
 		StateMachine: map[string]config.ConfigStateMachine{
-			"EthereumToMultiversX": stateMachineConfig,
-			"MultiversXToEthereum": stateMachineConfig,
+			"EthereumToKleverBlockchain": stateMachineConfig,
+			"KleverBlockchainToEthereum": stateMachineConfig,
 		},
 	}
 	configs := config.Configs{
@@ -154,7 +154,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 		assert.Equal(t, errNilErc20ContractsHolder, err)
 		assert.Nil(t, components)
 	})
-	t.Run("err on createMultiversXKeysAndAddresses, empty pk file", func(t *testing.T) {
+	t.Run("err on createKleverBlockchainKeysAndAddresses, empty pk file", func(t *testing.T) {
 		t.Parallel()
 		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Klever.PrivateKeyFile = ""
@@ -163,7 +163,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Nil(t, components)
 	})
-	t.Run("err on createMultiversXKeysAndAddresses, empty multisig address", func(t *testing.T) {
+	t.Run("err on createKleverBlockchainKeysAndAddresses, empty multisig address", func(t *testing.T) {
 		t.Parallel()
 		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Klever.MultisigContractAddress = ""
@@ -172,7 +172,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Nil(t, components)
 	})
-	t.Run("err on createMultiversXClient", func(t *testing.T) {
+	t.Run("err on createKleverBlockchainClient", func(t *testing.T) {
 		t.Parallel()
 		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Klever.GasMap = config.KleverGasMapConfig{}
@@ -181,7 +181,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Nil(t, components)
 	})
-	t.Run("err on createMultiversXRoleProvider", func(t *testing.T) {
+	t.Run("err on createKleverBlockchainRoleProvider", func(t *testing.T) {
 		t.Parallel()
 		args := createMockEthKleverBridgeArgs()
 		args.Configs.GeneralConfig.Relayer.RoleProvider.PollingIntervalInMillis = 0
@@ -215,7 +215,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 
 		components, err := NewEthKleverBridgeComponents(args)
 		assert.True(t, errors.Is(err, errMissingConfig))
-		assert.True(t, strings.Contains(err.Error(), args.Configs.GeneralConfig.Eth.Chain.EvmCompatibleChainToMultiversXName()))
+		assert.True(t, strings.Contains(err.Error(), args.Configs.GeneralConfig.Eth.Chain.EvmCompatibleChainToKleverBlockchainName()))
 		assert.Nil(t, components)
 	})
 	t.Run("invalid time for bootstrap", func(t *testing.T) {

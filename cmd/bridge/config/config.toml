@@ -52,7 +52,7 @@
 [P2P]
     Port = "10010"
     InitialPeerList = []
-    ProtocolID = "/erd/relay/1.0.0"
+    ProtocolID = "/klv/relay/1.0.0"
     [P2P.Transports]
         QUICAddress = "" # optional QUIC address. If this transport should be activated, should be in this format: /ip4/0.0.0.0/udp/%d/quic-v1
         WebSocketAddress = "" # optional WebSocket address. If this transport should be activated, should be in this format: /ip4/0.0.0.0/tcp/%d/ws
@@ -122,8 +122,8 @@
             Type = "LRU"
         [P2P.AntifloodConfig.Topic]
             DefaultMaxMessagesPerSec = 300 # default number of messages per interval for a topic
-            MaxMessages = [{ Topic = "EthereumToKleverChain_join", NumMessagesPerSec = 100 },
-                           { Topic = "EthereumToKleverChain_sign", NumMessagesPerSec = 100 }]
+            MaxMessages = [{ Topic = "EthereumToKleverBlockchain_join", NumMessagesPerSec = 100 },
+                           { Topic = "EthereumToKleverBlockchain_sign", NumMessagesPerSec = 100 }]
 
 [Relayer]
     [Relayer.Marshalizer]
@@ -144,11 +144,11 @@
             MaxOpenFiles = 10
 
 [StateMachine]
-    [StateMachine.EthereumToKleverChain]
+    [StateMachine.EthereumToKleverBlockchain]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 120 #2 minutes
 
-    [StateMachine.KleverChainToEthereum]
+    [StateMachine.KleverBlockchainToEthereum]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 720 #12 minutes
 
