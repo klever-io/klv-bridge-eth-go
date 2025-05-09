@@ -15,7 +15,7 @@ type Proxy interface {
 	SendTransactions(ctx context.Context, txs []*transaction.Transaction) ([]string, error)
 	ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error)
 	GetAccount(ctx context.Context, address address.Address) (*models.Account, error)
-	GetNetworkStatus(ctx context.Context, shardID uint32) (*models.NodeOverview, error)
+	GetNetworkStatus(ctx context.Context) (*models.NodeOverview, error)
 	GetKDATokenData(ctx context.Context, address address.Address, tokenIdentifier string) (*models.KDAFungibleTokenData, error)
 	GetTransactionInfoWithResults(ctx context.Context, hash string) (*models.TransactionData, error)
 	ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error)

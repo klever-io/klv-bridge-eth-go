@@ -16,7 +16,7 @@ type ProxyStub struct {
 	SendTransactionsCalled              func(ctx context.Context, txs []*transaction.Transaction) ([]string, error)
 	ExecuteVMQueryCalled                func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error)
 	GetAccountCalled                    func(ctx context.Context, address address.Address) (*models.Account, error)
-	GetNetworkStatusCalled              func(ctx context.Context, shardID uint32) (*models.NodeOverview, error)
+	GetNetworkStatusCalled              func(ctx context.Context) (*models.NodeOverview, error)
 	GetShardOfAddressCalled             func(ctx context.Context, bech32Address string) (uint32, error)
 	GetKDATokenDataCalled               func(ctx context.Context, address address.Address, tokenIdentifier string) (*models.KDAFungibleTokenData, error)
 	GetTransactionInfoWithResultsCalled func(_ context.Context, _ string) (*models.TransactionData, error)
@@ -70,9 +70,9 @@ func (eps *ProxyStub) GetAccount(ctx context.Context, address address.Address) (
 }
 
 // GetNetworkStatus -
-func (eps *ProxyStub) GetNetworkStatus(ctx context.Context, shardID uint32) (*models.NodeOverview, error) {
+func (eps *ProxyStub) GetNetworkStatus(ctx context.Context) (*models.NodeOverview, error) {
 	if eps.GetNetworkStatusCalled != nil {
-		return eps.GetNetworkStatusCalled(ctx, shardID)
+		return eps.GetNetworkStatusCalled(ctx)
 	}
 
 	return nil, fmt.Errorf("not implemented")
