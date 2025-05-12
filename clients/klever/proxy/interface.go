@@ -18,7 +18,6 @@ type Proxy interface {
 	GetNetworkStatus(ctx context.Context) (*models.NodeOverview, error)
 	GetKDATokenData(ctx context.Context, address address.Address, tokenIdentifier string) (*models.KDAFungibleTokenData, error)
 	GetTransactionInfoWithResults(ctx context.Context, hash string) (*models.TransactionData, error)
-	ProcessTransactionStatus(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error)
 	EstimateTransactionFees(ctx context.Context, txs *transaction.Transaction) (*transaction.FeesResponse, error)
 	IsInterfaceNil() bool
 }
