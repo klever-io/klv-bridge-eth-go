@@ -122,8 +122,7 @@ func (dataGetter *klvClientDataGetter) ExecuteQueryReturningBytes(ctx context.Co
 
 // GetCurrentNonce will get from the shard containing the multisig contract the latest block's nonce
 func (dataGetter *klvClientDataGetter) GetCurrentNonce(ctx context.Context) (uint64, error) {
-	// TODO: remove shardID parameter from GetNetworkStatus since kleverchain doesn't have sharding
-	nodeStatus, err := dataGetter.proxy.GetNetworkStatus(ctx, 0)
+	nodeStatus, err := dataGetter.proxy.GetNetworkStatus(ctx)
 	if err != nil {
 		return 0, err
 	}

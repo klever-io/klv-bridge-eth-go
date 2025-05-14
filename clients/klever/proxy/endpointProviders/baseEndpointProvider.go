@@ -3,16 +3,15 @@ package endpointProviders
 import "fmt"
 
 const (
-	networkConfig              = "network/config"
-	nodeStatus                 = "node/overview"
-	account                    = "address/%s"
-	estimateTransactionFees    = "transaction/estimate-fee"
-	sendTransaction            = "transaction/broadcast"
-	sendMultipleTransactions   = "transaction/broadcast"
-	transactionStatus          = "transaction/%s/status"
-	processedTransactionStatus = "transaction/%s/process-status"
-	transactionInfo            = "transaction/%s"
-	kda                        = "address/%s/kda/%s"
+	networkConfig            = "network/config"
+	nodeStatus               = "node/overview"
+	account                  = "address/%s"
+	estimateTransactionFees  = "transaction/estimate-fee"
+	sendTransaction          = "transaction/broadcast"
+	sendMultipleTransactions = "transaction/broadcast"
+	transactionStatus        = "transaction/%s/status"
+	transactionInfo          = "transaction/%s"
+	kda                      = "address/%s/kda/%s"
 )
 
 type baseEndpointProvider struct{}
@@ -55,11 +54,6 @@ func (base *baseEndpointProvider) GetSendMultipleTransactions() string {
 // GetTransactionStatus returns the transaction status endpoint
 func (base *baseEndpointProvider) GetTransactionStatus(hexHash string) string {
 	return fmt.Sprintf(transactionStatus, hexHash)
-}
-
-// GetProcessedTransactionStatus returns the transaction status endpoint
-func (base *baseEndpointProvider) GetProcessedTransactionStatus(hexHash string) string {
-	return fmt.Sprintf(processedTransactionStatus, hexHash)
 }
 
 // GetTransactionInfo returns the transaction info endpoint

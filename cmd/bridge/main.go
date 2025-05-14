@@ -14,7 +14,8 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/wrappers"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/factory"
@@ -157,18 +158,20 @@ func startRelay(ctx *cli.Context, version string) error {
 		return fmt.Errorf("empty Klever.NetworkAddress in config file")
 	}
 
-	// argsProxy := blockchain.ArgsProxy{
-	// 	ProxyURL:            cfg.MultiversX.NetworkAddress,
-	// 	SameScState:         false,
-	// 	ShouldBeSynced:      false,
-	// 	FinalityCheck:       cfg.MultiversX.Proxy.FinalityCheck,
-	// 	AllowedDeltaToFinal: cfg.MultiversX.Proxy.MaxNoncesDelta,
-	// 	CacheExpirationTime: time.Second * time.Duration(cfg.MultiversX.Proxy.CacherExpirationSeconds),
-	// 	EntityType:          sdkCore.RestAPIEntityType(cfg.MultiversX.Proxy.RestAPIEntityType),
-	// }
+	argsProxy := proxy.ArgsProxy{
+		ProxyURL:            cfg.Klever.NetworkAddress,
+		SameScState:         false,
+		ShouldBeSynced:      false,
+		FinalityCheck:       cfg.Klever.Proxy.FinalityCheck,
+		AllowedDeltaToFinal: cfg.Klever.Proxy.MaxNoncesDelta,
+		CacheExpirationTime: time.Second * time.Duration(cfg.Klever.Proxy.CacherExpirationSeconds),
+		EntityType:          models.RestAPIEntityType(cfg.Klever.Proxy.RestAPIEntityType),
+	}
 
-	// TODO: remove mock when real proxy with klever chain is added
-	proxy := mock.CreateMockProxyKLV()
+	proxy, err := proxy.NewProxy(argsProxy)
+	if err != nil {
+		return err
+	}
 
 	ethClient, err := ethclient.Dial(cfg.Eth.NetworkAddress)
 	if err != nil {

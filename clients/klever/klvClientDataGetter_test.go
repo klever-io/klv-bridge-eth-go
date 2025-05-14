@@ -1294,7 +1294,7 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*models.NodeOverview, error) {
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
 				return nil, expectedErr
 			},
 		}
@@ -1312,7 +1312,7 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*models.NodeOverview, error) {
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
 				return nil, nil
 			},
 		}
@@ -1330,7 +1330,7 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 			GetShardOfAddressCalled: func(ctx context.Context, bech32Address string) (uint32, error) {
 				return 0, nil
 			},
-			GetNetworkStatusCalled: func(ctx context.Context, shardID uint32) (*models.NodeOverview, error) {
+			GetNetworkStatusCalled: func(ctx context.Context) (*models.NodeOverview, error) {
 				return &models.NodeOverview{
 					Nonce: expectedNonce,
 				}, nil
