@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	okCodeAfterExecution                                      = "ok"
+	okCodeAfterExecution                                      = "Ok"
 	internalError                                             = "internal error"
 	getCurrentTxBatchFuncName                                 = "getCurrentTxBatch"
 	getBatchFuncName                                          = "getBatch"
