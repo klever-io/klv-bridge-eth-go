@@ -6,7 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-// DataGetter defines the interface able to handle get requests for MultiversX blockchain
+// DataGetter defines the interface able to handle get requests for Klever blockchain
 type DataGetter interface {
 	GetAllStakedRelayers(ctx context.Context) ([][]byte, error)
 	IsInterfaceNil() bool

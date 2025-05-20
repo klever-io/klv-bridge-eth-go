@@ -420,13 +420,13 @@ func (components *ethKleverBridgeComponents) createKleverRoleProvider(args ArgsE
 	multiversXRoleProviderLogId := components.evmCompatibleChain.KleverBlockchainRoleProviderLogId()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXRoleProviderLogId), multiversXRoleProviderLogId)
 
-	argsRoleProvider := roleproviders.ArgsMultiversXRoleProvider{
+	argsRoleProvider := roleproviders.ArgsKleverRoleProvider{
 		DataGetter: components.mxDataGetter,
 		Log:        log,
 	}
 
 	var err error
-	components.kleverRoleProvider, err = roleproviders.NewMultiversXRoleProvider(argsRoleProvider)
+	components.kleverRoleProvider, err = roleproviders.NewKleverRoleProvider(argsRoleProvider)
 	if err != nil {
 		return err
 	}
