@@ -14,7 +14,6 @@ type EndpointProvider interface {
 	GetVmQuery() string
 	GetNodeStatus() string
 	GetRestAPIEntityType() models.RestAPIEntityType
-	GetProcessedTransactionStatus(hexHash string) string
 	GetKDATokenData(addressAsBech32 string, tokenIdentifier string) string
 	IsInterfaceNil() bool
 }

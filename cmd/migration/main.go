@@ -17,7 +17,8 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/gasManagement/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/cmd/migration/disabled"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
@@ -124,7 +125,19 @@ func executeQuery(cfg config.MigrationToolConfig) error {
 }
 
 func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*internalComponents, error) {
-	proxy := mock.CreateMockProxyKLV()
+	argsProxy := proxy.ArgsProxy{
+		ProxyURL:            cfg.Klever.NetworkAddress,
+		SameScState:         false,
+		ShouldBeSynced:      false,
+		FinalityCheck:       cfg.Klever.Proxy.FinalityCheck,
+		AllowedDeltaToFinal: cfg.Klever.Proxy.MaxNoncesDelta,
+		CacheExpirationTime: time.Second * time.Duration(cfg.Klever.Proxy.CacherExpirationSeconds),
+		EntityType:          models.RestAPIEntityType(cfg.Klever.Proxy.RestAPIEntityType),
+	}
+	proxy, err := proxy.NewProxy(argsProxy)
+	if err != nil {
+		return nil, err
+	}
 
 	dummyAddress, err := address.NewAddressFromBytes(bytes.Repeat([]byte{0x1}, 32))
 	if err != nil {

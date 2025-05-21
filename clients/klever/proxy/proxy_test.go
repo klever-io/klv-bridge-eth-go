@@ -290,17 +290,17 @@ func TestProxy_GetTransactionInfoWithResults(t *testing.T) {
 	tx, err := ep.GetTransactionInfoWithResults(context.Background(), txHash)
 	require.Nil(t, err)
 
-	require.Equal(t, txHash, tx.Data.Transaction.Hash)
-	require.Equal(t, uint64(61), tx.Data.Transaction.BlockNum)
-	require.Equal(t, "klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j", tx.Data.Transaction.Sender)
-	require.Equal(t, uint64(1), tx.Data.Transaction.Nonce)
-	require.Equal(t, int64(500000), tx.Data.Transaction.KAppFee)
-	require.Equal(t, int64(1000000), tx.Data.Transaction.BandwidthFee)
-	require.Equal(t, "success", tx.Data.Transaction.Status)
-	require.Equal(t, "Ok", tx.Data.Transaction.ResultCode)
-	require.Equal(t, uint32(1), tx.Data.Transaction.Version)
-	require.Equal(t, "420420", tx.Data.Transaction.ChainID)
-	require.Len(t, tx.Data.Transaction.Signature, 1)
+	require.Equal(t, txHash, tx.Hash)
+	require.Equal(t, uint64(61), tx.BlockNum)
+	require.Equal(t, "klv12e0kqcvqsrayj8j0c4dqjyvnv4ep253m5anx4rfj4jeq34lxsg8s84ec9j", tx.Sender)
+	require.Equal(t, uint64(1), tx.Nonce)
+	require.Equal(t, int64(500000), tx.KAppFee)
+	require.Equal(t, int64(1000000), tx.BandwidthFee)
+	require.Equal(t, "success", tx.Status)
+	require.Equal(t, "Ok", tx.ResultCode)
+	require.Equal(t, uint32(1), tx.Version)
+	require.Equal(t, "420420", tx.ChainID)
+	require.Len(t, tx.Signature, 1)
 }
 
 func TestSendTransaction_ShouldWork(t *testing.T) {

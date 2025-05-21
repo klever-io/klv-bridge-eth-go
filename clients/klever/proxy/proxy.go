@@ -311,16 +311,16 @@ func (ep *proxy) GetTransactionStatus(ctx context.Context, hash string) (string,
 }
 
 // GetTransactionInfo retrieves a transaction's details from the network
-func (ep *proxy) GetTransactionInfo(ctx context.Context, hash string) (*models.GetTransactionResponse, error) {
+func (ep *proxy) GetTransactionInfo(ctx context.Context, hash string) (*models.TransactionData, error) {
 	return ep.getTransactionInfo(ctx, hash, false)
 }
 
 // GetTransactionInfoWithResults retrieves a transaction's details from the network with events
-func (ep *proxy) GetTransactionInfoWithResults(ctx context.Context, hash string) (*models.GetTransactionResponse, error) {
+func (ep *proxy) GetTransactionInfoWithResults(ctx context.Context, hash string) (*models.TransactionData, error) {
 	return ep.getTransactionInfo(ctx, hash, true)
 }
 
-func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResults bool) (*models.GetTransactionResponse, error) {
+func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResults bool) (*models.TransactionData, error) {
 	endpoint := ep.endpointProvider.GetTransactionInfo(hash)
 	if withResults {
 		endpoint += withResultsQueryParam
@@ -340,7 +340,7 @@ func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResult
 		return nil, errors.New(response.Error)
 	}
 
-	return response, nil
+	return &response.Data.Transaction, nil
 }
 
 // RequestTransactionCost retrieves how many gas a transaction will consume

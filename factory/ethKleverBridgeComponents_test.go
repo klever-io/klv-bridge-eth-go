@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/status"
@@ -57,8 +58,8 @@ func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 			PrivateKeyFile:                  "testdata/grace.pem",
 			IntervalToResendTxsInSeconds:    60,
 			NetworkAddress:                  "http://127.0.0.1:8079",
-			MultisigContractAddress:         "erd1qqqqqqqqqqqqqpgqgftcwj09u0nhmskrw7xxqcqh8qmzwyexd8ss7ftcxx",
-			SafeContractAddress:             "erd1qqqqqqqqqqqqqpgqgftcwj09u0nhmskrw7xxqcqh8qmzwyexd8ss7ftcxx",
+			MultisigContractAddress:         "klv1qqqqqqqqqqqqqpgqevhczyxnvn4ndgu8a2nd40ezhyagwqfwsg8s26azxp",
+			SafeContractAddress:             "klv1qqqqqqqqqqqqqpgqevhczyxnvn4ndgu8a2nd40ezhyagwqfwsg8s26azxp",
 			GasMap:                          testsCommon.CreateTestKleverGasMap(),
 			MaxRetriesOnQuorumReached:       1,
 			MaxRetriesOnWasTransferProposed: 1,
@@ -88,8 +89,12 @@ func createMockEthKleverBridgeArgs() ArgsEthereumToKleverBridge {
 		},
 	}
 
-	// TODO: change to real klever proxy when available
-	proxy := mock.CreateMockProxyKLV()
+	argsProxy := proxy.ArgsProxy{
+		ProxyURL:            cfg.Klever.NetworkAddress,
+		CacheExpirationTime: time.Minute,
+		EntityType:          models.ObserverNode,
+	}
+	proxy, _ := proxy.NewProxy(argsProxy)
 
 	return ArgsEthereumToKleverBridge{
 		Configs:                   configs,
@@ -422,6 +427,6 @@ func TestEthKleverBridgeComponents_RelayerAddresses(t *testing.T) {
 	components, _ := NewEthKleverBridgeComponents(args)
 
 	bech32Address := components.KleverRelayerAddress().Bech32()
-	assert.Equal(t, "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede", bech32Address)
+	assert.Equal(t, "klv17la0vdplk320zvy9s7qps5j69ff2yl3dn0drmhyuw57dnhe23g5schkvag", bech32Address)
 	assert.Equal(t, "0x3FE464Ac5aa562F7948322F92020F2b668D543d8", components.EthereumRelayerAddress().String())
 }
