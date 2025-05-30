@@ -74,7 +74,7 @@ type ethKleverBridgeComponents struct {
 	baseLogger                    logger.Logger
 	messenger                     p2p.NetMessenger
 	statusStorer                  core.Storer
-	multiversXClient              ethklever.MultiversXClient
+	kleverchainClient             ethklever.KleverchainClient
 	ethClient                     ethklever.EthereumClient
 	evmCompatibleChain            chain.Chain
 	kleverMultisigContractAddress address.Address
@@ -82,7 +82,7 @@ type ethKleverBridgeComponents struct {
 	kleverRelayerPrivateKey       crypto.PrivateKey
 	kleverRelayerAddress          address.Address
 	ethereumRelayerAddress        common.Address
-	mxDataGetter                  dataGetter
+	klvDataGetter                 dataGetter
 	proxy                         proxy.Proxy
 	kleverRoleProvider            KleverRoleProvider
 	ethereumRoleProvider          EthereumRoleProvider
@@ -98,10 +98,10 @@ type ethKleverBridgeComponents struct {
 	ethtoKleverStateMachine     StateMachine
 	ethtoKleverSignaturesHolder ethklever.SignaturesHolder
 
-	multiversXToEthMachineStates core.MachineStates
-	multiversXToEthStepDuration  time.Duration
-	multiversXToEthStatusHandler core.StatusHandler
-	multiversXToEthStateMachine  StateMachine
+	kleverchainToEthMachineStates core.MachineStates
+	kleverchainToEthStepDuration  time.Duration
+	kleverchainToEthStatusHandler core.StatusHandler
+	kleverchainToEthStateMachine  StateMachine
 
 	mutClosableHandlers sync.RWMutex
 	closableHandlers    []io.Closer
@@ -113,7 +113,7 @@ type ethKleverBridgeComponents struct {
 	appStatusHandler     chainCore.AppStatusHandler
 }
 
-// NewethKleverBridgeComponents creates a new eth-multiversx bridge components holder
+// NewethKleverBridgeComponents creates a new eth-kleverchain bridge components holder
 func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBridgeComponents, error) {
 	err := checkArgsEthereumToKleverBridge(args)
 	if err != nil {
@@ -159,7 +159,7 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 		return nil, err
 	}
 
-	err = components.createMultiversXClient(args)
+	err = components.createKleverchainClient(args)
 	if err != nil {
 		return nil, err
 	}
@@ -184,12 +184,12 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 		return nil, err
 	}
 
-	err = components.createMultiversXToEthereumBridge(args)
+	err = components.createKleverchainToEthereumBridge(args)
 	if err != nil {
 		return nil, err
 	}
 
-	err = components.createMultiversXToEthereumStateMachine()
+	err = components.createKleverchainToEthereumStateMachine()
 	if err != nil {
 		return nil, err
 	}
@@ -272,33 +272,33 @@ func (components *ethKleverBridgeComponents) createKleverKeysAndAddresses(chainC
 }
 
 func (components *ethKleverBridgeComponents) createDataGetter() error {
-	multiversXDataGetterLogId := components.evmCompatibleChain.KleverBlockchainDataGetterLogId()
+	kleverchainDataGetterLogId := components.evmCompatibleChain.KleverBlockchainDataGetterLogId()
 	argsKLVClientDataGetter := klever.ArgsKLVClientDataGetter{
 		MultisigContractAddress: components.kleverMultisigContractAddress,
 		SafeContractAddress:     components.kleverSafeContractAddress,
 		RelayerAddress:          components.kleverRelayerAddress,
 		Proxy:                   components.proxy,
-		Log:                     core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXDataGetterLogId), multiversXDataGetterLogId),
+		Log:                     core.NewLoggerWithIdentifier(logger.GetOrCreate(kleverchainDataGetterLogId), kleverchainDataGetterLogId),
 	}
 
 	var err error
-	components.mxDataGetter, err = klever.NewKLVClientDataGetter(argsKLVClientDataGetter)
+	components.klvDataGetter, err = klever.NewKLVClientDataGetter(argsKLVClientDataGetter)
 
 	return err
 }
 
-func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEthereumToKleverBridge) error {
+func (components *ethKleverBridgeComponents) createKleverchainClient(args ArgsEthereumToKleverBridge) error {
 	chainConfigs := args.Configs.GeneralConfig.Klever
-	tokensMapper, err := mappers.NewMultiversXToErc20Mapper(components.mxDataGetter)
+	tokensMapper, err := mappers.NewKleverchainToErc20Mapper(components.klvDataGetter)
 	if err != nil {
 		return err
 	}
-	multiversXClientLogId := components.evmCompatibleChain.KleverBlockchainClientLogId()
+	kleverchainClientLogId := components.evmCompatibleChain.KleverBlockchainClientLogId()
 
 	clientArgs := klever.ClientArgs{
 		GasMapConfig:                 chainConfigs.GasMap,
 		Proxy:                        args.Proxy,
-		Log:                          core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXClientLogId), multiversXClientLogId),
+		Log:                          core.NewLoggerWithIdentifier(logger.GetOrCreate(kleverchainClientLogId), kleverchainClientLogId),
 		RelayerPrivateKey:            components.kleverRelayerPrivateKey,
 		MultisigContractAddress:      components.kleverMultisigContractAddress,
 		SafeContractAddress:          components.kleverSafeContractAddress,
@@ -309,8 +309,8 @@ func (components *ethKleverBridgeComponents) createMultiversXClient(args ArgsEth
 		ClientAvailabilityAllowDelta: chainConfigs.ClientAvailabilityAllowDelta,
 	}
 
-	components.multiversXClient, err = klever.NewClient(clientArgs)
-	components.addClosableComponent(components.multiversXClient)
+	components.kleverchainClient, err = klever.NewClient(clientArgs)
+	components.addClosableComponent(components.kleverchainClient)
 
 	return err
 }
@@ -354,15 +354,15 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 	broadcasterLogId := components.evmCompatibleChain.BroadcasterLogId()
 	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	argsBroadcaster := p2p.ArgsBroadcaster{
-		Messenger:              args.Messenger,
-		Log:                    core.NewLoggerWithIdentifier(logger.GetOrCreate(broadcasterLogId), broadcasterLogId),
-		MultiversXRoleProvider: components.kleverRoleProvider,
-		SignatureProcessor:     components.ethereumRoleProvider,
-		KeyGen:                 keyGen,
-		SingleSigner:           singleSigner,
-		PrivateKey:             components.kleverRelayerPrivateKey,
-		Name:                   ethtokleverName,
-		AntifloodComponents:    antifloodComponents,
+		Messenger:               args.Messenger,
+		Log:                     core.NewLoggerWithIdentifier(logger.GetOrCreate(broadcasterLogId), broadcasterLogId),
+		KleverchainRoleProvider: components.kleverRoleProvider,
+		SignatureProcessor:      components.ethereumRoleProvider,
+		KeyGen:                  keyGen,
+		SingleSigner:            singleSigner,
+		PrivateKey:              components.kleverRelayerPrivateKey,
+		Name:                    ethtokleverName,
+		AntifloodComponents:     antifloodComponents,
 	}
 
 	components.broadcaster, err = p2p.NewBroadcaster(argsBroadcaster)
@@ -377,7 +377,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 
 	components.ethereumRelayerAddress = cryptoHandler.GetAddress()
 
-	tokensMapper, err := mappers.NewErc20ToMultiversXMapper(components.mxDataGetter)
+	tokensMapper, err := mappers.NewErc20ToKleverchainMapper(components.klvDataGetter)
 	if err != nil {
 		return err
 	}
@@ -417,11 +417,11 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 
 func (components *ethKleverBridgeComponents) createKleverRoleProvider(args ArgsEthereumToKleverBridge) error {
 	configs := args.Configs.GeneralConfig
-	multiversXRoleProviderLogId := components.evmCompatibleChain.KleverBlockchainRoleProviderLogId()
-	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXRoleProviderLogId), multiversXRoleProviderLogId)
+	kleverchainRoleProviderLogId := components.evmCompatibleChain.KleverBlockchainRoleProviderLogId()
+	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(kleverchainRoleProviderLogId), kleverchainRoleProviderLogId)
 
 	argsRoleProvider := roleproviders.ArgsKleverRoleProvider{
-		DataGetter: components.mxDataGetter,
+		DataGetter: components.klvDataGetter,
 		Log:        log,
 	}
 
@@ -527,17 +527,17 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBri
 	}
 
 	argsBridgeExecutor := ethklever.ArgsBridgeExecutor{
-		Log:                          log,
-		TopologyProvider:             topologyHandler,
-		MultiversXClient:             components.multiversXClient,
-		EthereumClient:               components.ethClient,
-		StatusHandler:                components.ethtoKleverStatusHandler,
-		TimeForWaitOnEthereum:        timeForTransferExecution,
-		SignaturesHolder:             disabled.NewDisabledSignaturesHolder(),
-		BalanceValidator:             balanceValidator,
-		MaxQuorumRetriesOnEthereum:   args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
-		MaxQuorumRetriesOnMultiversX: args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
-		MaxRestriesOnWasProposed:     args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
+		Log:                           log,
+		TopologyProvider:              topologyHandler,
+		KleverchainClient:             components.kleverchainClient,
+		EthereumClient:                components.ethClient,
+		StatusHandler:                 components.ethtoKleverStatusHandler,
+		TimeForWaitOnEthereum:         timeForTransferExecution,
+		SignaturesHolder:              disabled.NewDisabledSignaturesHolder(),
+		BalanceValidator:              balanceValidator,
+		MaxQuorumRetriesOnEthereum:    args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
+		MaxQuorumRetriesOnKleverchain: args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
+		MaxRestriesOnWasProposed:      args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
 	bridge, err := ethklever.NewBridgeExecutor(argsBridgeExecutor)
@@ -553,16 +553,16 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBri
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(args ArgsEthereumToKleverBridge) error {
-	multiversXToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
-	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXToEthName), multiversXToEthName)
+func (components *ethKleverBridgeComponents) createKleverchainToEthereumBridge(args ArgsEthereumToKleverBridge) error {
+	kleverchainToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
+	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(kleverchainToEthName), kleverchainToEthName)
 
-	configs, found := args.Configs.GeneralConfig.StateMachine[multiversXToEthName]
+	configs, found := args.Configs.GeneralConfig.StateMachine[kleverchainToEthName]
 	if !found {
-		return fmt.Errorf("%w for %q", errMissingConfig, multiversXToEthName)
+		return fmt.Errorf("%w for %q", errMissingConfig, kleverchainToEthName)
 	}
 
-	components.multiversXToEthStepDuration = time.Duration(configs.StepDurationInMillis) * time.Millisecond
+	components.kleverchainToEthStepDuration = time.Duration(configs.StepDurationInMillis) * time.Millisecond
 	argsTopologyHandler := topology.ArgsTopologyHandler{
 		PublicKeysProvider: components.kleverRoleProvider,
 		Timer:              components.timer,
@@ -577,12 +577,12 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(ar
 		return err
 	}
 
-	components.multiversXToEthStatusHandler, err = status.NewStatusHandler(multiversXToEthName, components.statusStorer)
+	components.kleverchainToEthStatusHandler, err = status.NewStatusHandler(kleverchainToEthName, components.statusStorer)
 	if err != nil {
 		return err
 	}
 
-	err = components.metricsHolder.AddStatusHandler(components.multiversXToEthStatusHandler)
+	err = components.metricsHolder.AddStatusHandler(components.kleverchainToEthStatusHandler)
 	if err != nil {
 		return err
 	}
@@ -595,17 +595,17 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(ar
 	}
 
 	argsBridgeExecutor := ethklever.ArgsBridgeExecutor{
-		Log:                          log,
-		TopologyProvider:             topologyHandler,
-		MultiversXClient:             components.multiversXClient,
-		EthereumClient:               components.ethClient,
-		StatusHandler:                components.multiversXToEthStatusHandler,
-		TimeForWaitOnEthereum:        timeForWaitOnEthereum,
-		SignaturesHolder:             components.ethtoKleverSignaturesHolder,
-		BalanceValidator:             balanceValidator,
-		MaxQuorumRetriesOnEthereum:   args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
-		MaxQuorumRetriesOnMultiversX: args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
-		MaxRestriesOnWasProposed:     args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
+		Log:                           log,
+		TopologyProvider:              topologyHandler,
+		KleverchainClient:             components.kleverchainClient,
+		EthereumClient:                components.ethClient,
+		StatusHandler:                 components.kleverchainToEthStatusHandler,
+		TimeForWaitOnEthereum:         timeForWaitOnEthereum,
+		SignaturesHolder:              components.ethtoKleverSignaturesHolder,
+		BalanceValidator:              balanceValidator,
+		MaxQuorumRetriesOnEthereum:    args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
+		MaxQuorumRetriesOnKleverchain: args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
+		MaxRestriesOnWasProposed:      args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
 	bridge, err := ethklever.NewBridgeExecutor(argsBridgeExecutor)
@@ -613,7 +613,7 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(ar
 		return err
 	}
 
-	components.multiversXToEthMachineStates, err = kleverchaintoeth.CreateSteps(bridge)
+	components.kleverchainToEthMachineStates, err = kleverchaintoeth.CreateSteps(bridge)
 	if err != nil {
 		return err
 	}
@@ -663,9 +663,9 @@ func (components *ethKleverBridgeComponents) Start() error {
 
 func (components *ethKleverBridgeComponents) createBalanceValidator() (ethklever.BalanceValidator, error) {
 	argsBalanceValidator := balanceValidatorManagement.ArgsBalanceValidator{
-		Log:              components.baseLogger,
-		MultiversXClient: components.multiversXClient,
-		EthereumClient:   components.ethClient,
+		Log:               components.baseLogger,
+		KleverchainClient: components.kleverchainClient,
+		EthereumClient:    components.ethClient,
 	}
 
 	return balanceValidatorManagement.NewBalanceValidator(argsBalanceValidator)
@@ -708,30 +708,30 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainSta
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createMultiversXToEthereumStateMachine() error {
-	multiversXToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
-	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXToEthName), multiversXToEthName)
+func (components *ethKleverBridgeComponents) createKleverchainToEthereumStateMachine() error {
+	kleverchainToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
+	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(kleverchainToEthName), kleverchainToEthName)
 
 	argsStateMachine := stateMachine.ArgsStateMachine{
-		StateMachineName:     multiversXToEthName,
-		Steps:                components.multiversXToEthMachineStates,
-		StartStateIdentifier: kleverchaintoeth.GettingPendingBatchFromMultiversX,
+		StateMachineName:     kleverchainToEthName,
+		Steps:                components.kleverchainToEthMachineStates,
+		StartStateIdentifier: kleverchaintoeth.GettingPendingBatchFromKleverchain,
 		Log:                  log,
-		StatusHandler:        components.multiversXToEthStatusHandler,
+		StatusHandler:        components.kleverchainToEthStatusHandler,
 	}
 
 	var err error
-	components.multiversXToEthStateMachine, err = stateMachine.NewStateMachine(argsStateMachine)
+	components.kleverchainToEthStateMachine, err = stateMachine.NewStateMachine(argsStateMachine)
 	if err != nil {
 		return err
 	}
 
 	argsPollingHandler := polling.ArgsPollingHandler{
 		Log:              log,
-		Name:             multiversXToEthName + " State machine",
-		PollingInterval:  components.multiversXToEthStepDuration,
+		Name:             kleverchainToEthName + " State machine",
+		PollingInterval:  components.kleverchainToEthStepDuration,
 		PollingWhenError: pollingDurationOnError,
-		Executor:         components.multiversXToEthStateMachine,
+		Executor:         components.kleverchainToEthStateMachine,
 	}
 
 	pollingHandler, err := polling.NewPollingHandler(argsPollingHandler)

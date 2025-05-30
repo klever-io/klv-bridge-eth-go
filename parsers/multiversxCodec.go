@@ -11,10 +11,10 @@ import (
 )
 
 const lenEthAddress = 20
-const lenMvxAddress = 32
+const lenKlvAddress = 32
 
-// MultiversxCodec defines the codec operations to be used for MultiversX contracts
-type MultiversxCodec struct {
+// KleverchainCodec defines the codec operations to be used for Kleverchain contracts
+type KleverchainCodec struct {
 }
 
 func partiallyDecodeCallData(buff []byte, marker byte) (CallData, error) {
@@ -110,7 +110,7 @@ func ExtractUint32(buff []byte) ([]byte, int, error) {
 }
 
 // DecodeProxySCCompleteCallData will try to decode the provided bytes into a ProxySCCompleteCallData struct
-func (codec *MultiversxCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxySCCompleteCallData, error) {
+func (codec *KleverchainCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxySCCompleteCallData, error) {
 	result := ProxySCCompleteCallData{}
 
 	if len(buff) < lenEthAddress {
@@ -120,17 +120,17 @@ func (codec *MultiversxCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxyS
 	result.From.SetBytes(buff[:lenEthAddress])
 	buff = buff[lenEthAddress:]
 
-	if len(buff) < lenMvxAddress {
-		return ProxySCCompleteCallData{}, errBufferTooShortForMvxAddress
+	if len(buff) < lenKlvAddress {
+		return ProxySCCompleteCallData{}, errBufferTooShortForKlvAddress
 	}
 
-	toAddress, err := address.NewAddressFromBytes(buff[:lenMvxAddress])
+	toAddress, err := address.NewAddressFromBytes(buff[:lenKlvAddress])
 	if err != nil {
 		return ProxySCCompleteCallData{}, fmt.Errorf("%w for token", err)
 	}
 	result.To = toAddress
 
-	buff = buff[lenMvxAddress:]
+	buff = buff[lenKlvAddress:]
 
 	buff, token, err := ExtractString(buff)
 	if err != nil {
@@ -156,7 +156,7 @@ func (codec *MultiversxCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxyS
 }
 
 // ExtractGasLimitFromRawCallData will try to extract the gas limit from the provided buffer
-func (codec *MultiversxCodec) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
+func (codec *KleverchainCodec) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
 	if len(buff) == 0 {
 		return 0, errBufferTooShortForMarker
 	}
@@ -177,6 +177,6 @@ func (codec *MultiversxCodec) ExtractGasLimitFromRawCallData(buff []byte) (uint6
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
-func (codec *MultiversxCodec) IsInterfaceNil() bool {
+func (codec *KleverchainCodec) IsInterfaceNil() bool {
 	return codec == nil
 }

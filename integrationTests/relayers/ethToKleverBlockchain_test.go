@@ -34,20 +34,20 @@ type argsForSCCallsTest struct {
 	expectedScCallData []byte
 }
 
-func TestRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T) {
+func TestRelayersShouldExecuteTransfersFromEthToKleverchain(t *testing.T) {
 	if testing.Short() {
 		t.Skip("this is not a short test")
 	}
 
 	t.Run("simple tokens transfers", func(t *testing.T) {
-		testRelayersShouldExecuteTransfersFromEthToMultiversX(t, false)
+		testRelayersShouldExecuteTransfersFromEthToKleverchain(t, false)
 	})
 	t.Run("native tokens transfers", func(t *testing.T) {
-		testRelayersShouldExecuteTransfersFromEthToMultiversX(t, true)
+		testRelayersShouldExecuteTransfersFromEthToKleverchain(t, true)
 	})
 }
 
-func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNativeTokens bool) {
+func testRelayersShouldExecuteTransfersFromEthToKleverchain(t *testing.T, withNativeTokens bool) {
 	safeContractEthAddress := testsCommon.CreateRandomEthereumAddress()
 	token1Erc20 := testsCommon.CreateRandomEthereumAddress()
 	ticker1 := "tck-000001"
@@ -56,11 +56,11 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 	ticker2 := "tck-000002"
 
 	value1 := big.NewInt(111111111)
-	destination1 := testsCommon.CreateRandomMultiversXAddress()
+	destination1 := testsCommon.CreateRandomKleverchainAddress()
 	depositor1 := testsCommon.CreateRandomEthereumAddress()
 
 	value2 := big.NewInt(222222222)
-	destination2 := testsCommon.CreateRandomMultiversXAddress()
+	destination2 := testsCommon.CreateRandomKleverchainAddress()
 	depositor2 := testsCommon.CreateRandomEthereumAddress()
 
 	tokens := []common.Address{token1Erc20, token2Erc20}
@@ -100,7 +100,7 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 	ethereumChainMock.SetQuorum(numRelayers)
 	ethereumChainMock.SetFinalNonce(batchNonceOnEthereum + 1)
 
-	multiversXChainMock := mock.NewKleverBlockchainMock()
+	kleverchainChainMock := mock.NewKleverBlockchainMock()
 
 	if !withNativeTokens {
 		ethereumChainMock.UpdateNativeTokens(token1Erc20, true)
@@ -111,8 +111,8 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 		ethereumChainMock.UpdateMintBurnTokens(token2Erc20, false)
 		ethereumChainMock.UpdateTotalBalances(token2Erc20, value2)
 
-		multiversXChainMock.AddTokensPair(token1Erc20, ticker1, withNativeTokens, true, zero, zero, zero)
-		multiversXChainMock.AddTokensPair(token2Erc20, ticker2, withNativeTokens, true, zero, zero, zero)
+		kleverchainChainMock.AddTokensPair(token1Erc20, ticker1, withNativeTokens, true, zero, zero, zero)
+		kleverchainChainMock.AddTokensPair(token2Erc20, ticker2, withNativeTokens, true, zero, zero, zero)
 	} else {
 		ethereumChainMock.UpdateNativeTokens(token1Erc20, false)
 		ethereumChainMock.UpdateMintBurnTokens(token1Erc20, true)
@@ -124,16 +124,16 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 		ethereumChainMock.UpdateBurnBalances(token2Erc20, value2)
 		ethereumChainMock.UpdateMintBalances(token2Erc20, value2)
 
-		multiversXChainMock.AddTokensPair(token1Erc20, ticker1, withNativeTokens, true, zero, zero, value1)
-		multiversXChainMock.AddTokensPair(token2Erc20, ticker2, withNativeTokens, true, zero, zero, value2)
+		kleverchainChainMock.AddTokensPair(token1Erc20, ticker1, withNativeTokens, true, zero, zero, value1)
+		kleverchainChainMock.AddTokensPair(token2Erc20, ticker2, withNativeTokens, true, zero, zero, value2)
 	}
 
-	multiversXChainMock.SetLastExecutedEthBatchID(batchNonceOnEthereum)
-	multiversXChainMock.SetLastExecutedEthTxId(txNonceOnEthereum)
-	multiversXChainMock.GetStatusesAfterExecutionHandler = func() []byte {
+	kleverchainChainMock.SetLastExecutedEthBatchID(batchNonceOnEthereum)
+	kleverchainChainMock.SetLastExecutedEthTxId(txNonceOnEthereum)
+	kleverchainChainMock.GetStatusesAfterExecutionHandler = func() []byte {
 		return []byte{bridgeCore.Executed, bridgeCore.Rejected}
 	}
-	multiversXChainMock.SetQuorum(numRelayers)
+	kleverchainChainMock.SetQuorum(numRelayers)
 
 	relayers := make([]bridgeComponents, 0, numRelayers)
 	defer closeRelayers(relayers)
@@ -142,19 +142,19 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
 	defer cancel()
-	multiversXChainMock.ProcessFinishedHandler = func() {
-		log.Info("multiversXChainMock.ProcessFinishedHandler called")
+	kleverchainChainMock.ProcessFinishedHandler = func() {
+		log.Info("kleverchainChainMock.ProcessFinishedHandler called")
 		asyncCancelCall(cancel, time.Second*5)
 	}
 
 	for i := 0; i < numRelayers; i++ {
-		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], multiversXChainMock, ethereumChainMock)
+		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], kleverchainChainMock, ethereumChainMock)
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
 		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
-		multiversXChainMock.AddRelayer(relayer.KleverRelayerAddress())
+		kleverchainChainMock.AddRelayer(relayer.KleverRelayerAddress())
 		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
 
 		go func() {
@@ -169,8 +169,8 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 	<-ctx.Done()
 	time.Sleep(time.Second * 5)
 
-	assert.NotNil(t, multiversXChainMock.PerformedActionID())
-	transfer := multiversXChainMock.ProposedTransfer()
+	assert.NotNil(t, kleverchainChainMock.PerformedActionID())
+	transfer := kleverchainChainMock.ProposedTransfer()
 	require.NotNil(t, transfer)
 	require.Equal(t, 2, len(transfer.Transfers))
 	assert.Equal(t, batchNonceOnEthereum+1, transfer.BatchId.Uint64())
@@ -190,7 +190,7 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 	assert.Equal(t, []byte{bridgeCore.MissingDataProtocolMarker}, transfer.Transfers[1].Data)
 }
 
-func TestRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t *testing.T) {
+func TestRelayersShouldExecuteTransferFromEthToKleverchainHavingTxsWithSCcalls(t *testing.T) {
 	if testing.Short() {
 		t.Skip("this is not a short test")
 	}
@@ -201,7 +201,7 @@ func TestRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 			expectedScCallData: bridge.CallDataMock,
 		}
 
-		testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t, testArgs)
+		testRelayersShouldExecuteTransferFromEthToKleverchainHavingTxsWithSCcalls(t, testArgs)
 	})
 	t.Run("no SC call", func(t *testing.T) {
 		testArgs := argsForSCCallsTest{
@@ -209,11 +209,11 @@ func TestRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 			expectedScCallData: []byte{bridgeCore.MissingDataProtocolMarker},
 		}
 
-		testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t, testArgs)
+		testRelayersShouldExecuteTransferFromEthToKleverchainHavingTxsWithSCcalls(t, testArgs)
 	})
 }
 
-func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t *testing.T, args argsForSCCallsTest) {
+func testRelayersShouldExecuteTransferFromEthToKleverchainHavingTxsWithSCcalls(t *testing.T, args argsForSCCallsTest) {
 	safeContractEthAddress := testsCommon.CreateRandomEthereumAddress()
 
 	token1Erc20 := testsCommon.CreateRandomEthereumAddress()
@@ -226,17 +226,17 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 	ticker3 := "tck-000003"
 
 	value1 := big.NewInt(111111111)
-	destination1 := testsCommon.CreateRandomMultiversXAddress()
+	destination1 := testsCommon.CreateRandomKleverchainAddress()
 	depositor1 := testsCommon.CreateRandomEthereumAddress()
 
 	value2 := big.NewInt(222222222)
-	destination2 := testsCommon.CreateRandomMultiversXAddress()
+	destination2 := testsCommon.CreateRandomKleverchainAddress()
 	depositor2 := testsCommon.CreateRandomEthereumAddress()
 
 	depositor3 := testsCommon.CreateRandomEthereumAddress()
 
 	value3 := big.NewInt(333333333)
-	destination3Sc := testsCommon.CreateRandomMultiversXSCAddress()
+	destination3Sc := testsCommon.CreateRandomKleverchainSCAddress()
 
 	tokens := []common.Address{token1Erc20, token2Erc20, token3Erc20}
 	availableBalances := []*big.Int{value1, value2, value3}
@@ -316,16 +316,16 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 		return []types.Log{scLog}, nil
 	}
 
-	multiversXChainMock := mock.NewKleverBlockchainMock()
-	multiversXChainMock.AddTokensPair(token1Erc20, ticker1, false, true, zero, zero, zero)
-	multiversXChainMock.AddTokensPair(token2Erc20, ticker2, false, true, zero, zero, zero)
-	multiversXChainMock.AddTokensPair(token3Erc20, ticker3, false, true, zero, zero, zero)
-	multiversXChainMock.SetLastExecutedEthBatchID(batchNonceOnEthereum)
-	multiversXChainMock.SetLastExecutedEthTxId(txNonceOnEthereum)
-	multiversXChainMock.GetStatusesAfterExecutionHandler = func() []byte {
+	kleverchainChainMock := mock.NewKleverBlockchainMock()
+	kleverchainChainMock.AddTokensPair(token1Erc20, ticker1, false, true, zero, zero, zero)
+	kleverchainChainMock.AddTokensPair(token2Erc20, ticker2, false, true, zero, zero, zero)
+	kleverchainChainMock.AddTokensPair(token3Erc20, ticker3, false, true, zero, zero, zero)
+	kleverchainChainMock.SetLastExecutedEthBatchID(batchNonceOnEthereum)
+	kleverchainChainMock.SetLastExecutedEthTxId(txNonceOnEthereum)
+	kleverchainChainMock.GetStatusesAfterExecutionHandler = func() []byte {
 		return []byte{bridgeCore.Executed, bridgeCore.Rejected, bridgeCore.Executed}
 	}
-	multiversXChainMock.SetQuorum(numRelayers)
+	kleverchainChainMock.SetQuorum(numRelayers)
 
 	relayers := make([]bridgeComponents, 0, numRelayers)
 	defer func() {
@@ -338,19 +338,19 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
 	defer cancel()
-	multiversXChainMock.ProcessFinishedHandler = func() {
-		log.Info("multiversXChainMock.ProcessFinishedHandler called")
+	kleverchainChainMock.ProcessFinishedHandler = func() {
+		log.Info("kleverchainChainMock.ProcessFinishedHandler called")
 		asyncCancelCall(cancel, time.Second*5)
 	}
 
 	for i := 0; i < numRelayers; i++ {
-		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], multiversXChainMock, ethereumChainMock)
+		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], kleverchainChainMock, ethereumChainMock)
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
 		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
 		require.Nil(t, err)
 
-		multiversXChainMock.AddRelayer(relayer.KleverRelayerAddress())
+		kleverchainChainMock.AddRelayer(relayer.KleverRelayerAddress())
 		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
 
 		go func() {
@@ -365,8 +365,8 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 	<-ctx.Done()
 	time.Sleep(time.Second * 5)
 
-	assert.NotNil(t, multiversXChainMock.PerformedActionID())
-	transfer := multiversXChainMock.ProposedTransfer()
+	assert.NotNil(t, kleverchainChainMock.PerformedActionID())
+	transfer := kleverchainChainMock.ProposedTransfer()
 	require.NotNil(t, transfer)
 	require.Equal(t, 3, len(transfer.Transfers))
 	assert.Equal(t, batchNonceOnEthereum+1, transfer.BatchId.Uint64())
@@ -396,7 +396,7 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 func createMockBridgeComponentsArgs(
 	index int,
 	messenger p2p.Messenger,
-	multiversXChainMock *mock.KleverBlockchainMock,
+	kleverChainMock *mock.KleverBlockchainMock,
 	ethereumChainMock *mock.EthereumChainMock,
 ) factory.ArgsEthereumToKleverBridge {
 
@@ -409,7 +409,7 @@ func createMockBridgeComponentsArgs(
 				RestApiInterface: bridgeCore.WebServerOffString,
 			},
 		},
-		Proxy:                     multiversXChainMock,
+		Proxy:                     kleverChainMock,
 		ClientWrapper:             ethereumChainMock,
 		Messenger:                 messenger,
 		StatusStorer:              testsCommon.NewStorerMock(),

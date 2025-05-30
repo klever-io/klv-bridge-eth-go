@@ -14,12 +14,12 @@ type waitForQuorumStep struct {
 
 // Execute will execute this step returning the next step to be executed
 func (step *waitForQuorumStep) Execute(ctx context.Context) core.StepIdentifier {
-	if step.bridge.ProcessMaxQuorumRetriesOnMultiversX() {
+	if step.bridge.ProcessMaxQuorumRetriesOnKleverchain() {
 		step.bridge.PrintInfo(logger.LogDebug, "max number of retries reached, resetting counter")
 		return GettingPendingBatchFromEthereum
 	}
 
-	isQuorumReached, err := step.bridge.ProcessQuorumReachedOnMultiversX(ctx)
+	isQuorumReached, err := step.bridge.ProcessQuorumReachedOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error while checking the quorum", "error", err)
 		return GettingPendingBatchFromEthereum

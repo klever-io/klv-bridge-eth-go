@@ -29,8 +29,8 @@ func init() {
 type pendingOperationFilter struct {
 	allowedEthAddresses []string
 	deniedEthAddresses  []string
-	allowedMvxAddresses []string
-	deniedMvxAddresses  []string
+	allowedKlvAddresses []string
+	deniedKlvAddresses  []string
 	allowedTokens       []string
 	deniedTokens        []string
 }
@@ -40,7 +40,7 @@ func NewPendingOperationFilter(cfg config.PendingOperationsFilterConfig, log log
 	if check.IfNil(log) {
 		return nil, errNilLogger
 	}
-	if len(cfg.AllowedMvxAddresses)+len(cfg.AllowedEthAddresses)+len(cfg.AllowedTokens) == 0 {
+	if len(cfg.AllowedKlvAddresses)+len(cfg.AllowedEthAddresses)+len(cfg.AllowedTokens) == 0 {
 		return nil, errNoItemsAllowed
 	}
 
@@ -57,10 +57,10 @@ func NewPendingOperationFilter(cfg config.PendingOperationsFilterConfig, log log
 
 	log.Info("NewPendingOperationFilter config options",
 		"DeniedEthAddresses", strings.Join(filter.deniedEthAddresses, ", "),
-		"DeniedMvxAddresses", strings.Join(filter.deniedMvxAddresses, ", "),
+		"DeniedKlvAddresses", strings.Join(filter.deniedKlvAddresses, ", "),
 		"DeniedTokens", strings.Join(filter.deniedTokens, ", "),
 		"AllowedEthAddresses", strings.Join(filter.allowedEthAddresses, ", "),
-		"AllowedMvxAddresses", strings.Join(filter.allowedMvxAddresses, ", "),
+		"AllowedKlvAddresses", strings.Join(filter.allowedKlvAddresses, ", "),
 		"AllowedTokens", strings.Join(filter.allowedTokens, ", "),
 	)
 
@@ -76,9 +76,9 @@ func (filter *pendingOperationFilter) parseConfigs(cfg config.PendingOperationsF
 		return fmt.Errorf("%w in list DeniedEthAddresses", err)
 	}
 
-	filter.deniedMvxAddresses, err = parseList(cfg.DeniedMvxAddresses, wildcardString)
+	filter.deniedKlvAddresses, err = parseList(cfg.DeniedKlvAddresses, wildcardString)
 	if err != nil {
-		return fmt.Errorf("%w in list DeniedMvxAddresses", err)
+		return fmt.Errorf("%w in list DeniedKlvAddresses", err)
 	}
 
 	filter.deniedTokens, err = parseList(cfg.DeniedTokens, wildcardString)
@@ -92,9 +92,9 @@ func (filter *pendingOperationFilter) parseConfigs(cfg config.PendingOperationsF
 		return fmt.Errorf("%w in list AllowedEthAddresses", err)
 	}
 
-	filter.allowedMvxAddresses, err = parseList(cfg.AllowedMvxAddresses, emptyString)
+	filter.allowedKlvAddresses, err = parseList(cfg.AllowedKlvAddresses, emptyString)
 	if err != nil {
-		return fmt.Errorf("%w in list AllowedMvxAddresses", err)
+		return fmt.Errorf("%w in list AllowedKlvAddresses", err)
 	}
 
 	filter.allowedTokens, err = parseList(cfg.AllowedTokens, emptyString)
@@ -131,14 +131,14 @@ func (filter *pendingOperationFilter) checkLists() error {
 		return fmt.Errorf("%w in list DeniedEthAddresses", err)
 	}
 
-	err = filter.checkList(filter.allowedMvxAddresses, checkMvxItemValid)
+	err = filter.checkList(filter.allowedKlvAddresses, checkKlvItemValid)
 	if err != nil {
-		return fmt.Errorf("%w in list AllowedMvxAddresses", err)
+		return fmt.Errorf("%w in list AllowedKlvAddresses", err)
 	}
 
-	err = filter.checkList(filter.deniedMvxAddresses, checkMvxItemValid)
+	err = filter.checkList(filter.deniedKlvAddresses, checkKlvItemValid)
 	if err != nil {
-		return fmt.Errorf("%w in list DeniedMvxAddresses", err)
+		return fmt.Errorf("%w in list DeniedKlvAddresses", err)
 	}
 
 	return nil
@@ -159,7 +159,7 @@ func (filter *pendingOperationFilter) checkList(list []string, checkItem func(it
 	return nil
 }
 
-func checkMvxItemValid(item string) error {
+func checkKlvItemValid(item string) error {
 	_, errNewAddr := address.NewAddress(item)
 	return errNewAddr
 }
@@ -180,14 +180,14 @@ func (filter *pendingOperationFilter) ShouldExecute(callData parsers.ProxySCComp
 
 	toAddress := callData.To.Bech32()
 	isSpecificallyDenied := filter.stringExistsInList(callData.From.String(), filter.deniedEthAddresses, ethWildcardString) ||
-		filter.stringExistsInList(toAddress, filter.deniedMvxAddresses, wildcardString) ||
+		filter.stringExistsInList(toAddress, filter.deniedKlvAddresses, wildcardString) ||
 		filter.stringExistsInList(callData.Token, filter.deniedTokens, wildcardString)
 	if isSpecificallyDenied {
 		return false
 	}
 
 	isAllowed := filter.stringExistsInList(callData.From.String(), filter.allowedEthAddresses, ethWildcardString) ||
-		filter.stringExistsInList(toAddress, filter.allowedMvxAddresses, wildcardString) ||
+		filter.stringExistsInList(toAddress, filter.allowedKlvAddresses, wildcardString) ||
 		filter.stringExistsInList(callData.Token, filter.allowedTokens, wildcardString)
 
 	return isAllowed

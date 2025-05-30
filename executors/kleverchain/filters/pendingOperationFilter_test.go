@@ -25,8 +25,8 @@ func createTestConfig() config.PendingOperationsFilterConfig {
 		DeniedEthAddresses:  nil,
 		AllowedEthAddresses: []string{"*"},
 
-		DeniedMvxAddresses:  nil,
-		AllowedMvxAddresses: []string{"*"},
+		DeniedKlvAddresses:  nil,
+		AllowedKlvAddresses: []string{"*"},
 
 		DeniedTokens:  nil,
 		AllowedTokens: []string{"*"},
@@ -61,16 +61,16 @@ func TestNewPendingOperationFilter(t *testing.T) {
 		assert.ErrorIs(t, err, errUnsupportedMarker)
 		assert.Contains(t, err.Error(), "on item at index 0 in list DeniedEthAddresses")
 	})
-	t.Run("denied mvx list contains wildcard should error", func(t *testing.T) {
+	t.Run("denied kda list contains wildcard should error", func(t *testing.T) {
 		t.Parallel()
 
 		cfg := createTestConfig()
-		cfg.DeniedMvxAddresses = []string{"	*  "}
+		cfg.DeniedKlvAddresses = []string{"	*  "}
 
 		filter, err := NewPendingOperationFilter(cfg, testLog)
 		assert.Nil(t, filter)
 		assert.ErrorIs(t, err, errUnsupportedMarker)
-		assert.Contains(t, err.Error(), "on item at index 0 in list DeniedMvxAddresses")
+		assert.Contains(t, err.Error(), "on item at index 0 in list DeniedKlvAddresses")
 	})
 	t.Run("denied tokens list contains wildcard should error", func(t *testing.T) {
 		t.Parallel()
@@ -94,16 +94,16 @@ func TestNewPendingOperationFilter(t *testing.T) {
 		assert.ErrorIs(t, err, errUnsupportedMarker)
 		assert.Contains(t, err.Error(), "on item at index 1 in list AllowedEthAddresses")
 	})
-	t.Run("allowed mvx list contains empty string should error", func(t *testing.T) {
+	t.Run("allowed kda list contains empty string should error", func(t *testing.T) {
 		t.Parallel()
 
 		cfg := createTestConfig()
-		cfg.AllowedMvxAddresses = append(cfg.AllowedMvxAddresses, "	 ")
+		cfg.AllowedKlvAddresses = append(cfg.AllowedKlvAddresses, "	 ")
 
 		filter, err := NewPendingOperationFilter(cfg, testLog)
 		assert.Nil(t, filter)
 		assert.ErrorIs(t, err, errUnsupportedMarker)
-		assert.Contains(t, err.Error(), "on item at index 1 in list AllowedMvxAddresses")
+		assert.Contains(t, err.Error(), "on item at index 1 in list AllowedKlvAddresses")
 	})
 	t.Run("allowed tokens list contains empty string should error", func(t *testing.T) {
 		t.Parallel()
@@ -138,36 +138,36 @@ func TestNewPendingOperationFilter(t *testing.T) {
 		assert.ErrorIs(t, err, errMissingEthPrefix)
 		assert.Contains(t, err.Error(), "on item at index 0 in list DeniedEthAddresses")
 	})
-	t.Run("invalid address in AllowedMvxAddresses should error", func(t *testing.T) {
+	t.Run("invalid address in AllowedKlvAddresses should error", func(t *testing.T) {
 		t.Parallel()
 
 		cfg := createTestConfig()
-		cfg.AllowedMvxAddresses = append(cfg.AllowedMvxAddresses, "invalid address")
+		cfg.AllowedKlvAddresses = append(cfg.AllowedKlvAddresses, "invalid address")
 
 		filter, err := NewPendingOperationFilter(cfg, testLog)
 		assert.Nil(t, filter)
 		assert.NotNil(t, err)
-		assert.Contains(t, err.Error(), "on item at index 1 in list AllowedMvxAddresses")
+		assert.Contains(t, err.Error(), "on item at index 1 in list AllowedKlvAddresses")
 	})
-	t.Run("invalid address in DeniedMvxAddresses should error", func(t *testing.T) {
+	t.Run("invalid address in DeniedKlvAddresses should error", func(t *testing.T) {
 		t.Parallel()
 
 		cfg := createTestConfig()
-		cfg.DeniedMvxAddresses = append(cfg.DeniedMvxAddresses, "invalid address")
+		cfg.DeniedKlvAddresses = append(cfg.DeniedKlvAddresses, "invalid address")
 
 		filter, err := NewPendingOperationFilter(cfg, testLog)
 		assert.Nil(t, filter)
 		assert.NotNil(t, err)
-		assert.Contains(t, err.Error(), "on item at index 0 in list DeniedMvxAddresses")
+		assert.Contains(t, err.Error(), "on item at index 0 in list DeniedKlvAddresses")
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
 
 		cfg := createTestConfig()
-		cfg.AllowedEthAddresses = append(cfg.AllowedMvxAddresses, ethTestAddress1)
+		cfg.AllowedEthAddresses = append(cfg.AllowedKlvAddresses, ethTestAddress1)
 		cfg.DeniedEthAddresses = append(cfg.DeniedEthAddresses, ethTestAddress1)
-		cfg.AllowedMvxAddresses = append(cfg.AllowedMvxAddresses, klvTestAddress1)
-		cfg.DeniedMvxAddresses = append(cfg.DeniedMvxAddresses, klvTestAddress1)
+		cfg.AllowedKlvAddresses = append(cfg.AllowedKlvAddresses, klvTestAddress1)
+		cfg.DeniedKlvAddresses = append(cfg.DeniedKlvAddresses, klvTestAddress1)
 		filter, err := NewPendingOperationFilter(cfg, testLog)
 		assert.NotNil(t, filter)
 		assert.Nil(t, err)
@@ -252,13 +252,13 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			cfg := createTestConfig()
 			cfg.AllowedEthAddresses = []string{ethTestAddress2}
 			cfg.AllowedTokens = nil
-			cfg.AllowedMvxAddresses = nil
+			cfg.AllowedKlvAddresses = nil
 
 			filter, _ := NewPendingOperationFilter(cfg, testLog)
 			assert.False(t, filter.ShouldExecute(callData))
 		})
 	})
-	t.Run("mvx address", func(t *testing.T) {
+	t.Run("kda address", func(t *testing.T) {
 		t.Parallel()
 
 		callData := parsers.ProxySCCompleteCallData{
@@ -269,13 +269,13 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			t.Parallel()
 
 			cfg := createTestConfig()
-			cfg.DeniedMvxAddresses = []string{klvTestAddress1}
-			cfg.AllowedMvxAddresses = []string{klvTestAddress1}
+			cfg.DeniedKlvAddresses = []string{klvTestAddress1}
+			cfg.AllowedKlvAddresses = []string{klvTestAddress1}
 
 			filter, _ := NewPendingOperationFilter(cfg, testLog)
 			assert.False(t, filter.ShouldExecute(callData))
 
-			cfg.AllowedMvxAddresses = []string{"*"}
+			cfg.AllowedKlvAddresses = []string{"*"}
 			filter, _ = NewPendingOperationFilter(cfg, testLog)
 			assert.False(t, filter.ShouldExecute(callData))
 		})
@@ -283,12 +283,12 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			t.Parallel()
 
 			cfg := createTestConfig()
-			cfg.AllowedMvxAddresses = []string{klvTestAddress1}
+			cfg.AllowedKlvAddresses = []string{klvTestAddress1}
 
 			filter, _ := NewPendingOperationFilter(cfg, testLog)
 			assert.True(t, filter.ShouldExecute(callData))
 
-			cfg.AllowedMvxAddresses = []string{"*"}
+			cfg.AllowedKlvAddresses = []string{"*"}
 			filter, _ = NewPendingOperationFilter(cfg, testLog)
 			assert.True(t, filter.ShouldExecute(callData))
 		})
@@ -296,7 +296,7 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 			t.Parallel()
 
 			cfg := createTestConfig()
-			cfg.AllowedMvxAddresses = []string{klvTestAddress2}
+			cfg.AllowedKlvAddresses = []string{klvTestAddress2}
 			cfg.AllowedTokens = nil
 			cfg.AllowedEthAddresses = nil
 
@@ -347,7 +347,7 @@ func TestPendingOperationFilter_ShouldExecute(t *testing.T) {
 
 			cfg := createTestConfig()
 			cfg.AllowedTokens = []string{token2}
-			cfg.AllowedMvxAddresses = nil
+			cfg.AllowedKlvAddresses = nil
 			cfg.AllowedEthAddresses = nil
 
 			filter, _ := NewPendingOperationFilter(cfg, testLog)

@@ -295,11 +295,11 @@ func TestClient_GetBatch(t *testing.T) {
 	t.Run("returns batch should work", func(t *testing.T) {
 		from1 := testsCommon.CreateRandomEthereumAddress()
 		token1 := testsCommon.CreateRandomEthereumAddress()
-		recipient1 := testsCommon.CreateRandomMultiversXAddress()
+		recipient1 := testsCommon.CreateRandomKleverchainAddress()
 
 		from2 := testsCommon.CreateRandomEthereumAddress()
 		token2 := testsCommon.CreateRandomEthereumAddress()
-		recipient2 := testsCommon.CreateRandomMultiversXAddress()
+		recipient2 := testsCommon.CreateRandomKleverchainAddress()
 
 		c.clientWrapper = &bridgeTests.EthereumClientWrapperStub{
 			GetBatchCalled: func(ctx context.Context, batchNonce *big.Int) (contract.Batch, bool, error) {
@@ -369,11 +369,11 @@ func TestClient_GetBatch(t *testing.T) {
 	t.Run("returns non final batch should work", func(t *testing.T) {
 		from1 := testsCommon.CreateRandomEthereumAddress()
 		token1 := testsCommon.CreateRandomEthereumAddress()
-		recipient1 := testsCommon.CreateRandomMultiversXAddress()
+		recipient1 := testsCommon.CreateRandomKleverchainAddress()
 
 		from2 := testsCommon.CreateRandomEthereumAddress()
 		token2 := testsCommon.CreateRandomEthereumAddress()
-		recipient2 := testsCommon.CreateRandomMultiversXAddress()
+		recipient2 := testsCommon.CreateRandomKleverchainAddress()
 
 		c.clientWrapper = &bridgeTests.EthereumClientWrapperStub{
 			GetBatchCalled: func(ctx context.Context, batchNonce *big.Int) (contract.Batch, bool, error) {
@@ -457,7 +457,7 @@ func TestClient_GenerateMessageHash(t *testing.T) {
 	})
 	t.Run("should work", func(t *testing.T) {
 		c, _ := NewEthereumClient(args)
-		argLists := batchProcessor.ExtractListMvxToEth(batch)
+		argLists := batchProcessor.ExtractListKlvToEth(batch)
 		assert.Equal(t, expectedAmounts, argLists.Amounts)
 		assert.Equal(t, expectedTokens, argLists.EthTokens)
 		assert.Equal(t, expectedRecipients, argLists.Recipients)
@@ -551,7 +551,7 @@ func TestClient_ExecuteTransfer(t *testing.T) {
 		},
 	}
 	batch := createMockTransferBatch()
-	argLists := batchProcessor.ExtractListMvxToEth(batch)
+	argLists := batchProcessor.ExtractListKlvToEth(batch)
 	signatures := make([][]byte, 10)
 	for i := range signatures {
 		signatures[i] = []byte(fmt.Sprintf("sig %d", i))
@@ -692,7 +692,7 @@ func TestClient_ExecuteTransfer(t *testing.T) {
 			Amount:                big.NewInt(80),
 			DestinationTokenBytes: []byte("ERC20token1"),
 		})
-		newArgLists := batchProcessor.ExtractListMvxToEth(newBatch)
+		newArgLists := batchProcessor.ExtractListKlvToEth(newBatch)
 		hash, err := c.ExecuteTransfer(context.Background(), common.Hash{}, newArgLists, newBatch.ID, 9)
 		assert.Equal(t, "", hash)
 		assert.True(t, errors.Is(err, errInsufficientBalance))
@@ -1199,8 +1199,8 @@ func TestClient_CheckClientAvailability(t *testing.T) {
 		incrementor = 0
 
 		// place a random message as to test it is reset
-		statusHandler.SetStringMetric(bridgeCore.MetricMultiversXClientStatus, bridgeCore.ClientStatus(3).String())
-		statusHandler.SetStringMetric(bridgeCore.MetricLastMultiversXClientError, "random")
+		statusHandler.SetStringMetric(bridgeCore.MetricKleverchainClientStatus, bridgeCore.ClientStatus(3).String())
+		statusHandler.SetStringMetric(bridgeCore.MetricLastKleverchainClientError, "random")
 
 		// this will just increment the retry counter
 		for i := 0; i < int(args.ClientAvailabilityAllowDelta); i++ {
@@ -1312,11 +1312,11 @@ func resetClient(c *client) {
 	c.mut.Lock()
 	c.retriesAvailabilityCheck = 0
 	c.mut.Unlock()
-	c.clientWrapper.SetStringMetric(bridgeCore.MetricMultiversXClientStatus, "")
-	c.clientWrapper.SetStringMetric(bridgeCore.MetricLastMultiversXClientError, "")
+	c.clientWrapper.SetStringMetric(bridgeCore.MetricKleverchainClientStatus, "")
+	c.clientWrapper.SetStringMetric(bridgeCore.MetricLastKleverchainClientError, "")
 }
 
 func checkStatusHandler(t *testing.T, statusHandler *testsCommon.StatusHandlerMock, status bridgeCore.ClientStatus, message string) {
-	assert.Equal(t, status.String(), statusHandler.GetStringMetric(bridgeCore.MetricMultiversXClientStatus))
-	assert.Equal(t, message, statusHandler.GetStringMetric(bridgeCore.MetricLastMultiversXClientError))
+	assert.Equal(t, status.String(), statusHandler.GetStringMetric(bridgeCore.MetricKleverchainClientStatus))
+	assert.Equal(t, message, statusHandler.GetStringMetric(bridgeCore.MetricLastKleverchainClientError))
 }

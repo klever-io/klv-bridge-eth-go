@@ -26,8 +26,8 @@ func createTestConfigs() config.ScCallsModuleConfig {
 		Filter: config.PendingOperationsFilterConfig{
 			DeniedEthAddresses:  nil,
 			AllowedEthAddresses: []string{"*"},
-			DeniedMvxAddresses:  nil,
-			AllowedMvxAddresses: []string{"*"},
+			DeniedKlvAddresses:  nil,
+			AllowedKlvAddresses: []string{"*"},
 			DeniedTokens:        nil,
 			AllowedTokens:       []string{"*"},
 		},

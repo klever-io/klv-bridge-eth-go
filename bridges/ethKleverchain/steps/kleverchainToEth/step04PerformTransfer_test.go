@@ -47,7 +47,7 @@ func TestExecute_PerformTransfer(t *testing.T) {
 
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
-		t.Run("if transfer was performed we should go to ResolvingSetStatusOnMultiversX", func(t *testing.T) {
+		t.Run("if transfer was performed we should go to ResolvingSetStatusOnKleverchain", func(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorPerformTransfer()
 			bridgeStub.WasTransferPerformedOnEthereumCalled = func(ctx context.Context) (bool, error) {
@@ -59,7 +59,7 @@ func TestExecute_PerformTransfer(t *testing.T) {
 			}
 
 			assert.False(t, step.IsInterfaceNil())
-			expectedStep := core.StepIdentifier(ResolvingSetStatusOnMultiversX)
+			expectedStep := core.StepIdentifier(ResolvingSetStatusOnKleverchain)
 			stepIdentifier := step.Execute(context.Background())
 			assert.Equal(t, expectedStep, stepIdentifier)
 		})

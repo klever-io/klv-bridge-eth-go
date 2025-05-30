@@ -11,10 +11,10 @@ import (
 func TestExecute_PerformSetStatus(t *testing.T) {
 	t.Parallel()
 
-	t.Run("error on WasActionPerformedOnMultiversXCalled", func(t *testing.T) {
+	t.Run("error on WasActionPerformedOnKleverchainCalled", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorPerformSetStatus()
-		bridgeStub.WasActionPerformedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionPerformedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
 
@@ -26,13 +26,13 @@ func TestExecute_PerformSetStatus(t *testing.T) {
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
 
-	t.Run("error on PerformActionOnMultiversXCalled", func(t *testing.T) {
+	t.Run("error on PerformActionOnKleverchainCalled", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorPerformSetStatus()
 		bridgeStub.MyTurnAsLeaderCalled = func() bool {
 			return true
 		}
-		bridgeStub.PerformActionOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.PerformActionOnKleverchainCalled = func(ctx context.Context) error {
 			return expectedError
 		}
 
@@ -49,7 +49,7 @@ func TestExecute_PerformSetStatus(t *testing.T) {
 		t.Run("if transfer was performed we should go to initial step", func(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorPerformSetStatus()
-			bridgeStub.WasActionPerformedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+			bridgeStub.WasActionPerformedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 				return true, nil
 			}
 
@@ -65,7 +65,7 @@ func TestExecute_PerformSetStatus(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorPerformSetStatus()
 			wasCalled := false
-			bridgeStub.PerformActionOnMultiversXCalled = func(ctx context.Context) error {
+			bridgeStub.PerformActionOnKleverchainCalled = func(ctx context.Context) error {
 				wasCalled = true
 				return nil
 			}
@@ -78,14 +78,14 @@ func TestExecute_PerformSetStatus(t *testing.T) {
 			assert.False(t, wasCalled)
 			assert.Equal(t, step.Identifier(), stepIdentifier)
 		})
-		t.Run("if leader, first perform Set Status and then check again WasSetStatusPerformedOnMultiversX", func(t *testing.T) {
+		t.Run("if leader, first perform Set Status and then check again WasSetStatusPerformedOnKleverchain", func(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorPerformSetStatus()
 			bridgeStub.MyTurnAsLeaderCalled = func() bool {
 				return true
 			}
 			wasCalled := false
-			bridgeStub.PerformActionOnMultiversXCalled = func(ctx context.Context) error {
+			bridgeStub.PerformActionOnKleverchainCalled = func(ctx context.Context) error {
 				wasCalled = true
 				return nil
 			}
@@ -102,7 +102,7 @@ func TestExecute_PerformSetStatus(t *testing.T) {
 
 func createStubExecutorPerformSetStatus() *bridgeTests.BridgeExecutorStub {
 	stub := bridgeTests.NewBridgeExecutorStub()
-	stub.WasActionPerformedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+	stub.WasActionPerformedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	stub.MyTurnAsLeaderCalled = func() bool {

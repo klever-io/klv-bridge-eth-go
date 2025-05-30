@@ -1,8 +1,8 @@
 package kleverchaintoeth
 
 const (
-	// GettingPendingBatchFromMultiversX is the step identifier for fetching the pending batch from the MultiversX chain
-	GettingPendingBatchFromMultiversX = "get pending batch from MultiversX"
+	// GettingPendingBatchFromKleverchain is the step identifier for fetching the pending batch from the Kleverchain
+	GettingPendingBatchFromKleverchain = "get pending batch from Kleverchain"
 
 	// SigningProposedTransferOnEthereum is the step identifier for signing proposed transfer
 	SigningProposedTransferOnEthereum = "sign proposed transfer"
@@ -16,21 +16,21 @@ const (
 	// WaitingTransferConfirmation is the step identifier for waiting the transfer confirmation on Ethereum
 	WaitingTransferConfirmation = "wait transfer confirmating"
 
-	// ResolvingSetStatusOnMultiversX is the step identifier for resolving set status on MultiversX
-	ResolvingSetStatusOnMultiversX = "resolve set status"
+	// ResolvingSetStatusOnKleverchain is the step identifier for resolving set status on Kleverchain
+	ResolvingSetStatusOnKleverchain = "resolve set status"
 
-	// ProposingSetStatusOnMultiversX is the step idetifier for proposing set status action on MultiversX
-	ProposingSetStatusOnMultiversX = "propose set status"
+	// ProposingSetStatusOnKleverchain is the step idetifier for proposing set status action on Kleverchain
+	ProposingSetStatusOnKleverchain = "propose set status"
 
-	// SigningProposedSetStatusOnMultiversX is the step identifier for signing proposed set status action
-	SigningProposedSetStatusOnMultiversX = "sign proposed set status"
+	// SigningProposedSetStatusOnKleverchain is the step identifier for signing proposed set status action
+	SigningProposedSetStatusOnKleverchain = "sign proposed set status"
 
 	// WaitingForQuorumOnSetStatus is the step identifier for waiting until the quorum is reached
 	WaitingForQuorumOnSetStatus = "wait for quorum on set status"
 
-	// PerformingSetStatus is the step identifier for performing the set status action on MultiversX
+	// PerformingSetStatus is the step identifier for performing the set status action on Kleverchain
 	PerformingSetStatus = "perform set status"
 
-	// NumSteps indicates how many steps the state machine for MultiversX -> Ethereum flow has
+	// NumSteps indicates how many steps the state machine for Kleverchain -> Ethereum flow has
 	NumSteps = 10
 )

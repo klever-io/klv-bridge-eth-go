@@ -32,8 +32,8 @@ func (registry *tokensRegistry) AddToken(params IssueTokenParams) {
 
 	newToken := &TokenData{
 		AbstractTokenIdentifier:     params.AbstractTokenIdentifier,
-		MvxUniversalTokenTicker:     params.MvxUniversalTokenTicker,
-		MvxChainSpecificTokenTicker: params.MvxChainSpecificTokenDisplayName,
+		KlvUniversalTokenTicker:     params.KlvUniversalTokenTicker,
+		KlvChainSpecificTokenTicker: params.KlvChainSpecificTokenDisplayName,
 		EthTokenName:                params.EthTokenName,
 		EthTokenSymbol:              params.EthTokenSymbol,
 	}
@@ -42,25 +42,25 @@ func (registry *tokensRegistry) AddToken(params IssueTokenParams) {
 }
 
 // RegisterUniversalToken will save the universal token identifier
-func (registry *tokensRegistry) RegisterUniversalToken(abstractTokenIdentifier string, mvxUniversalToken string) {
+func (registry *tokensRegistry) RegisterUniversalToken(abstractTokenIdentifier string, kdaUniversalToken string) {
 	registry.mut.Lock()
 	defer registry.mut.Unlock()
 
 	data, found := registry.tokens[abstractTokenIdentifier]
 	require.True(registry, found, "abstract token identifier not registered %s", abstractTokenIdentifier)
 
-	data.MvxUniversalToken = mvxUniversalToken
+	data.KlvUniversalToken = kdaUniversalToken
 }
 
 // RegisterChainSpecificToken will save the chain specific token identifier
-func (registry *tokensRegistry) RegisterChainSpecificToken(abstractTokenIdentifier string, mvxChainSpecificToken string) {
+func (registry *tokensRegistry) RegisterChainSpecificToken(abstractTokenIdentifier string, kdaChainSpecificToken string) {
 	registry.mut.Lock()
 	defer registry.mut.Unlock()
 
 	data, found := registry.tokens[abstractTokenIdentifier]
 	require.True(registry, found, "abstract token identifier not registered %s", abstractTokenIdentifier)
 
-	data.MvxChainSpecificToken = mvxChainSpecificToken
+	data.KlvChainSpecificToken = kdaChainSpecificToken
 }
 
 // RegisterEthAddressAndContract will save under the mutex lock the provided Ethereum address and contract

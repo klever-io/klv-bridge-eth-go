@@ -18,38 +18,38 @@ func (step *signProposedSetStatusStep) Execute(ctx context.Context) core.StepIde
 	storedBatch := step.bridge.GetStoredBatch()
 	if storedBatch == nil {
 		step.bridge.PrintInfo(logger.LogDebug, "nil stored batch")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
-	actionID, err := step.bridge.GetAndStoreActionIDForProposeSetStatusFromMultiversX(ctx)
+	actionID, err := step.bridge.GetAndStoreActionIDForProposeSetStatusFromKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error fetching action ID", "batch ID", storedBatch.ID, "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 	if actionID == ethKleverchain.InvalidActionID {
 		step.bridge.PrintInfo(logger.LogError, "contract error, got invalid action ID",
 			"batch ID", storedBatch.ID, "error", err, "action ID", actionID)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	step.bridge.PrintInfo(logger.LogInfo, "fetched action ID", "action ID", actionID, "batch ID", storedBatch.ID)
 
-	wasSigned, err := step.bridge.WasActionSignedOnMultiversX(ctx)
+	wasSigned, err := step.bridge.WasActionSignedOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error determining if the proposed transfer was signed or not",
 			"batch ID", storedBatch.ID, "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	if wasSigned {
 		return WaitingForQuorumOnSetStatus
 	}
 
-	err = step.bridge.SignActionOnMultiversX(ctx)
+	err = step.bridge.SignActionOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error signing the proposed set status",
 			"batch ID", storedBatch.ID, "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	return WaitingForQuorumOnSetStatus
@@ -57,7 +57,7 @@ func (step *signProposedSetStatusStep) Execute(ctx context.Context) core.StepIde
 
 // Identifier returns the step's identifier
 func (step *signProposedSetStatusStep) Identifier() core.StepIdentifier {
-	return SigningProposedSetStatusOnMultiversX
+	return SigningProposedSetStatusOnKleverchain
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

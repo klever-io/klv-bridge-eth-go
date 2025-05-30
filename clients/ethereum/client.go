@@ -201,7 +201,7 @@ func (c *client) GetBatch(ctx context.Context, nonce uint64) (*bridgeCore.Transf
 	return transferBatch, isFinalBatch && areFinalDeposits, nil
 }
 
-// GetBatchSCMetadata returns the emitted logs in a batch that hold metadata for SC execution on MVX
+// GetBatchSCMetadata returns the emitted logs in a batch that hold metadata for SC execution on Klv
 func (c *client) GetBatchSCMetadata(ctx context.Context, nonce uint64, blockNumber int64) ([]*contract.ERC20SafeERC20SCDeposit, error) {
 	scExecAbi, err := contract.ERC20SafeMetaData.GetAbi()
 	if err != nil {
@@ -239,9 +239,9 @@ func (c *client) GetBatchSCMetadata(ctx context.Context, nonce uint64, blockNumb
 	return depositEvents, nil
 }
 
-// WasExecuted returns true if the MultiversX batch ID was executed
-func (c *client) WasExecuted(ctx context.Context, mvxBatchID uint64) (bool, error) {
-	return c.clientWrapper.WasBatchExecuted(ctx, big.NewInt(0).SetUint64(mvxBatchID))
+// WasExecuted returns true if the Kleverchain batch ID was executed
+func (c *client) WasExecuted(ctx context.Context, kdaBatchID uint64) (bool, error) {
+	return c.clientWrapper.WasBatchExecuted(ctx, big.NewInt(0).SetUint64(kdaBatchID))
 }
 
 // BroadcastSignatureForMessageHash will send the signature for the provided message hash
@@ -423,8 +423,8 @@ func (c *client) incrementRetriesAvailabilityCheck() {
 }
 
 func (c *client) setStatusForAvailabilityCheck(status bridgeCore.ClientStatus, message string, nonce uint64) {
-	c.clientWrapper.SetStringMetric(core.MetricMultiversXClientStatus, status.String())
-	c.clientWrapper.SetStringMetric(core.MetricLastMultiversXClientError, message)
+	c.clientWrapper.SetStringMetric(core.MetricKleverchainClientStatus, status.String())
+	c.clientWrapper.SetStringMetric(core.MetricLastKleverchainClientError, message)
 	c.clientWrapper.SetIntMetric(core.MetricLastBlockNonce, int(nonce))
 }
 

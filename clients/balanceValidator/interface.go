@@ -8,12 +8,12 @@ import (
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 )
 
-// MultiversXClient defines the behavior of the MultiversX client able to communicate with the MultiversX chain
-type MultiversXClient interface {
+// KleverchainClient defines the behavior of the Kleverchain client able to communicate with the Kleverchain chain
+type KleverchainClient interface {
 	GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error)
 	GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error)
 	GetLastExecutedEthBatchID(ctx context.Context) (uint64, error)
-	GetLastMvxBatchID(ctx context.Context) (uint64, error)
+	GetLastKlvBatchID(ctx context.Context) (uint64, error)
 	IsMintBurnToken(ctx context.Context, token []byte) (bool, error)
 	IsNativeToken(ctx context.Context, token []byte) (bool, error)
 	TotalBalances(ctx context.Context, token []byte) (*big.Int, error)
@@ -32,6 +32,6 @@ type EthereumClient interface {
 	MintBurnTokens(ctx context.Context, token common.Address) (bool, error)
 	NativeTokens(ctx context.Context, token common.Address) (bool, error)
 	CheckRequiredBalance(ctx context.Context, erc20Address common.Address, value *big.Int) error
-	WasExecuted(ctx context.Context, mvxBatchID uint64) (bool, error)
+	WasExecuted(ctx context.Context, kdaBatchID uint64) (bool, error)
 	IsInterfaceNil() bool
 }

@@ -106,7 +106,7 @@ func CreateMessengerWithNoDiscovery() p2p.Messenger {
 		},
 		KadDhtPeerDiscovery: p2pConfig.KadDhtPeerDiscoveryConfig{
 			Enabled:    false,
-			ProtocolID: "/erd/relay/1.0.0",
+			ProtocolID: "/klv/relay/1.0.0",
 		},
 		Sharding: p2pConfig.ShardingConfig{
 			Type: p2p.NilListSharder,

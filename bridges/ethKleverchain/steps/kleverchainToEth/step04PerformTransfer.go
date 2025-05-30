@@ -17,19 +17,19 @@ func (step *performTransferStep) Execute(ctx context.Context) core.StepIdentifie
 	wasPerformed, err := step.bridge.WasTransferPerformedOnEthereum(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error determining if transfer was performed or not", "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	if wasPerformed {
 		step.bridge.PrintInfo(logger.LogInfo, "transfer performed")
-		return ResolvingSetStatusOnMultiversX
+		return ResolvingSetStatusOnKleverchain
 	}
 
 	if step.bridge.MyTurnAsLeader() {
 		err = step.bridge.PerformTransferOnEthereum(ctx)
 		if err != nil {
 			step.bridge.PrintInfo(logger.LogError, "error performing transfer on Ethereum", "error", err)
-			return GettingPendingBatchFromMultiversX
+			return GettingPendingBatchFromKleverchain
 		}
 	} else {
 		step.bridge.PrintInfo(logger.LogDebug, "not my turn as leader in this round")

@@ -27,13 +27,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var testCodec = &testsCommon.TestMultiversXCodec{}
+var testCodec = &testsCommon.TestKleverchainCodec{}
 
 func createMockArgsScCallExecutor() ArgsScCallExecutor {
 	return ArgsScCallExecutor{
 		ScProxyBech32Address:            "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3",
 		Proxy:                           &interactors.ProxyStub{},
-		Codec:                           &testsCommon.MultiversxCodecStub{},
+		Codec:                           &testsCommon.KleverchainCodecStub{},
 		Filter:                          &testsCommon.ScCallsExecuteFilterStub{},
 		Log:                             &testsCommon.LoggerStub{},
 		ExtraGasToExecute:               100,
@@ -344,7 +344,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
@@ -381,7 +381,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				return nil, expectedError
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
@@ -428,7 +428,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				return &models.NetworkConfig{}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
@@ -475,7 +475,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				return &models.NetworkConfig{}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
@@ -526,7 +526,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				return &models.NetworkConfig{}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
@@ -591,7 +591,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				return transaction.Transaction_SUCCESS, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				if string(buff) == "ProxySCCompleteCallData 1" {
 					return createTestProxySCCompleteCallData("tkn1"), nil
@@ -693,7 +693,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				if string(buff) == "ProxySCCompleteCallData 1" {
 					return createTestProxySCCompleteCallData("tkn1"), nil
@@ -790,7 +790,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				if string(buff) == "ProxySCCompleteCallData 1" {
 					return createTestProxySCCompleteCallData("tkn1"), nil
@@ -883,7 +883,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				}, nil
 			},
 		}
-		args.Codec = &testsCommon.MultiversxCodecStub{
+		args.Codec = &testsCommon.KleverchainCodecStub{
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				if string(buff) == "ProxySCCompleteCallData 1" {
 					return createTestProxySCCompleteCallData("tkn1"), nil

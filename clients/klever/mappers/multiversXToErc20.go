@@ -9,23 +9,23 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/check"
 )
 
-type multiversXToErc20 struct {
+type kleverchainToErc20 struct {
 	dg DataGetter
 }
 
-// NewMultiversXToErc20Mapper returns a new instance of multiversXToErc20
-func NewMultiversXToErc20Mapper(dg DataGetter) (*multiversXToErc20, error) {
+// NewKleverchainToErc20Mapper returns a new instance of kleverchainToErc20
+func NewKleverchainToErc20Mapper(dg DataGetter) (*kleverchainToErc20, error) {
 	if check.IfNil(dg) {
 		return nil, clients.ErrNilDataGetter
 	}
 
-	return &multiversXToErc20{
+	return &kleverchainToErc20{
 		dg: dg,
 	}, nil
 }
 
-// ConvertToken will return erd token id given a specific erc20 address
-func (mapper *multiversXToErc20) ConvertToken(ctx context.Context, sourceBytes []byte) ([]byte, error) {
+// ConvertToken will return klv token id given a specific erc20 address
+func (mapper *kleverchainToErc20) ConvertToken(ctx context.Context, sourceBytes []byte) ([]byte, error) {
 
 	response, err := mapper.dg.GetERC20AddressForTokenId(ctx, sourceBytes)
 	if err != nil {
@@ -40,6 +40,6 @@ func (mapper *multiversXToErc20) ConvertToken(ctx context.Context, sourceBytes [
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
-func (mapper *multiversXToErc20) IsInterfaceNil() bool {
+func (mapper *kleverchainToErc20) IsInterfaceNil() bool {
 	return mapper == nil
 }

@@ -16,13 +16,13 @@ type waitForQuorumOnTransferStep struct {
 func (step *waitForQuorumOnTransferStep) Execute(ctx context.Context) core.StepIdentifier {
 	if step.bridge.ProcessMaxQuorumRetriesOnEthereum() {
 		step.bridge.PrintInfo(logger.LogDebug, "max number of retries reached, resetting counter")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	isQuorumReached, err := step.bridge.ProcessQuorumReachedOnEthereum(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error while checking the quorum on Ethereum", "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	step.bridge.PrintInfo(logger.LogDebug, "quorum reached check", "is reached", isQuorumReached)

@@ -4,7 +4,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 )
 
-// MultiversXRoleProviderStub -
+// KleverchainRoleProviderStub -
 type KleverRoleProviderStub struct {
 	IsWhitelistedCalled func(address address.Address) bool
 }

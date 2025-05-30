@@ -20,38 +20,43 @@ func (step *resolveSetStatusStep) Execute(ctx context.Context) core.StepIdentifi
 	storedBatch := step.bridge.GetStoredBatch()
 	if storedBatch == nil {
 		step.bridge.PrintInfo(logger.LogDebug, "nil batch stored")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
-	batch, err := step.bridge.GetBatchFromMultiversX(ctx)
+	batch, err := step.GetBatchFromKleverchain(ctx)
 	isEmptyBatch := batch == nil || (err != nil && errors.Is(err, clients.ErrNoPendingBatchAvailable))
 	if isEmptyBatch {
 		step.bridge.PrintInfo(logger.LogDebug, "nil/empty batch fetched")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error while fetching batch", "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	statuses := step.bridge.WaitAndReturnFinalBatchStatuses(ctx)
 	if len(statuses) == 0 {
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	storedBatch.Statuses = statuses
 
 	step.bridge.ResolveNewDepositsStatuses(uint64(len(batch.Statuses)))
 
-	return ProposingSetStatusOnMultiversX
+	return ProposingSetStatusOnKleverchain
 }
 
 // Identifier returns the step's identifier
 func (step *resolveSetStatusStep) Identifier() core.StepIdentifier {
-	return ResolvingSetStatusOnMultiversX
+	return ResolvingSetStatusOnKleverchain
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
 func (step *resolveSetStatusStep) IsInterfaceNil() bool {
 	return step == nil
+}
+
+// GetBatchFromKleverchain fetches the batch from the Klever Blockchain
+func (step *resolveSetStatusStep) GetBatchFromKleverchain(ctx context.Context) (*core.TransferBatch, error) {
+	return step.bridge.GetBatchFromKleverchain(ctx)
 }

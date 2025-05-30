@@ -17,23 +17,23 @@ func (step *proposeSetStatusStep) Execute(ctx context.Context) core.StepIdentifi
 	batch := step.bridge.GetStoredBatch()
 	if batch == nil {
 		step.bridge.PrintInfo(logger.LogDebug, "nil batch stored")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
-	if step.bridge.ProcessMaxRetriesOnWasTransferProposedOnMultiversX() {
+	if step.bridge.ProcessMaxRetriesOnWasTransferProposedOnKleverchain() {
 		step.bridge.PrintInfo(logger.LogDebug, "max number of retries reached, resetting counter")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
-	wasSetStatusProposed, err := step.bridge.WasSetStatusProposedOnMultiversX(ctx)
+	wasSetStatusProposed, err := step.bridge.WasSetStatusProposedOnKleverchain(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogError, "error determining if the set status action was proposed or not on MultiversX",
+		step.bridge.PrintInfo(logger.LogError, "error determining if the set status action was proposed or not on Kleverchain",
 			"batch ID", batch.ID, "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	if wasSetStatusProposed {
-		return SigningProposedSetStatusOnMultiversX
+		return SigningProposedSetStatusOnKleverchain
 	}
 
 	if !step.bridge.MyTurnAsLeader() {
@@ -41,19 +41,19 @@ func (step *proposeSetStatusStep) Execute(ctx context.Context) core.StepIdentifi
 		return step.Identifier()
 	}
 
-	err = step.bridge.ProposeSetStatusOnMultiversX(ctx)
+	err = step.bridge.ProposeSetStatusOnKleverchain(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogError, "error proposing transfer on MultiversX",
+		step.bridge.PrintInfo(logger.LogError, "error proposing transfer on Kleverchain",
 			"batch ID", batch.ID, "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
-	return SigningProposedSetStatusOnMultiversX
+	return SigningProposedSetStatusOnKleverchain
 }
 
 // Identifier returns the step's identifier
 func (step *proposeSetStatusStep) Identifier() core.StepIdentifier {
-	return ProposingSetStatusOnMultiversX
+	return ProposingSetStatusOnKleverchain
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

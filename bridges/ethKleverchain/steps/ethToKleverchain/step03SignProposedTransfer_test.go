@@ -36,7 +36,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
 
@@ -55,10 +55,10 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
-		bridgeStub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
 			return expectedError
 		}
 
@@ -78,10 +78,10 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return true, nil
 		}
-		bridgeStub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeTransferOnKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return 0, expectedErr
 		}
 
@@ -100,10 +100,10 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return true, nil
 		}
-		bridgeStub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeTransferOnKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return ethKleverchain.InvalidActionID, nil
 		}
 
@@ -116,16 +116,16 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
 
-	t.Run("error on WasActionSignedOnMultiversX", func(t *testing.T) {
+	t.Run("error on WasActionSignedOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutor()
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
-		bridgeStub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeTransferOnKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return ethKleverchain.InvalidActionID, nil
 		}
 
@@ -144,10 +144,10 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return true, nil
 		}
-		bridgeStub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeTransferOnKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return 2, nil
 		}
 
@@ -166,13 +166,13 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
-		bridgeStub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
 			return nil
 		}
-		bridgeStub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeTransferOnKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return 2, nil
 		}
 
@@ -180,7 +180,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 		// Test Identifier()
-		expectedStepIdentifier := core.StepIdentifier(SigningProposedTransferOnMultiversX)
+		expectedStepIdentifier := core.StepIdentifier(SigningProposedTransferOnKleverchain)
 		assert.Equal(t, expectedStepIdentifier, step.Identifier())
 		// Test IsInterfaceNil
 		assert.NotNil(t, step.IsInterfaceNil())

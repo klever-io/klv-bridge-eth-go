@@ -17,13 +17,13 @@ func (step *signProposedTransferStep) Execute(_ context.Context) core.StepIdenti
 	storedBatch := step.bridge.GetStoredBatch()
 	if storedBatch == nil {
 		step.bridge.PrintInfo(logger.LogDebug, "nil batch stored")
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	err := step.bridge.SignTransferOnEthereum()
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error signing", "batch ID", storedBatch.ID, "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	return WaitingForQuorumOnTransfer

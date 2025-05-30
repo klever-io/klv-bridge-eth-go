@@ -69,7 +69,7 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 	argsExecutor := kleverChain.ArgsScCallExecutor{
 		ScProxyBech32Address:            cfg.ScProxyBech32Address,
 		Proxy:                           proxy,
-		Codec:                           &parsers.MultiversxCodec{},
+		Codec:                           &parsers.KleverchainCodec{},
 		Filter:                          filter,
 		Log:                             log,
 		ExtraGasToExecute:               cfg.ExtraGasToExecute,
@@ -88,7 +88,7 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 
 	argsPollingHandler := polling.ArgsPollingHandler{
 		Log:              log,
-		Name:             "MultiversX SC calls",
+		Name:             "Kleverchain SC calls",
 		PollingInterval:  time.Duration(cfg.PollingIntervalInMillis) * time.Millisecond,
 		PollingWhenError: time.Duration(cfg.PollingIntervalInMillis) * time.Millisecond,
 		Executor:         module.executorInstance,

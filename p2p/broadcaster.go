@@ -26,15 +26,15 @@ const (
 
 // ArgsBroadcaster is the DTO used in the broadcaster constructor
 type ArgsBroadcaster struct {
-	Messenger              NetMessenger
-	Log                    logger.Logger
-	MultiversXRoleProvider KleverChainRoleProvider
-	SignatureProcessor     SignatureProcessor
-	KeyGen                 crypto.KeyGenerator
-	SingleSigner           crypto.SingleSigner
-	PrivateKey             crypto.PrivateKey
-	Name                   string
-	AntifloodComponents    *factory.AntiFloodComponents
+	Messenger               NetMessenger
+	Log                     logger.Logger
+	KleverchainRoleProvider KleverChainRoleProvider
+	SignatureProcessor      SignatureProcessor
+	KeyGen                  crypto.KeyGenerator
+	SingleSigner            crypto.SingleSigner
+	PrivateKey              crypto.PrivateKey
+	Name                    string
+	AntifloodComponents     *factory.AntiFloodComponents
 }
 
 type broadcaster struct {
@@ -63,7 +63,7 @@ func NewBroadcaster(args ArgsBroadcaster) (*broadcaster, error) {
 		messenger:             args.Messenger,
 		noncesOfPublicKeys:    newNoncesOfPublicKeys(),
 		log:                   args.Log,
-		multiversRoleProvider: args.MultiversXRoleProvider,
+		multiversRoleProvider: args.KleverchainRoleProvider,
 		signatureProcessor:    args.SignatureProcessor,
 		relayerMessageHandler: &relayerMessageHandler{
 			marshalizer:         &marshal.JsonMarshalizer{},
@@ -102,8 +102,8 @@ func checkArgs(args ArgsBroadcaster) error {
 	if check.IfNil(args.SingleSigner) {
 		return ErrNilSingleSigner
 	}
-	if check.IfNil(args.MultiversXRoleProvider) {
-		return ErrNilMultiversXRoleProvider
+	if check.IfNil(args.KleverchainRoleProvider) {
+		return ErrNilKleverchainRoleProvider
 	}
 	if check.IfNil(args.Messenger) {
 		return ErrNilMessenger

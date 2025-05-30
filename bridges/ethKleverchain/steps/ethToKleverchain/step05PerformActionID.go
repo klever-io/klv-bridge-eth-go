@@ -14,7 +14,7 @@ type performActionIDStep struct {
 
 // Execute will execute this step returning the next step to be executed
 func (step *performActionIDStep) Execute(ctx context.Context) core.StepIdentifier {
-	wasPerformed, err := step.bridge.WasActionPerformedOnMultiversX(ctx)
+	wasPerformed, err := step.bridge.WasActionPerformedOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error determining if the action ID was proposed or not",
 			"action ID", step.bridge.GetStoredActionID(), "error", err)
@@ -32,7 +32,7 @@ func (step *performActionIDStep) Execute(ctx context.Context) core.StepIdentifie
 		return step.Identifier()
 	}
 
-	err = step.bridge.PerformActionOnMultiversX(ctx)
+	err = step.bridge.PerformActionOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error performing action ID",
 			"action ID", step.bridge.GetStoredActionID(), "error", err)

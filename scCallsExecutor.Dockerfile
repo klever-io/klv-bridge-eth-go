@@ -1,12 +1,12 @@
 FROM golang:1.20.7-bookworm AS builder
 LABEL description="This Docker image builds the SC calls executor binary."
 
-WORKDIR /multiversx
+WORKDIR /kleverchain
 COPY . .
 
 RUN go mod tidy
 
-WORKDIR /multiversx/cmd/scCallsExecutor
+WORKDIR /kleverchain/cmd/scCallsExecutor
 
 RUN APPVERSION=$(git describe --tags --long --always | tail -c 11) && echo "package main\n\nfunc init() {\n\tappVersion = \"${APPVERSION}\"\n}" > local.go
 RUN go mod tidy
@@ -19,8 +19,8 @@ RUN apt-get update \
     && apt-get -y install git \
     && apt-get clean
 
-COPY --from=builder /multiversx/cmd/scCallsExecutor /multiversx
+COPY --from=builder /kleverchain/cmd/scCallsExecutor /kleverchain
 
-WORKDIR /multiversx
+WORKDIR /kleverchain
 
 ENTRYPOINT ["./scCallsExecutor"]

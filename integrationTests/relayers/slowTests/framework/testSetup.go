@@ -33,7 +33,7 @@ type TestSetup struct {
 	*KeysStore
 	Bridge                 *BridgeComponents
 	EthereumHandler        *EthereumHandler
-	MultiversxHandler      *MultiversxHandler
+	KleverchainHandler     *KleverchainHandler
 	WorkingDir             string
 	ChainSimulator         ChainSimulatorWrapper
 	ScCallerKeys           KeysHolder
@@ -42,7 +42,7 @@ type TestSetup struct {
 	ctxCancel             func()
 	Ctx                   context.Context
 	mutBalances           sync.RWMutex
-	esdtBalanceForSafe    map[string]*big.Int
+	kdaBalanceForSafe     map[string]*big.Int
 	ethBalanceTestAddress map[string]*big.Int
 	numScCallsInTest      uint32
 }
@@ -55,7 +55,7 @@ func NewTestSetup(tb testing.TB) *TestSetup {
 		TB:                    tb,
 		TokensRegistry:        NewTokenRegistry(tb),
 		WorkingDir:            tb.TempDir(),
-		esdtBalanceForSafe:    make(map[string]*big.Int),
+		kdaBalanceForSafe:     make(map[string]*big.Int),
 		ethBalanceTestAddress: make(map[string]*big.Int),
 	}
 	setup.KeysStore = NewKeysStore(tb, setup.WorkingDir, NumRelayers, NumOracles)
@@ -67,8 +67,8 @@ func NewTestSetup(tb testing.TB) *TestSetup {
 	setup.EthereumHandler.DeployContracts(setup.Ctx)
 
 	setup.createChainSimulatorWrapper()
-	setup.MultiversxHandler = NewMultiversxHandler(tb, setup.Ctx, setup.KeysStore, setup.TokensRegistry, setup.ChainSimulator, quorum)
-	setup.MultiversxHandler.DeployAndSetContracts(setup.Ctx)
+	setup.KleverchainHandler = NewKleverchainHandler(tb, setup.Ctx, setup.KeysStore, setup.TokensRegistry, setup.ChainSimulator, quorum)
+	setup.KleverchainHandler.DeployAndSetContracts(setup.Ctx)
 
 	return setup
 }
@@ -103,8 +103,8 @@ func (setup *TestSetup) StartRelayersAndScModule() {
 		setup.EthereumHandler.SimulatedChain,
 		NumRelayers,
 		setup.EthereumHandler.SafeAddress.Hex(),
-		setup.MultiversxHandler.SafeAddress,
-		setup.MultiversxHandler.MultisigAddress,
+		setup.KleverchainHandler.SafeAddress,
+		setup.KleverchainHandler.MultisigAddress,
 	)
 
 	setup.startScCallerModule()
@@ -112,7 +112,7 @@ func (setup *TestSetup) StartRelayersAndScModule() {
 
 func (setup *TestSetup) startScCallerModule() {
 	cfg := config.ScCallsModuleConfig{
-		ScProxyBech32Address:            setup.MultiversxHandler.ScProxyAddress.Bech32(),
+		ScProxyBech32Address:            setup.KleverchainHandler.ScProxyAddress.Bech32(),
 		ExtraGasToExecute:               60_000_000,  // 60 million: this ensures that a SC call with 0 gas limit is refunded
 		MaxGasLimitToUse:                249_999_999, // max cross shard limit
 		GasLimitForOutOfGasTransactions: 30_000_000,  // gas to use when a higher than max allowed is encountered
@@ -126,7 +126,7 @@ func (setup *TestSetup) startScCallerModule() {
 		PollingIntervalInMillis:         1000, // 1 second
 		Filter: config.PendingOperationsFilterConfig{
 			AllowedEthAddresses: []string{"*"},
-			AllowedMvxAddresses: []string{"*"},
+			AllowedKlvAddresses: []string{"*"},
 			AllowedTokens:       []string{"*"},
 		},
 		TransactionChecks: config.TransactionChecksConfig{
@@ -140,7 +140,7 @@ func (setup *TestSetup) startScCallerModule() {
 	var err error
 	setup.ScCallerModuleInstance, err = module.NewScCallsModule(cfg, log, nil)
 	require.Nil(setup, err)
-	log.Info("started SC calls module", "monitoring SC proxy address", setup.MultiversxHandler.ScProxyAddress)
+	log.Info("started SC calls module", "monitoring SC proxy address", setup.KleverchainHandler.ScProxyAddress)
 }
 
 // IssueAndConfigureTokens will issue and configure the provided tokens on both chains
@@ -150,37 +150,37 @@ func (setup *TestSetup) IssueAndConfigureTokens(tokens ...TestTokenParams) {
 	require.Greater(setup, len(tokens), 0)
 
 	setup.EthereumHandler.PauseContractsForTokenChanges(setup.Ctx)
-	setup.MultiversxHandler.PauseContractsForTokenChanges(setup.Ctx)
+	setup.KleverchainHandler.PauseContractsForTokenChanges(setup.Ctx)
 
 	for _, token := range tokens {
 		setup.processNumScCallsOperations(token)
 		setup.AddToken(token.IssueTokenParams)
 		setup.EthereumHandler.IssueAndWhitelistToken(setup.Ctx, token.IssueTokenParams)
-		setup.MultiversxHandler.IssueAndWhitelistToken(setup.Ctx, token.IssueTokenParams)
+		setup.KleverchainHandler.IssueAndWhitelistToken(setup.Ctx, token.IssueTokenParams)
 
-		esdtBalanceForSafe := setup.MultiversxHandler.GetESDTChainSpecificTokenBalance(setup.Ctx, setup.MultiversxHandler.SafeAddress, token.AbstractTokenIdentifier)
+		kdaBalanceForSafe := setup.KleverchainHandler.GetKDAChainSpecificTokenBalance(setup.Ctx, setup.KleverchainHandler.SafeAddress, token.AbstractTokenIdentifier)
 		ethBalanceForTestAddr := setup.EthereumHandler.GetBalance(setup.TestKeys.EthAddress, token.AbstractTokenIdentifier)
 
 		setup.mutBalances.Lock()
-		setup.esdtBalanceForSafe[token.AbstractTokenIdentifier] = esdtBalanceForSafe
+		setup.kdaBalanceForSafe[token.AbstractTokenIdentifier] = kdaBalanceForSafe
 		setup.ethBalanceTestAddress[token.AbstractTokenIdentifier] = ethBalanceForTestAddr
 		setup.mutBalances.Unlock()
 
-		log.Info("recorded the ESDT balance for safe contract", "token", token.AbstractTokenIdentifier, "balance", esdtBalanceForSafe.String())
+		log.Info("recorded the KDA balance for safe contract", "token", token.AbstractTokenIdentifier, "balance", kdaBalanceForSafe.String())
 		log.Info("recorded the ETH balance for test address", "token", token.AbstractTokenIdentifier, "balance", ethBalanceForTestAddr.String())
 	}
 
 	setup.EthereumHandler.UnPauseContractsAfterTokenChanges(setup.Ctx)
-	setup.MultiversxHandler.UnPauseContractsAfterTokenChanges(setup.Ctx)
+	setup.KleverchainHandler.UnPauseContractsAfterTokenChanges(setup.Ctx)
 
 	for _, token := range tokens {
-		setup.MultiversxHandler.SubmitAggregatorBatch(setup.Ctx, token.IssueTokenParams)
+		setup.KleverchainHandler.SubmitAggregatorBatch(setup.Ctx, token.IssueTokenParams)
 	}
 }
 
 func (setup *TestSetup) processNumScCallsOperations(token TestTokenParams) {
 	for _, op := range token.TestOperations {
-		if len(op.MvxSCCallData) > 0 || op.MvxForceSCCall {
+		if len(op.KlvSCCallData) > 0 || op.KlvForceSCCall {
 			atomic.AddUint32(&setup.numScCallsInTest, 1)
 		}
 	}
@@ -191,7 +191,7 @@ func (setup *TestSetup) GetNumScCallsOperations() uint32 {
 	return atomic.LoadUint32(&setup.numScCallsInTest)
 }
 
-// IsTransferDoneFromEthereum returns true if all provided tokens are bridged from Ethereum towards MultiversX
+// IsTransferDoneFromEthereum returns true if all provided tokens are bridged from Ethereum towards Kleverchain
 func (setup *TestSetup) IsTransferDoneFromEthereum(tokens ...TestTokenParams) bool {
 	isDone := true
 	for _, params := range tokens {
@@ -205,29 +205,29 @@ func (setup *TestSetup) isTransferDoneFromEthereumForToken(params TestTokenParam
 	expectedValueOnReceiver := big.NewInt(0)
 	expectedValueOnContract := big.NewInt(0)
 	for _, operation := range params.TestOperations {
-		if operation.ValueToTransferToMvx == nil {
+		if operation.ValueToTransferToKlv == nil {
 			continue
 		}
 
-		if len(operation.MvxSCCallData) > 0 || operation.MvxForceSCCall {
-			if !operation.MvxFaultySCCall {
-				expectedValueOnContract.Add(expectedValueOnContract, operation.ValueToTransferToMvx)
+		if len(operation.KlvSCCallData) > 0 || operation.KlvForceSCCall {
+			if !operation.KlvFaultySCCall {
+				expectedValueOnContract.Add(expectedValueOnContract, operation.ValueToTransferToKlv)
 			}
 		} else {
-			expectedValueOnReceiver.Add(expectedValueOnReceiver, operation.ValueToTransferToMvx)
+			expectedValueOnReceiver.Add(expectedValueOnReceiver, operation.ValueToTransferToKlv)
 		}
 	}
 
-	receiverBalance := setup.MultiversxHandler.GetESDTUniversalTokenBalance(setup.Ctx, setup.TestKeys.MvxAddress, params.AbstractTokenIdentifier)
+	receiverBalance := setup.KleverchainHandler.GetKDAUniversalTokenBalance(setup.Ctx, setup.TestKeys.KlvAddress, params.AbstractTokenIdentifier)
 	if receiverBalance.String() != expectedValueOnReceiver.String() {
 		return false
 	}
 
-	contractBalance := setup.MultiversxHandler.GetESDTUniversalTokenBalance(setup.Ctx, setup.MultiversxHandler.TestCallerAddress, params.AbstractTokenIdentifier)
+	contractBalance := setup.KleverchainHandler.GetKDAUniversalTokenBalance(setup.Ctx, setup.KleverchainHandler.TestCallerAddress, params.AbstractTokenIdentifier)
 	return contractBalance.String() == expectedValueOnContract.String()
 }
 
-// IsTransferDoneFromEthereumWithRefund returns true if all provided tokens are bridged from Ethereum towards MultiversX including refunds
+// IsTransferDoneFromEthereumWithRefund returns true if all provided tokens are bridged from Ethereum towards Kleverchain including refunds
 func (setup *TestSetup) IsTransferDoneFromEthereumWithRefund(tokens ...TestTokenParams) bool {
 	isDone := true
 	for _, params := range tokens {
@@ -240,23 +240,23 @@ func (setup *TestSetup) IsTransferDoneFromEthereumWithRefund(tokens ...TestToken
 func (setup *TestSetup) isTransferDoneFromEthereumWithRefundForToken(params TestTokenParams) bool {
 	expectedValueOnReceiver := big.NewInt(0)
 	for _, operation := range params.TestOperations {
-		valueToTransferToMvx := big.NewInt(0)
-		if operation.ValueToTransferToMvx != nil {
-			valueToTransferToMvx.Set(operation.ValueToTransferToMvx)
+		valueToTransferToKlv := big.NewInt(0)
+		if operation.ValueToTransferToKlv != nil {
+			valueToTransferToKlv.Set(operation.ValueToTransferToKlv)
 		}
 
-		valueToSendFromMvX := big.NewInt(0)
-		if operation.ValueToSendFromMvX != nil {
-			valueToSendFromMvX.Set(operation.ValueToSendFromMvX)
+		valueToSendFromKlv := big.NewInt(0)
+		if operation.ValueToSendFromKlv != nil {
+			valueToSendFromKlv.Set(operation.ValueToSendFromKlv)
 			// we subtract the fee also
 			expectedValueOnReceiver.Sub(expectedValueOnReceiver, feeInt)
 		}
 
-		expectedValueOnReceiver.Add(expectedValueOnReceiver, big.NewInt(0).Sub(valueToSendFromMvX, valueToTransferToMvx))
-		if len(operation.MvxSCCallData) > 0 || operation.MvxForceSCCall {
-			if operation.MvxFaultySCCall {
+		expectedValueOnReceiver.Add(expectedValueOnReceiver, big.NewInt(0).Sub(valueToSendFromKlv, valueToTransferToKlv))
+		if len(operation.KlvSCCallData) > 0 || operation.KlvForceSCCall {
+			if operation.KlvFaultySCCall {
 				// the balance should be bridged back to the receiver on Ethereum - fee
-				expectedValueOnReceiver.Add(expectedValueOnReceiver, valueToTransferToMvx)
+				expectedValueOnReceiver.Add(expectedValueOnReceiver, valueToTransferToKlv)
 				expectedValueOnReceiver.Sub(expectedValueOnReceiver, feeInt)
 			}
 		}
@@ -266,60 +266,60 @@ func (setup *TestSetup) isTransferDoneFromEthereumWithRefundForToken(params Test
 	return receiverBalance.String() == expectedValueOnReceiver.String()
 }
 
-// IsTransferDoneFromMultiversX returns true if all provided tokens are bridged from MultiversX towards Ethereum
-func (setup *TestSetup) IsTransferDoneFromMultiversX(tokens ...TestTokenParams) bool {
+// IsTransferDoneFromKleverchain returns true if all provided tokens are bridged from Kleverchain towards Ethereum
+func (setup *TestSetup) IsTransferDoneFromKleverchain(tokens ...TestTokenParams) bool {
 	isDone := true
 	for _, params := range tokens {
-		isDone = isDone && setup.isTransferDoneFromMultiversXForToken(params)
+		isDone = isDone && setup.isTransferDoneFromKleverchainForToken(params)
 	}
 
 	return isDone
 }
 
-func (setup *TestSetup) isTransferDoneFromMultiversXForToken(params TestTokenParams) bool {
+func (setup *TestSetup) isTransferDoneFromKleverchainForToken(params TestTokenParams) bool {
 	setup.mutBalances.Lock()
-	initialBalanceForSafe := setup.esdtBalanceForSafe[params.AbstractTokenIdentifier]
+	initialBalanceForSafe := setup.kdaBalanceForSafe[params.AbstractTokenIdentifier]
 	expectedReceiver := big.NewInt(0).Set(setup.ethBalanceTestAddress[params.AbstractTokenIdentifier])
 	expectedReceiver.Add(expectedReceiver, params.EthTestAddrExtraBalance)
 	setup.mutBalances.Unlock()
 
 	ethTestBalance := setup.EthereumHandler.GetBalance(setup.TestKeys.EthAddress, params.AbstractTokenIdentifier)
-	isTransferDoneFromMultiversX := ethTestBalance.String() == expectedReceiver.String()
+	isTransferDoneFromKleverchain := ethTestBalance.String() == expectedReceiver.String()
 
-	expectedEsdtSafe := big.NewInt(0).Add(initialBalanceForSafe, params.ESDTSafeExtraBalance)
-	balanceForSafe := setup.MultiversxHandler.GetESDTChainSpecificTokenBalance(setup.Ctx, setup.MultiversxHandler.SafeAddress, params.AbstractTokenIdentifier)
+	expectedEsdtSafe := big.NewInt(0).Add(initialBalanceForSafe, params.KDASafeExtraBalance)
+	balanceForSafe := setup.KleverchainHandler.GetKDAChainSpecificTokenBalance(setup.Ctx, setup.KleverchainHandler.SafeAddress, params.AbstractTokenIdentifier)
 	isSafeContractOnCorrectBalance := expectedEsdtSafe.String() == balanceForSafe.String()
 
-	return isTransferDoneFromMultiversX && isSafeContractOnCorrectBalance
+	return isTransferDoneFromKleverchain && isSafeContractOnCorrectBalance
 }
 
-// CreateBatchOnMultiversX will create deposits that will be gathered in a batch on MultiversX
-func (setup *TestSetup) CreateBatchOnMultiversX(tokensParams ...TestTokenParams) {
+// CreateBatchOnKleverchain will create deposits that will be gathered in a batch on Kleverchain
+func (setup *TestSetup) CreateBatchOnKleverchain(tokensParams ...TestTokenParams) {
 	for _, params := range tokensParams {
-		setup.createBatchOnMultiversXForToken(params)
+		setup.createBatchOnKleverchainForToken(params)
 	}
 }
 
-func (setup *TestSetup) createBatchOnMultiversXForToken(params TestTokenParams) {
+func (setup *TestSetup) createBatchOnKleverchainForToken(params TestTokenParams) {
 	token := setup.GetTokenData(params.AbstractTokenIdentifier)
 	require.NotNil(setup, token)
 
 	setup.transferTokensToTestKey(params)
-	valueToMintOnEthereum := setup.sendFromMultiversxToEthereumForToken(params)
+	valueToMintOnEthereum := setup.sendFromKleverchainToEthereumForToken(params)
 	setup.EthereumHandler.Mint(setup.Ctx, params, valueToMintOnEthereum)
 }
 
 func (setup *TestSetup) transferTokensToTestKey(params TestTokenParams) {
 	depositValue := big.NewInt(0)
 	for _, operation := range params.TestOperations {
-		if operation.ValueToSendFromMvX == nil {
+		if operation.ValueToSendFromKlv == nil {
 			continue
 		}
 
-		depositValue.Add(depositValue, operation.ValueToSendFromMvX)
+		depositValue.Add(depositValue, operation.ValueToSendFromKlv)
 	}
 
-	setup.MultiversxHandler.TransferToken(
+	setup.KleverchainHandler.TransferToken(
 		setup.Ctx,
 		setup.OwnerKeys,
 		setup.TestKeys,
@@ -328,25 +328,25 @@ func (setup *TestSetup) transferTokensToTestKey(params TestTokenParams) {
 	)
 }
 
-// SendFromMultiversxToEthereum will create the deposits that will be gathered in a batch on MultiversX (without mint on Ethereum)
-func (setup *TestSetup) SendFromMultiversxToEthereum(tokensParams ...TestTokenParams) {
+// SendFromKleverchainToEthereum will create the deposits that will be gathered in a batch on Kleverchain (without mint on Ethereum)
+func (setup *TestSetup) SendFromKleverchainToEthereum(tokensParams ...TestTokenParams) {
 	for _, params := range tokensParams {
-		_ = setup.sendFromMultiversxToEthereumForToken(params)
+		_ = setup.sendFromKleverchainToEthereumForToken(params)
 	}
 }
 
-func (setup *TestSetup) sendFromMultiversxToEthereumForToken(params TestTokenParams) *big.Int {
+func (setup *TestSetup) sendFromKleverchainToEthereumForToken(params TestTokenParams) *big.Int {
 	token := setup.GetTokenData(params.AbstractTokenIdentifier)
 	require.NotNil(setup, token)
 
 	depositValue := big.NewInt(0)
 	for _, operation := range params.TestOperations {
-		if operation.ValueToSendFromMvX == nil {
+		if operation.ValueToSendFromKlv == nil {
 			continue
 		}
 
-		depositValue.Add(depositValue, operation.ValueToSendFromMvX)
-		setup.MultiversxHandler.SendDepositTransactionFromMultiversx(setup.Ctx, token, params, operation.ValueToSendFromMvX)
+		depositValue.Add(depositValue, operation.ValueToSendFromKlv)
+		setup.KleverchainHandler.SendDepositTransactionFromKleverchain(setup.Ctx, token, params, operation.ValueToSendFromKlv)
 	}
 
 	return depositValue
@@ -359,17 +359,17 @@ func (setup *TestSetup) TestWithdrawTotalFeesOnEthereumForTokens(tokensParams ..
 
 		expectedAccumulated := big.NewInt(0)
 		for _, operation := range param.TestOperations {
-			if operation.ValueToSendFromMvX == nil {
+			if operation.ValueToSendFromKlv == nil {
 				continue
 			}
-			if operation.ValueToSendFromMvX.Cmp(zeroValueBigInt) == 0 {
+			if operation.ValueToSendFromKlv.Cmp(zeroValueBigInt) == 0 {
 				continue
 			}
 
 			expectedAccumulated.Add(expectedAccumulated, feeInt)
 		}
 
-		setup.MultiversxHandler.TestWithdrawFees(setup.Ctx, token.MvxChainSpecificToken, zeroValueBigInt, expectedAccumulated)
+		setup.KleverchainHandler.TestWithdrawFees(setup.Ctx, token.KlvChainSpecificToken, zeroValueBigInt, expectedAccumulated)
 	}
 }
 

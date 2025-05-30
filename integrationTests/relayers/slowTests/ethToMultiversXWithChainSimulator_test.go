@@ -55,10 +55,10 @@ func TestRelayersShouldExecuteTransfersWithSCCallsWithArguments(t *testing.T) {
 	callData := createScCallData("callPayableWithParams", 50000000, dummyUint64, dummyAddress)
 
 	usdcToken := GenerateTestUSDCToken()
-	usdcToken.TestOperations[2].MvxSCCallData = callData
+	usdcToken.TestOperations[2].KlvSCCallData = callData
 
 	memeToken := GenerateTestMEMEToken()
-	memeToken.TestOperations[2].MvxSCCallData = callData
+	memeToken.TestOperations[2].KlvSCCallData = callData
 
 	testSetup := testRelayersWithChainSimulatorAndTokens(
 		t,
@@ -82,10 +82,10 @@ func TestRelayersShouldExecuteTransfersWithSCCallsWithArgumentsWithMintBurnToken
 	callData := createScCallData("callPayableWithParams", 50000000, dummyUint64, dummyAddress)
 
 	eurocToken := GenerateTestEUROCToken()
-	eurocToken.TestOperations[2].MvxSCCallData = callData
+	eurocToken.TestOperations[2].KlvSCCallData = callData
 
 	mexToken := GenerateTestMEXToken()
-	mexToken.TestOperations[2].MvxSCCallData = callData
+	mexToken.TestOperations[2].KlvSCCallData = callData
 
 	testSetup := testRelayersWithChainSimulatorAndTokens(
 		t,
@@ -150,25 +150,25 @@ func TestRelayersShouldExecuteTransfersWithInitSupply(t *testing.T) {
 }
 
 func testRelayersWithChainSimulatorAndTokens(tb testing.TB, manualStopChan chan error, tokens ...framework.TestTokenParams) *framework.TestSetup {
-	startsFromEthFlow, startsFromMvXFlow := createFlowsBasedOnToken(tb, tokens...)
+	startsFromEthFlow, startsFromKlvFlow := createFlowsBasedOnToken(tb, tokens...)
 
 	setupFunc := func(tb testing.TB, setup *framework.TestSetup) {
-		startsFromMvXFlow.setup = setup
+		startsFromKlvFlow.setup = setup
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.MultiversxHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.KleverchainHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
 		if len(startsFromEthFlow.tokens) > 0 {
-			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.MultiversxHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KleverchainHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 		}
-		if len(startsFromMvXFlow.tokens) > 0 {
-			setup.CreateBatchOnMultiversX(startsFromMvXFlow.tokens...)
+		if len(startsFromKlvFlow.tokens) > 0 {
+			setup.CreateBatchOnKleverchain(startsFromKlvFlow.tokens...)
 		}
 	}
 
 	processFunc := func(tb testing.TB, setup *framework.TestSetup) bool {
-		if startsFromEthFlow.process() && startsFromMvXFlow.process() {
-			setup.TestWithdrawTotalFeesOnEthereumForTokens(startsFromMvXFlow.tokens...)
+		if startsFromEthFlow.process() && startsFromKlvFlow.process() {
+			setup.TestWithdrawTotalFeesOnEthereumForTokens(startsFromKlvFlow.tokens...)
 			setup.TestWithdrawTotalFeesOnEthereumForTokens(startsFromEthFlow.tokens...)
 
 			return true
@@ -189,13 +189,13 @@ func testRelayersWithChainSimulatorAndTokens(tb testing.TB, manualStopChan chan 
 	)
 }
 
-func createFlowsBasedOnToken(tb testing.TB, tokens ...framework.TestTokenParams) (*startsFromEthereumFlow, *startsFromMultiversXFlow) {
+func createFlowsBasedOnToken(tb testing.TB, tokens ...framework.TestTokenParams) (*startsFromEthereumFlow, *startsFromKleverchainFlow) {
 	startsFromEthFlow := &startsFromEthereumFlow{
 		TB:     tb,
 		tokens: make([]framework.TestTokenParams, 0, len(tokens)),
 	}
 
-	startsFromMvXFlow := &startsFromMultiversXFlow{
+	startsFromKlvFlow := &startsFromKleverchainFlow{
 		TB:     tb,
 		tokens: make([]framework.TestTokenParams, 0, len(tokens)),
 	}
@@ -206,14 +206,14 @@ func createFlowsBasedOnToken(tb testing.TB, tokens ...framework.TestTokenParams)
 			startsFromEthFlow.tokens = append(startsFromEthFlow.tokens, token)
 			continue
 		}
-		if token.IsNativeOnMvX {
-			startsFromMvXFlow.tokens = append(startsFromMvXFlow.tokens, token)
+		if token.IsNativeOnKlv {
+			startsFromKlvFlow.tokens = append(startsFromKlvFlow.tokens, token)
 			continue
 		}
 		require.Fail(tb, "invalid setup, found a token that is not native on any chain", "abstract identifier", token.AbstractTokenIdentifier)
 	}
 
-	return startsFromEthFlow, startsFromMvXFlow
+	return startsFromEthFlow, startsFromKlvFlow
 }
 
 func testRelayersWithChainSimulator(tb testing.TB,
@@ -263,74 +263,74 @@ func createBadToken() framework.TestTokenParams {
 			AbstractTokenIdentifier:          "BAD",
 			NumOfDecimalsUniversal:           6,
 			NumOfDecimalsChainSpecific:       6,
-			MvxUniversalTokenTicker:          "BAD",
-			MvxChainSpecificTokenTicker:      "ETHBAD",
-			MvxUniversalTokenDisplayName:     "WrappedBAD",
-			MvxChainSpecificTokenDisplayName: "EthereumWrappedBAD",
-			ValueToMintOnMvx:                 "10000000000",
+			KlvUniversalTokenTicker:          "BAD",
+			KlvChainSpecificTokenTicker:      "ETHBAD",
+			KlvUniversalTokenDisplayName:     "WrappedBAD",
+			KlvChainSpecificTokenDisplayName: "EthereumWrappedBAD",
+			ValueToMintOnKlv:                 "10000000000",
 			EthTokenName:                     "ETHTOKEN",
 			EthTokenSymbol:                   "ETHT",
 			ValueToMintOnEth:                 "10000000000",
 		},
 		TestOperations: []framework.TokenOperations{
 			{
-				ValueToTransferToMvx: big.NewInt(5000),
-				ValueToSendFromMvX:   big.NewInt(2500),
+				ValueToTransferToKlv: big.NewInt(5000),
+				ValueToSendFromKlv:   big.NewInt(2500),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(7000),
-				ValueToSendFromMvX:   big.NewInt(300),
+				ValueToTransferToKlv: big.NewInt(7000),
+				ValueToSendFromKlv:   big.NewInt(300),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(1000),
-				ValueToSendFromMvX:   nil,
-				MvxSCCallData:        createScCallData("callPayable", 50000000),
+				ValueToTransferToKlv: big.NewInt(1000),
+				ValueToSendFromKlv:   nil,
+				KlvSCCallData:        createScCallData("callPayable", 50000000),
 			},
 		},
-		ESDTSafeExtraBalance:    big.NewInt(0),
+		KDASafeExtraBalance:     big.NewInt(0),
 		EthTestAddrExtraBalance: big.NewInt(0),
 	}
 }
 
 func TestRelayersShouldNotExecuteTransfers(t *testing.T) {
-	t.Run("isNativeOnEth = true, isMintBurnOnEth = false, isNativeOnMvX = true, isMintBurnOnMvX = false", func(t *testing.T) {
+	t.Run("isNativeOnEth = true, isMintBurnOnEth = false, isNativeOnKlv = true, isMintBurnOnKlv = false", func(t *testing.T) {
 		badToken := createBadToken()
 		badToken.IsNativeOnEth = true
 		badToken.IsMintBurnOnEth = false
-		badToken.IsNativeOnMvX = true
-		badToken.IsMintBurnOnMvX = false
+		badToken.IsNativeOnKlv = true
+		badToken.IsMintBurnOnKlv = false
 		badToken.HasChainSpecificToken = true
 
-		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnMultiversX = true"
+		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnKleverchain = true"
 		testRelayersShouldNotExecuteTransfers(t, expectedStringInLogs, badToken)
 	})
-	t.Run("isNativeOnEth = true, isMintBurnOnEth = false, isNativeOnMvX = true, isMintBurnOnMvX = true", func(t *testing.T) {
+	t.Run("isNativeOnEth = true, isMintBurnOnEth = false, isNativeOnKlv = true, isMintBurnOnKlv = true", func(t *testing.T) {
 		badToken := createBadToken()
 		badToken.IsNativeOnEth = true
 		badToken.IsMintBurnOnEth = false
-		badToken.IsNativeOnMvX = true
-		badToken.IsMintBurnOnMvX = true
+		badToken.IsNativeOnKlv = true
+		badToken.IsMintBurnOnKlv = true
 		badToken.HasChainSpecificToken = false
 
-		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnMultiversX = true"
+		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnKleverchain = true"
 		testRelayersShouldNotExecuteTransfers(t, expectedStringInLogs, badToken)
 	})
-	t.Run("isNativeOnEth = true, isMintBurnOnEth = true, isNativeOnMvX = true, isMintBurnOnMvX = false", func(t *testing.T) {
+	t.Run("isNativeOnEth = true, isMintBurnOnEth = true, isNativeOnKlv = true, isMintBurnOnKlv = false", func(t *testing.T) {
 		badToken := createBadToken()
 		badToken.IsNativeOnEth = true
 		badToken.IsMintBurnOnEth = true
-		badToken.IsNativeOnMvX = true
-		badToken.IsMintBurnOnMvX = false
+		badToken.IsNativeOnKlv = true
+		badToken.IsMintBurnOnKlv = false
 		badToken.HasChainSpecificToken = true
 
 		testEthContractsShouldError(t, badToken)
 	})
-	t.Run("isNativeOnEth = false, isMintBurnOnEth = true, isNativeOnMvX = false, isMintBurnOnMvX = true", func(t *testing.T) {
+	t.Run("isNativeOnEth = false, isMintBurnOnEth = true, isNativeOnKlv = false, isMintBurnOnKlv = true", func(t *testing.T) {
 		badToken := createBadToken()
 		badToken.IsNativeOnEth = false
 		badToken.IsMintBurnOnEth = true
-		badToken.IsNativeOnMvX = false
-		badToken.IsMintBurnOnMvX = true
+		badToken.IsNativeOnKlv = false
+		badToken.IsMintBurnOnKlv = true
 		badToken.HasChainSpecificToken = true
 
 		testEthContractsShouldError(t, badToken)
@@ -342,24 +342,24 @@ func testRelayersShouldNotExecuteTransfers(
 	expectedStringInLogs string,
 	tokens ...framework.TestTokenParams,
 ) {
-	startsFromEthFlow, startsFromMvXFlow := createFlowsBasedOnToken(tb, tokens...)
+	startsFromEthFlow, startsFromKlvFlow := createFlowsBasedOnToken(tb, tokens...)
 
 	setupFunc := func(tb testing.TB, setup *framework.TestSetup) {
-		startsFromMvXFlow.setup = setup
+		startsFromKlvFlow.setup = setup
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.MultiversxHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.KleverchainHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
 		if len(startsFromEthFlow.tokens) > 0 {
-			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.MultiversxHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KleverchainHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 		}
-		if len(startsFromMvXFlow.tokens) > 0 {
-			setup.CreateBatchOnMultiversX(startsFromMvXFlow.tokens...)
+		if len(startsFromKlvFlow.tokens) > 0 {
+			setup.CreateBatchOnKleverchain(startsFromKlvFlow.tokens...)
 		}
 	}
 
 	processFunc := func(tb testing.TB, setup *framework.TestSetup) bool {
-		if startsFromEthFlow.process() && startsFromMvXFlow.process() {
+		if startsFromEthFlow.process() && startsFromKlvFlow.process() {
 			return true
 		}
 
@@ -416,9 +416,9 @@ func testEthContractsShouldError(tb testing.TB, testToken framework.TestTokenPar
 		valueToMintOnEth, ok := big.NewInt(0).SetString(testToken.ValueToMintOnEth, 10)
 		require.True(tb, ok)
 
-		receiverKeys := framework.GenerateMvxPrivatePublicKey(tb, projectedShardForTestKeys)
+		receiverKeys := framework.GenerateKlvPrivatePublicKey(tb, projectedShardForTestKeys)
 		auth, _ := bind.NewKeyedTransactorWithChainID(setup.DepositorKeys.EthSK, setup.EthereumHandler.ChainID)
-		_, err := setup.EthereumHandler.SafeContract.Deposit(auth, token.EthErc20Address, valueToMintOnEth, receiverKeys.MvxAddress.AddressSlice())
+		_, err := setup.EthereumHandler.SafeContract.Deposit(auth, token.EthErc20Address, valueToMintOnEth, receiverKeys.KlvAddress.AddressSlice())
 		require.Error(tb, err)
 	}
 
@@ -442,11 +442,11 @@ func testCallPayableWithParamsWasCalled(testSetup *framework.TestSetup, value ui
 	universalTokens := make([]string, 0, len(tokens))
 	for _, identifier := range tokens {
 		tkData := testSetup.TokensRegistry.GetTokenData(identifier)
-		universalTokens = append(universalTokens, tkData.MvxUniversalToken)
+		universalTokens = append(universalTokens, tkData.KlvUniversalToken)
 	}
 
 	vmRequest := &data.VmValueRequest{
-		Address:  testSetup.MultiversxHandler.TestCallerAddress.Bech32(),
+		Address:  testSetup.KleverchainHandler.TestCallerAddress.Bech32(),
 		FuncName: "getCalledDataParams",
 	}
 

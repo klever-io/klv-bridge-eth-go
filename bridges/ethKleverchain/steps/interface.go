@@ -15,35 +15,35 @@ type Executor interface {
 	PrintInfo(logLevel logger.LogLevel, message string, extras ...interface{})
 	MyTurnAsLeader() bool
 
-	GetBatchFromMultiversX(ctx context.Context) (*bridgeCore.TransferBatch, error)
-	StoreBatchFromMultiversX(batch *bridgeCore.TransferBatch) error
+	GetBatchFromKleverchain(ctx context.Context) (*bridgeCore.TransferBatch, error)
+	StoreBatchFromKleverchain(batch *bridgeCore.TransferBatch) error
 	GetStoredBatch() *bridgeCore.TransferBatch
 
-	GetLastExecutedEthBatchIDFromMultiversX(ctx context.Context) (uint64, error)
+	GetLastExecutedEthBatchIDFromKleverchain(ctx context.Context) (uint64, error)
 	VerifyLastDepositNonceExecutedOnEthereumBatch(ctx context.Context) error
 
-	GetAndStoreActionIDForProposeTransferOnMultiversX(ctx context.Context) (uint64, error)
-	GetAndStoreActionIDForProposeSetStatusFromMultiversX(ctx context.Context) (uint64, error)
+	GetAndStoreActionIDForProposeTransferOnKleverchain(ctx context.Context) (uint64, error)
+	GetAndStoreActionIDForProposeSetStatusFromKleverchain(ctx context.Context) (uint64, error)
 	GetStoredActionID() uint64
 
-	WasTransferProposedOnMultiversX(ctx context.Context) (bool, error)
-	ProposeTransferOnMultiversX(ctx context.Context) error
-	ProcessMaxRetriesOnWasTransferProposedOnMultiversX() bool
-	ResetRetriesOnWasTransferProposedOnMultiversX()
+	WasTransferProposedOnKleverchain(ctx context.Context) (bool, error)
+	ProposeTransferOnKleverchain(ctx context.Context) error
+	ProcessMaxRetriesOnWasTransferProposedOnKleverchain() bool
+	ResetRetriesOnWasTransferProposedOnKleverchain()
 
-	WasSetStatusProposedOnMultiversX(ctx context.Context) (bool, error)
-	ProposeSetStatusOnMultiversX(ctx context.Context) error
+	WasSetStatusProposedOnKleverchain(ctx context.Context) (bool, error)
+	ProposeSetStatusOnKleverchain(ctx context.Context) error
 
-	WasActionSignedOnMultiversX(ctx context.Context) (bool, error)
-	SignActionOnMultiversX(ctx context.Context) error
+	WasActionSignedOnKleverchain(ctx context.Context) (bool, error)
+	SignActionOnKleverchain(ctx context.Context) error
 
-	ProcessQuorumReachedOnMultiversX(ctx context.Context) (bool, error)
-	WasActionPerformedOnMultiversX(ctx context.Context) (bool, error)
-	PerformActionOnMultiversX(ctx context.Context) error
+	ProcessQuorumReachedOnKleverchain(ctx context.Context) (bool, error)
+	WasActionPerformedOnKleverchain(ctx context.Context) (bool, error)
+	PerformActionOnKleverchain(ctx context.Context) error
 	ResolveNewDepositsStatuses(numDeposits uint64)
 
-	ProcessMaxQuorumRetriesOnMultiversX() bool
-	ResetRetriesCountOnMultiversX()
+	ProcessMaxQuorumRetriesOnKleverchain() bool
+	ResetRetriesCountOnKleverchain()
 
 	GetAndStoreBatchFromEthereum(ctx context.Context, nonce uint64) error
 	WasTransferPerformedOnEthereum(ctx context.Context) (bool, error)
@@ -58,9 +58,9 @@ type Executor interface {
 	ResetRetriesCountOnEthereum()
 	ClearStoredP2PSignaturesForEthereum()
 
-	CheckMultiversXClientAvailability(ctx context.Context) error
+	CheckKleverchainClientAvailability(ctx context.Context) error
 	CheckEthereumClientAvailability(ctx context.Context) error
-	CheckAvailableTokens(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error
+	CheckAvailableTokens(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error
 
 	IsInterfaceNil() bool
 }

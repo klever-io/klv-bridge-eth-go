@@ -11,7 +11,7 @@ import (
 // tokensRegistryMock is not concurrent safe
 type tokensRegistryMock struct {
 	ethToKleverchain map[common.Address]string
-	multiversXToEth  map[string]common.Address
+	kleverchainToEth map[string]common.Address
 	mintBurnTokens   map[string]bool
 	nativeTokens     map[string]bool
 	totalBalances    map[string]*big.Int
@@ -27,7 +27,7 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 	mock.ethToKleverchain[erc20Address] = ticker
 
 	hexedTicker := hex.EncodeToString([]byte(ticker))
-	mock.multiversXToEth[hexedTicker] = erc20Address
+	mock.kleverchainToEth[hexedTicker] = erc20Address
 
 	if isNativeToken {
 		mock.nativeTokens[hexedTicker] = true
@@ -43,7 +43,7 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 
 func (mock *tokensRegistryMock) clearTokens() {
 	mock.ethToKleverchain = make(map[common.Address]string)
-	mock.multiversXToEth = make(map[string]common.Address)
+	mock.kleverchainToEth = make(map[string]common.Address)
 	mock.mintBurnTokens = make(map[string]bool)
 	mock.nativeTokens = make(map[string]bool)
 	mock.totalBalances = make(map[string]*big.Int)
@@ -61,7 +61,7 @@ func (mock *tokensRegistryMock) getTicker(erc20Address common.Address) string {
 }
 
 func (mock *tokensRegistryMock) getErc20Address(ticker string) common.Address {
-	addr, found := mock.multiversXToEth[ticker]
+	addr, found := mock.kleverchainToEth[ticker]
 	if !found {
 		panic("erc20 address for ticker " + ticker + " not found")
 	}

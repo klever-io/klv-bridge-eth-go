@@ -25,38 +25,38 @@ const minRetries = 1
 
 // ArgsBridgeExecutor is the arguments DTO struct used in both bridges
 type ArgsBridgeExecutor struct {
-	Log                          logger.Logger
-	TopologyProvider             TopologyProvider
-	MultiversXClient             MultiversXClient
-	EthereumClient               EthereumClient
-	TimeForWaitOnEthereum        time.Duration
-	StatusHandler                core.StatusHandler
-	SignaturesHolder             SignaturesHolder
-	BalanceValidator             BalanceValidator
-	MaxQuorumRetriesOnEthereum   uint64
-	MaxQuorumRetriesOnMultiversX uint64
-	MaxRestriesOnWasProposed     uint64
+	Log                           logger.Logger
+	TopologyProvider              TopologyProvider
+	KleverchainClient             KleverchainClient
+	EthereumClient                EthereumClient
+	TimeForWaitOnEthereum         time.Duration
+	StatusHandler                 core.StatusHandler
+	SignaturesHolder              SignaturesHolder
+	BalanceValidator              BalanceValidator
+	MaxQuorumRetriesOnEthereum    uint64
+	MaxQuorumRetriesOnKleverchain uint64
+	MaxRestriesOnWasProposed      uint64
 }
 
 type bridgeExecutor struct {
-	log                          logger.Logger
-	topologyProvider             TopologyProvider
-	multiversXClient             MultiversXClient
-	ethereumClient               EthereumClient
-	timeForWaitOnEthereum        time.Duration
-	statusHandler                core.StatusHandler
-	sigsHolder                   SignaturesHolder
-	balanceValidator             BalanceValidator
-	maxQuorumRetriesOnEthereum   uint64
-	maxQuorumRetriesOnMultiversX uint64
-	maxRetriesOnWasProposed      uint64
+	log                           logger.Logger
+	topologyProvider              TopologyProvider
+	kleverchainClient             KleverchainClient
+	ethereumClient                EthereumClient
+	timeForWaitOnEthereum         time.Duration
+	statusHandler                 core.StatusHandler
+	sigsHolder                    SignaturesHolder
+	balanceValidator              BalanceValidator
+	maxQuorumRetriesOnEthereum    uint64
+	maxQuorumRetriesOnKleverchain uint64
+	maxRetriesOnWasProposed       uint64
 
-	batch                     *bridgeCore.TransferBatch
-	actionID                  uint64
-	msgHash                   common.Hash
-	quorumRetriesOnEthereum   uint64
-	quorumRetriesOnMultiversX uint64
-	retriesOnWasProposed      uint64
+	batch                      *bridgeCore.TransferBatch
+	actionID                   uint64
+	msgHash                    common.Hash
+	quorumRetriesOnEthereum    uint64
+	quorumRetriesOnKleverchain uint64
+	retriesOnWasProposed       uint64
 }
 
 // NewBridgeExecutor creates a bridge executor, which can be used for both half-bridges
@@ -74,8 +74,8 @@ func checkArgs(args ArgsBridgeExecutor) error {
 	if check.IfNil(args.Log) {
 		return ErrNilLogger
 	}
-	if check.IfNil(args.MultiversXClient) {
-		return ErrNilMultiversXClient
+	if check.IfNil(args.KleverchainClient) {
+		return ErrNilKleverchainClient
 	}
 	if check.IfNil(args.EthereumClient) {
 		return ErrNilEthereumClient
@@ -99,9 +99,9 @@ func checkArgs(args ArgsBridgeExecutor) error {
 		return fmt.Errorf("%w for args.MaxQuorumRetriesOnEthereum, got: %d, minimum: %d",
 			clients.ErrInvalidValue, args.MaxQuorumRetriesOnEthereum, minRetries)
 	}
-	if args.MaxQuorumRetriesOnMultiversX < minRetries {
-		return fmt.Errorf("%w for args.MaxQuorumRetriesOnMultiversX, got: %d, minimum: %d",
-			clients.ErrInvalidValue, args.MaxQuorumRetriesOnMultiversX, minRetries)
+	if args.MaxQuorumRetriesOnKleverchain < minRetries {
+		return fmt.Errorf("%w for args.MaxQuorumRetriesOnKleverchain, got: %d, minimum: %d",
+			clients.ErrInvalidValue, args.MaxQuorumRetriesOnKleverchain, minRetries)
 	}
 	if args.MaxRestriesOnWasProposed < minRetries {
 		return fmt.Errorf("%w for args.MaxRestriesOnWasProposed, got: %d, minimum: %d",
@@ -112,17 +112,17 @@ func checkArgs(args ArgsBridgeExecutor) error {
 
 func createBridgeExecutor(args ArgsBridgeExecutor) *bridgeExecutor {
 	return &bridgeExecutor{
-		log:                          args.Log,
-		multiversXClient:             args.MultiversXClient,
-		ethereumClient:               args.EthereumClient,
-		topologyProvider:             args.TopologyProvider,
-		statusHandler:                args.StatusHandler,
-		timeForWaitOnEthereum:        args.TimeForWaitOnEthereum,
-		sigsHolder:                   args.SignaturesHolder,
-		balanceValidator:             args.BalanceValidator,
-		maxQuorumRetriesOnEthereum:   args.MaxQuorumRetriesOnEthereum,
-		maxQuorumRetriesOnMultiversX: args.MaxQuorumRetriesOnMultiversX,
-		maxRetriesOnWasProposed:      args.MaxRestriesOnWasProposed,
+		log:                           args.Log,
+		kleverchainClient:             args.KleverchainClient,
+		ethereumClient:                args.EthereumClient,
+		topologyProvider:              args.TopologyProvider,
+		statusHandler:                 args.StatusHandler,
+		timeForWaitOnEthereum:         args.TimeForWaitOnEthereum,
+		sigsHolder:                    args.SignaturesHolder,
+		balanceValidator:              args.BalanceValidator,
+		maxQuorumRetriesOnEthereum:    args.MaxQuorumRetriesOnEthereum,
+		maxQuorumRetriesOnKleverchain: args.MaxQuorumRetriesOnKleverchain,
+		maxRetriesOnWasProposed:       args.MaxRestriesOnWasProposed,
 	}
 }
 
@@ -150,17 +150,17 @@ func (executor *bridgeExecutor) MyTurnAsLeader() bool {
 	return executor.topologyProvider.MyTurnAsLeader()
 }
 
-// GetBatchFromMultiversX fetches the pending batch from MultiversX
-func (executor *bridgeExecutor) GetBatchFromMultiversX(ctx context.Context) (*bridgeCore.TransferBatch, error) {
-	batch, err := executor.multiversXClient.GetPendingBatch(ctx)
+// GetBatchFromKleverchain fetches the pending batch from Kleverchain
+func (executor *bridgeExecutor) GetBatchFromKleverchain(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+	batch, err := executor.kleverchainClient.GetPendingBatch(ctx)
 	if err == nil {
 		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batch.ID)-1)
 	}
 	return batch, err
 }
 
-// StoreBatchFromMultiversX saves the pending batch from MultiversX
-func (executor *bridgeExecutor) StoreBatchFromMultiversX(batch *bridgeCore.TransferBatch) error {
+// StoreBatchFromKleverchain saves the pending batch from Kleverchain
+func (executor *bridgeExecutor) StoreBatchFromKleverchain(batch *bridgeCore.TransferBatch) error {
 	if batch == nil {
 		return ErrNilBatch
 	}
@@ -174,9 +174,9 @@ func (executor *bridgeExecutor) GetStoredBatch() *bridgeCore.TransferBatch {
 	return executor.batch
 }
 
-// GetLastExecutedEthBatchIDFromMultiversX returns the last executed batch ID that is stored on the MultiversX SC
-func (executor *bridgeExecutor) GetLastExecutedEthBatchIDFromMultiversX(ctx context.Context) (uint64, error) {
-	batchID, err := executor.multiversXClient.GetLastExecutedEthBatchID(ctx)
+// GetLastExecutedEthBatchIDFromKleverchain returns the last executed batch ID that is stored on the Kleverchain SC
+func (executor *bridgeExecutor) GetLastExecutedEthBatchIDFromKleverchain(ctx context.Context) (uint64, error) {
+	batchID, err := executor.kleverchainClient.GetLastExecutedEthBatchID(ctx)
 	if err == nil {
 		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batchID))
 	}
@@ -189,7 +189,7 @@ func (executor *bridgeExecutor) VerifyLastDepositNonceExecutedOnEthereumBatch(ct
 		return ErrNilBatch
 	}
 
-	lastNonce, err := executor.multiversXClient.GetLastExecutedEthTxID(ctx)
+	lastNonce, err := executor.kleverchainClient.GetLastExecutedEthTxID(ctx)
 	if err != nil {
 		return err
 	}
@@ -210,13 +210,13 @@ func (executor *bridgeExecutor) verifyDepositNonces(lastNonce uint64) error {
 	return nil
 }
 
-// GetAndStoreActionIDForProposeTransferOnMultiversX fetches the action ID for ProposeTransfer by using the stored batch. Stores the action ID and returns it
-func (executor *bridgeExecutor) GetAndStoreActionIDForProposeTransferOnMultiversX(ctx context.Context) (uint64, error) {
+// GetAndStoreActionIDForProposeTransferOnKleverchain fetches the action ID for ProposeTransfer by using the stored batch. Stores the action ID and returns it
+func (executor *bridgeExecutor) GetAndStoreActionIDForProposeTransferOnKleverchain(ctx context.Context) (uint64, error) {
 	if executor.batch == nil {
 		return InvalidActionID, ErrNilBatch
 	}
 
-	actionID, err := executor.multiversXClient.GetActionIDForProposeTransfer(ctx, executor.batch)
+	actionID, err := executor.kleverchainClient.GetActionIDForProposeTransfer(ctx, executor.batch)
 	if err != nil {
 		return InvalidActionID, err
 	}
@@ -226,13 +226,13 @@ func (executor *bridgeExecutor) GetAndStoreActionIDForProposeTransferOnMultivers
 	return actionID, nil
 }
 
-// GetAndStoreActionIDForProposeSetStatusFromMultiversX fetches the action ID for SetStatus by using the stored batch. Stores the action ID and returns it
-func (executor *bridgeExecutor) GetAndStoreActionIDForProposeSetStatusFromMultiversX(ctx context.Context) (uint64, error) {
+// GetAndStoreActionIDForProposeSetStatusFromKleverchain fetches the action ID for SetStatus by using the stored batch. Stores the action ID and returns it
+func (executor *bridgeExecutor) GetAndStoreActionIDForProposeSetStatusFromKleverchain(ctx context.Context) (uint64, error) {
 	if executor.batch == nil {
 		return InvalidActionID, ErrNilBatch
 	}
 
-	actionID, err := executor.multiversXClient.GetActionIDForSetStatusOnPendingTransfer(ctx, executor.batch)
+	actionID, err := executor.kleverchainClient.GetActionIDForSetStatusOnPendingTransfer(ctx, executor.batch)
 	if err != nil {
 		return InvalidActionID, err
 	}
@@ -247,22 +247,22 @@ func (executor *bridgeExecutor) GetStoredActionID() uint64 {
 	return executor.actionID
 }
 
-// WasTransferProposedOnMultiversX checks if the transfer was proposed on MultiversX
-func (executor *bridgeExecutor) WasTransferProposedOnMultiversX(ctx context.Context) (bool, error) {
+// WasTransferProposedOnKleverchain checks if the transfer was proposed on Kleverchain
+func (executor *bridgeExecutor) WasTransferProposedOnKleverchain(ctx context.Context) (bool, error) {
 	if executor.batch == nil {
 		return false, ErrNilBatch
 	}
 
-	return executor.multiversXClient.WasProposedTransfer(ctx, executor.batch)
+	return executor.kleverchainClient.WasProposedTransfer(ctx, executor.batch)
 }
 
-// ProposeTransferOnMultiversX propose the transfer on MultiversX
-func (executor *bridgeExecutor) ProposeTransferOnMultiversX(ctx context.Context) error {
+// ProposeTransferOnKleverchain propose the transfer on Kleverchain
+func (executor *bridgeExecutor) ProposeTransferOnKleverchain(ctx context.Context) error {
 	if executor.batch == nil {
 		return ErrNilBatch
 	}
 
-	hash, err := executor.multiversXClient.ProposeTransfer(ctx, executor.batch)
+	hash, err := executor.kleverchainClient.ProposeTransfer(ctx, executor.batch)
 	if err != nil {
 		return err
 	}
@@ -273,8 +273,8 @@ func (executor *bridgeExecutor) ProposeTransferOnMultiversX(ctx context.Context)
 	return nil
 }
 
-// ProcessMaxRetriesOnWasTransferProposedOnMultiversX checks if the retries on MultiversX were reached and increments the counter
-func (executor *bridgeExecutor) ProcessMaxRetriesOnWasTransferProposedOnMultiversX() bool {
+// ProcessMaxRetriesOnWasTransferProposedOnKleverchain checks if the retries on Kleverchain were reached and increments the counter
+func (executor *bridgeExecutor) ProcessMaxRetriesOnWasTransferProposedOnKleverchain() bool {
 	if executor.retriesOnWasProposed < executor.maxRetriesOnWasProposed {
 		executor.retriesOnWasProposed++
 		return false
@@ -283,27 +283,27 @@ func (executor *bridgeExecutor) ProcessMaxRetriesOnWasTransferProposedOnMultiver
 	return true
 }
 
-// ResetRetriesOnWasTransferProposedOnMultiversX resets the number of retries on was transfer proposed
-func (executor *bridgeExecutor) ResetRetriesOnWasTransferProposedOnMultiversX() {
+// ResetRetriesOnWasTransferProposedOnKleverchain resets the number of retries on was transfer proposed
+func (executor *bridgeExecutor) ResetRetriesOnWasTransferProposedOnKleverchain() {
 	executor.retriesOnWasProposed = 0
 }
 
-// WasSetStatusProposedOnMultiversX checks if set status was proposed on MultiversX
-func (executor *bridgeExecutor) WasSetStatusProposedOnMultiversX(ctx context.Context) (bool, error) {
+// WasSetStatusProposedOnKleverchain checks if set status was proposed on Kleverchain
+func (executor *bridgeExecutor) WasSetStatusProposedOnKleverchain(ctx context.Context) (bool, error) {
 	if executor.batch == nil {
 		return false, ErrNilBatch
 	}
 
-	return executor.multiversXClient.WasProposedSetStatus(ctx, executor.batch)
+	return executor.kleverchainClient.WasProposedSetStatus(ctx, executor.batch)
 }
 
-// ProposeSetStatusOnMultiversX propose set status on MultiversX
-func (executor *bridgeExecutor) ProposeSetStatusOnMultiversX(ctx context.Context) error {
+// ProposeSetStatusOnKleverchain propose set status on Kleverchain
+func (executor *bridgeExecutor) ProposeSetStatusOnKleverchain(ctx context.Context) error {
 	if executor.batch == nil {
 		return ErrNilBatch
 	}
 
-	hash, err := executor.multiversXClient.ProposeSetStatus(ctx, executor.batch)
+	hash, err := executor.kleverchainClient.ProposeSetStatus(ctx, executor.batch)
 	if err != nil {
 		return err
 	}
@@ -314,14 +314,14 @@ func (executor *bridgeExecutor) ProposeSetStatusOnMultiversX(ctx context.Context
 	return nil
 }
 
-// WasActionSignedOnMultiversX returns true if the current relayer already signed the action
-func (executor *bridgeExecutor) WasActionSignedOnMultiversX(ctx context.Context) (bool, error) {
-	return executor.multiversXClient.WasSigned(ctx, executor.actionID)
+// WasActionSignedOnKleverchain returns true if the current relayer already signed the action
+func (executor *bridgeExecutor) WasActionSignedOnKleverchain(ctx context.Context) (bool, error) {
+	return executor.kleverchainClient.WasSigned(ctx, executor.actionID)
 }
 
-// SignActionOnMultiversX calls the MultiversX client to generate and send the signature
-func (executor *bridgeExecutor) SignActionOnMultiversX(ctx context.Context) error {
-	hash, err := executor.multiversXClient.Sign(ctx, executor.actionID)
+// SignActionOnKleverchain calls the Kleverchain client to generate and send the signature
+func (executor *bridgeExecutor) SignActionOnKleverchain(ctx context.Context) error {
+	hash, err := executor.kleverchainClient.Sign(ctx, executor.actionID)
 	if err != nil {
 		return err
 	}
@@ -331,9 +331,9 @@ func (executor *bridgeExecutor) SignActionOnMultiversX(ctx context.Context) erro
 	return nil
 }
 
-// ProcessQuorumReachedOnMultiversX returns true if the proposed transfer reached the set quorum
-func (executor *bridgeExecutor) ProcessQuorumReachedOnMultiversX(ctx context.Context) (bool, error) {
-	return executor.multiversXClient.QuorumReached(ctx, executor.actionID)
+// ProcessQuorumReachedOnKleverchain returns true if the proposed transfer reached the set quorum
+func (executor *bridgeExecutor) ProcessQuorumReachedOnKleverchain(ctx context.Context) (bool, error) {
+	return executor.kleverchainClient.QuorumReached(ctx, executor.actionID)
 }
 
 // WaitForTransferConfirmation waits for the confirmation of a transfer
@@ -397,18 +397,18 @@ func (executor *bridgeExecutor) GetBatchStatusesFromEthereum(ctx context.Context
 	return statuses, nil
 }
 
-// WasActionPerformedOnMultiversX returns true if the action was already performed
-func (executor *bridgeExecutor) WasActionPerformedOnMultiversX(ctx context.Context) (bool, error) {
-	return executor.multiversXClient.WasExecuted(ctx, executor.actionID)
+// WasActionPerformedOnKleverchain returns true if the action was already performed
+func (executor *bridgeExecutor) WasActionPerformedOnKleverchain(ctx context.Context) (bool, error) {
+	return executor.kleverchainClient.WasExecuted(ctx, executor.actionID)
 }
 
-// PerformActionOnMultiversX sends the perform-action transaction on the MultiversX chain
-func (executor *bridgeExecutor) PerformActionOnMultiversX(ctx context.Context) error {
+// PerformActionOnKleverchain sends the perform-action transaction on the Kleverchain chain
+func (executor *bridgeExecutor) PerformActionOnKleverchain(ctx context.Context) error {
 	if executor.batch == nil {
 		return ErrNilBatch
 	}
 
-	hash, err := executor.multiversXClient.PerformAction(ctx, executor.actionID, executor.batch)
+	hash, err := executor.kleverchainClient.PerformAction(ctx, executor.actionID, executor.batch)
 	if err != nil {
 		return err
 	}
@@ -424,19 +424,19 @@ func (executor *bridgeExecutor) ResolveNewDepositsStatuses(numDeposits uint64) {
 	executor.batch.ResolveNewDeposits(int(numDeposits))
 }
 
-// ProcessMaxQuorumRetriesOnMultiversX checks if the retries on MultiversX were reached and increments the counter
-func (executor *bridgeExecutor) ProcessMaxQuorumRetriesOnMultiversX() bool {
-	if executor.quorumRetriesOnMultiversX < executor.maxQuorumRetriesOnMultiversX {
-		executor.quorumRetriesOnMultiversX++
+// ProcessMaxQuorumRetriesOnKleverchain checks if the retries on Kleverchain were reached and increments the counter
+func (executor *bridgeExecutor) ProcessMaxQuorumRetriesOnKleverchain() bool {
+	if executor.quorumRetriesOnKleverchain < executor.maxQuorumRetriesOnKleverchain {
+		executor.quorumRetriesOnKleverchain++
 		return false
 	}
 
 	return true
 }
 
-// ResetRetriesCountOnMultiversX resets the number of retries on MultiversX
-func (executor *bridgeExecutor) ResetRetriesCountOnMultiversX() {
-	executor.quorumRetriesOnMultiversX = 0
+// ResetRetriesCountOnKleverchain resets the number of retries on Kleverchain
+func (executor *bridgeExecutor) ResetRetriesCountOnKleverchain() {
+	executor.quorumRetriesOnKleverchain = 0
 }
 
 // GetAndStoreBatchFromEthereum fetches and stores the batch from the ethereum client
@@ -531,7 +531,7 @@ func (executor *bridgeExecutor) SignTransferOnEthereum() error {
 		return ErrNilBatch
 	}
 
-	argLists := batchProcessor.ExtractListMvxToEth(executor.batch)
+	argLists := batchProcessor.ExtractListKlvToEth(executor.batch)
 	hash, err := executor.ethereumClient.GenerateMessageHash(argLists, executor.batch.ID)
 	if err != nil {
 		return err
@@ -558,7 +558,7 @@ func (executor *bridgeExecutor) PerformTransferOnEthereum(ctx context.Context) e
 
 	executor.log.Debug("fetched quorum size", "quorum", quorumSize.Int64())
 
-	argLists := batchProcessor.ExtractListMvxToEth(executor.batch)
+	argLists := batchProcessor.ExtractListKlvToEth(executor.batch)
 
 	executor.log.Info("executing transfer " + executor.batch.String())
 
@@ -573,9 +573,9 @@ func (executor *bridgeExecutor) PerformTransferOnEthereum(ctx context.Context) e
 	return nil
 }
 
-func (executor *bridgeExecutor) checkCumulatedTransfers(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
+func (executor *bridgeExecutor) checkCumulatedTransfers(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
 	for i, ethToken := range ethTokens {
-		err := executor.balanceValidator.CheckToken(ctx, ethToken, mvxTokens[i], amounts[i], direction)
+		err := executor.balanceValidator.CheckToken(ctx, ethToken, kdaTokens[i], amounts[i], direction)
 		if err != nil {
 			return err
 		}
@@ -584,13 +584,13 @@ func (executor *bridgeExecutor) checkCumulatedTransfers(ctx context.Context, eth
 }
 
 // CheckAvailableTokens checks the available balances
-func (executor *bridgeExecutor) CheckAvailableTokens(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
-	ethTokens, mvxTokens, amounts = executor.getCumulatedTransfers(ethTokens, mvxTokens, amounts)
+func (executor *bridgeExecutor) CheckAvailableTokens(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
+	ethTokens, kdaTokens, amounts = executor.getCumulatedTransfers(ethTokens, kdaTokens, amounts)
 
-	return executor.checkCumulatedTransfers(ctx, ethTokens, mvxTokens, amounts, direction)
+	return executor.checkCumulatedTransfers(ctx, ethTokens, kdaTokens, amounts, direction)
 }
 
-func (executor *bridgeExecutor) getCumulatedTransfers(ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int) ([]common.Address, [][]byte, []*big.Int) {
+func (executor *bridgeExecutor) getCumulatedTransfers(ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int) ([]common.Address, [][]byte, []*big.Int) {
 	cumulatedAmounts := make(map[common.Address]*big.Int)
 	uniqueTokens := make([]common.Address, 0)
 	uniqueConvertedTokens := make([][]byte, 0)
@@ -604,7 +604,7 @@ func (executor *bridgeExecutor) getCumulatedTransfers(ethTokens []common.Address
 
 		cumulatedAmounts[token] = big.NewInt(0).Set(amounts[i]) // work on a new pointer
 		uniqueTokens = append(uniqueTokens, token)
-		uniqueConvertedTokens = append(uniqueConvertedTokens, mvxTokens[i])
+		uniqueConvertedTokens = append(uniqueConvertedTokens, kdaTokens[i])
 	}
 
 	finalAmounts := make([]*big.Int, len(uniqueTokens))
@@ -641,9 +641,9 @@ func (executor *bridgeExecutor) ClearStoredP2PSignaturesForEthereum() {
 	executor.log.Info("cleared stored P2P signatures")
 }
 
-// CheckMultiversXClientAvailability trigger a self availability check for the MultiversX client
-func (executor *bridgeExecutor) CheckMultiversXClientAvailability(ctx context.Context) error {
-	return executor.multiversXClient.CheckClientAvailability(ctx)
+// CheckKleverchainClientAvailability trigger a self availability check for the Kleverchain client
+func (executor *bridgeExecutor) CheckKleverchainClientAvailability(ctx context.Context) error {
+	return executor.kleverchainClient.CheckClientAvailability(ctx)
 }
 
 // CheckEthereumClientAvailability trigger a self availability check for the Ethereum client

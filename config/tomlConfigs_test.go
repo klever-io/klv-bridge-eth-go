@@ -67,7 +67,7 @@ func TestConfigs(t *testing.T) {
 		P2P: ConfigP2P{
 			Port:            "10010",
 			InitialPeerList: make([]string, 0),
-			ProtocolID:      "/erd/relay/1.0.0",
+			ProtocolID:      "/klv/relay/1.0.0",
 			Transports: p2pConfig.P2PTransportConfig{
 				TCP: config.TCPProtocolConfig{
 					ListenAddress:    "/ip4/0.0.0.0/tcp/%d",
@@ -153,11 +153,11 @@ func TestConfigs(t *testing.T) {
 					DefaultMaxMessagesPerSec: 300,
 					MaxMessages: []chainConfig.TopicMaxMessagesConfig{
 						{
-							Topic:             "EthereumToMultiversX_join",
+							Topic:             "EthereumToKleverchain_join",
 							NumMessagesPerSec: 100,
 						},
 						{
-							Topic:             "EthereumToMultiversX_sign",
+							Topic:             "EthereumToKleverchain_sign",
 							NumMessagesPerSec: 100,
 						},
 					},
@@ -166,11 +166,11 @@ func TestConfigs(t *testing.T) {
 			},
 		},
 		StateMachine: map[string]ConfigStateMachine{
-			"EthereumToMultiversX": {
+			"EthereumToKleverchain": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 120,
 			},
-			"MultiversXToEthereum": {
+			"KleverchainToEthereum": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 720,
 			},
@@ -271,7 +271,7 @@ func TestConfigs(t *testing.T) {
 [P2P]
     Port = "10010"
     InitialPeerList = []
-    ProtocolID = "/erd/relay/1.0.0"
+    ProtocolID = "/klv/relay/1.0.0"
     [P2P.Transports]
         QUICAddress = "" # optional QUIC address. If this transport should be activated, should be in this format: /ip4/0.0.0.0/udp/%d/quic-v1
         WebSocketAddress = "" # optional WebSocket address. If this transport should be activated, should be in this format: /ip4/0.0.0.0/tcp/%d/ws
@@ -341,8 +341,8 @@ func TestConfigs(t *testing.T) {
             Type = "LRU"
         [P2P.AntifloodConfig.Topic]
             DefaultMaxMessagesPerSec = 300 # default number of messages per interval for a topic
-            MaxMessages = [{ Topic = "EthereumToMultiversX_join", NumMessagesPerSec = 100 },
-                           { Topic = "EthereumToMultiversX_sign", NumMessagesPerSec = 100 }]
+            MaxMessages = [{ Topic = "EthereumToKleverchain_join", NumMessagesPerSec = 100 },
+                           { Topic = "EthereumToKleverchain_sign", NumMessagesPerSec = 100 }]
 
 [Relayer]
     [Relayer.Marshalizer]
@@ -363,11 +363,11 @@ func TestConfigs(t *testing.T) {
             MaxOpenFiles = 10
 
 [StateMachine]
-    [StateMachine.EthereumToMultiversX]
+    [StateMachine.EthereumToKleverchain]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 120 #2 minutes
 
-    [StateMachine.MultiversXToEthereum]
+    [StateMachine.KleverchainToEthereum]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 720 #12 minutes
 
@@ -419,7 +419,7 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 		PollingIntervalInMillis:         6000,
 		Filter: PendingOperationsFilterConfig{
 			AllowedEthAddresses: []string{"*"},
-			AllowedMvxAddresses: []string{"*"},
+			AllowedKlvAddresses: []string{"*"},
 			AllowedTokens:       []string{"MEME-a43fa1"},
 		},
 		Logs: LogsConfig{
@@ -451,7 +451,7 @@ PollingIntervalInMillis = 6000
 
 [Filter]
 	AllowedEthAddresses = ["*"]		# execute SC calls from all ETH addresses
-	AllowedMvxAddresses = ["*"]     # execute SC calls to all MvX contracts
+	AllowedKlvAddresses = ["*"]     # execute SC calls to all Klv contracts
 	AllowedTokens = ["MEME-a43fa1"] # execute SC calls for this token only
 
 [Logs]
@@ -537,8 +537,8 @@ func TestMigrationToolConfig(t *testing.T) {
 
 [Klever]
     NetworkAddress = "https://api.devnet.klever.finance/" # the network address
-    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
-    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the kleverchain address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the kleverchain address for the safe contract
     [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 

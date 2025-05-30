@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var initialStep = bridgeCore.StepIdentifier(GettingPendingBatchFromMultiversX)
+var initialStep = bridgeCore.StepIdentifier(GettingPendingBatchFromKleverchain)
 
 func TestExecute_SignProposedTransfer(t *testing.T) {
 	t.Parallel()

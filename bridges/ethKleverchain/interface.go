@@ -10,8 +10,8 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 )
 
-// MultiversXClient defines the behavior of the MultiversX client able to communicate with the MultiversX chain
-type MultiversXClient interface {
+// KleverchainClient defines the behavior of the Kleverchain client able to communicate with the Kleverchain chain
+type KleverchainClient interface {
 	GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error)
 	GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error)
 	GetCurrentBatchAsDataBytes(ctx context.Context) ([][]byte, error)
@@ -24,7 +24,7 @@ type MultiversXClient interface {
 	GetActionIDForSetStatusOnPendingTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error)
 	GetLastExecutedEthBatchID(ctx context.Context) (uint64, error)
 	GetLastExecutedEthTxID(ctx context.Context) (uint64, error)
-	GetLastMvxBatchID(ctx context.Context) (uint64, error)
+	GetLastKlvBatchID(ctx context.Context) (uint64, error)
 	GetCurrentNonce(ctx context.Context) (uint64, error)
 
 	ProposeSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error)
@@ -81,6 +81,6 @@ type SignaturesHolder interface {
 
 // BalanceValidator defines the operations for a component that can validate the balances on both chains for a provided token
 type BalanceValidator interface {
-	CheckToken(ctx context.Context, ethToken common.Address, mvxToken []byte, amount *big.Int, direction batchProcessor.Direction) error
+	CheckToken(ctx context.Context, ethToken common.Address, kdaToken []byte, amount *big.Int, direction batchProcessor.Direction) error
 	IsInterfaceNil() bool
 }

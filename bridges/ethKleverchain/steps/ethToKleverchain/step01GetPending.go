@@ -15,16 +15,16 @@ type getPendingStep struct {
 
 // Execute will execute this step returning the next step to be executed
 func (step *getPendingStep) Execute(ctx context.Context) core.StepIdentifier {
-	err := step.bridge.CheckMultiversXClientAvailability(ctx)
+	err := step.bridge.CheckKleverchainClientAvailability(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogDebug, "MultiversX client unavailable", "message", err)
+		step.bridge.PrintInfo(logger.LogDebug, "Kleverchain client unavailable", "message", err)
 	}
 	err = step.bridge.CheckEthereumClientAvailability(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogDebug, "Ethereum client unavailable", "message", err)
 	}
-	step.bridge.ResetRetriesCountOnMultiversX()
-	lastEthBatchExecuted, err := step.bridge.GetLastExecutedEthBatchIDFromMultiversX(ctx)
+	step.bridge.ResetRetriesCountOnKleverchain()
+	lastEthBatchExecuted, err := step.bridge.GetLastExecutedEthBatchIDFromKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error fetching last executed eth batch ID", "error", err)
 		return step.Identifier()
@@ -38,7 +38,7 @@ func (step *getPendingStep) Execute(ctx context.Context) core.StepIdentifier {
 
 	batch := step.bridge.GetStoredBatch()
 	if batch == nil {
-		step.bridge.PrintInfo(logger.LogDebug, "no new batch found on eth", "last executed on MultiversX", lastEthBatchExecuted)
+		step.bridge.PrintInfo(logger.LogDebug, "no new batch found on eth", "last executed on Kleverchain", lastEthBatchExecuted)
 		return step.Identifier()
 	}
 
@@ -50,14 +50,14 @@ func (step *getPendingStep) Execute(ctx context.Context) core.StepIdentifier {
 		return step.Identifier()
 	}
 
-	argLists := batchProcessor.ExtractListEthToMvx(batch)
-	err = step.bridge.CheckAvailableTokens(ctx, argLists.EthTokens, argLists.MvxTokenBytes, argLists.Amounts, argLists.Direction)
+	argLists := batchProcessor.ExtractListEthToKlv(batch)
+	err = step.bridge.CheckAvailableTokens(ctx, argLists.EthTokens, argLists.KdaTokenBytes, argLists.Amounts, argLists.Direction)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error checking available tokens", "error", err, "batch", batch.String())
 		return step.Identifier()
 	}
 
-	return ProposingTransferOnMultiversX
+	return ProposingTransferOnKleverchain
 }
 
 // Identifier returns the step's identifier

@@ -12,10 +12,10 @@ import (
 func TestExecute_WaitForQuorumOnSetStatus(t *testing.T) {
 	t.Parallel()
 
-	t.Run("error on ProcessQuorumReachedOnMultiversX", func(t *testing.T) {
+	t.Run("error on ProcessQuorumReachedOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorWaitForQuorumOnSetStatus()
-		bridgeStub.ProcessQuorumReachedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.ProcessQuorumReachedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
 
@@ -30,7 +30,7 @@ func TestExecute_WaitForQuorumOnSetStatus(t *testing.T) {
 	t.Run("max retries reached", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorWaitForQuorumOnSetStatus()
-		bridgeStub.ProcessMaxQuorumRetriesOnMultiversXCalled = func() bool {
+		bridgeStub.ProcessMaxQuorumRetriesOnKleverchainCalled = func() bool {
 			return true
 		}
 
@@ -45,7 +45,7 @@ func TestExecute_WaitForQuorumOnSetStatus(t *testing.T) {
 	t.Run("quorum not reached", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorWaitForQuorumOnSetStatus()
-		bridgeStub.ProcessQuorumReachedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.ProcessQuorumReachedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
 
@@ -63,7 +63,7 @@ func TestExecute_WaitForQuorumOnSetStatus(t *testing.T) {
 	t.Run("quorum reached", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorWaitForQuorumOnSetStatus()
-		bridgeStub.ProcessQuorumReachedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.ProcessQuorumReachedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return true, nil
 		}
 
@@ -81,7 +81,7 @@ func TestExecute_WaitForQuorumOnSetStatus(t *testing.T) {
 
 func createStubExecutorWaitForQuorumOnSetStatus() *bridgeTests.BridgeExecutorStub {
 	stub := bridgeTests.NewBridgeExecutorStub()
-	stub.ProcessMaxQuorumRetriesOnMultiversXCalled = func() bool {
+	stub.ProcessMaxQuorumRetriesOnKleverchainCalled = func() bool {
 		return false
 	}
 	return stub
