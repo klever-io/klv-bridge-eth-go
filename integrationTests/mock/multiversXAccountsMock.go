@@ -5,17 +5,17 @@ import (
 	"github.com/multiversx/mx-sdk-go/data"
 )
 
-type multiversXAccountsMock struct {
+type kleverchainAccountsMock struct {
 	accounts map[string]*data.Account
 }
 
-func newMultiversXAccountsMock() *multiversXAccountsMock {
-	return &multiversXAccountsMock{
+func newKleverchainAccountsMock() *kleverchainAccountsMock {
+	return &kleverchainAccountsMock{
 		accounts: make(map[string]*data.Account),
 	}
 }
 
-func (mock *multiversXAccountsMock) getOrCreate(address address.Address) *data.Account {
+func (mock *kleverchainAccountsMock) getOrCreate(address address.Address) *data.Account {
 	addrAsString := string(address.Bytes())
 	acc, found := mock.accounts[addrAsString]
 	if !found {
@@ -26,7 +26,7 @@ func (mock *multiversXAccountsMock) getOrCreate(address address.Address) *data.A
 	return acc
 }
 
-func (mock *multiversXAccountsMock) updateNonce(address address.Address, nonce uint64) {
+func (mock *kleverchainAccountsMock) updateNonce(address address.Address, nonce uint64) {
 	acc := mock.getOrCreate(address)
 	acc.Nonce = nonce
 }

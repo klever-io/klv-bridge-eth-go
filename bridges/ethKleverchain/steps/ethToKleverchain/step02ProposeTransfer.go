@@ -20,15 +20,15 @@ func (step *proposeTransferStep) Execute(ctx context.Context) core.StepIdentifie
 		return GettingPendingBatchFromEthereum
 	}
 
-	wasTransferProposed, err := step.bridge.WasTransferProposedOnMultiversX(ctx)
+	wasTransferProposed, err := step.bridge.WasTransferProposedOnKleverchain(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogError, "error determining if the batch was proposed or not on MultiversX",
+		step.bridge.PrintInfo(logger.LogError, "error determining if the batch was proposed or not on Kleverchain",
 			"batch ID", batch.ID, "error", err)
 		return GettingPendingBatchFromEthereum
 	}
 
 	if wasTransferProposed {
-		return SigningProposedTransferOnMultiversX
+		return SigningProposedTransferOnKleverchain
 	}
 
 	if !step.bridge.MyTurnAsLeader() {
@@ -36,19 +36,19 @@ func (step *proposeTransferStep) Execute(ctx context.Context) core.StepIdentifie
 		return step.Identifier()
 	}
 
-	err = step.bridge.ProposeTransferOnMultiversX(ctx)
+	err = step.bridge.ProposeTransferOnKleverchain(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogError, "error proposing transfer on MultiversX",
+		step.bridge.PrintInfo(logger.LogError, "error proposing transfer on Kleverchain",
 			"batch ID", batch.ID, "error", err)
 		return GettingPendingBatchFromEthereum
 	}
 
-	return SigningProposedTransferOnMultiversX
+	return SigningProposedTransferOnKleverchain
 }
 
 // Identifier returns the step's identifier
 func (step *proposeTransferStep) Identifier() core.StepIdentifier {
-	return ProposingTransferOnMultiversX
+	return ProposingTransferOnKleverchain
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

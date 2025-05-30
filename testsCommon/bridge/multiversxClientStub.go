@@ -10,8 +10,8 @@ import (
 
 var errNotImplemented = errors.New("not implemented")
 
-// MultiversXClientStub -
-type MultiversXClientStub struct {
+// KleverchainClientStub -
+type KleverchainClientStub struct {
 	GetPendingBatchCalled                          func(ctx context.Context) (*bridgeCore.TransferBatch, error)
 	GetBatchCalled                                 func(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error)
 	GetCurrentBatchAsDataBytesCalled               func(ctx context.Context) ([][]byte, error)
@@ -38,12 +38,12 @@ type MultiversXClientStub struct {
 	MintBalancesCalled                             func(ctx context.Context, token []byte) (*big.Int, error)
 	BurnBalancesCalled                             func(ctx context.Context, token []byte) (*big.Int, error)
 	CheckRequiredBalanceCalled                     func(ctx context.Context, token []byte, value *big.Int) error
-	GetLastMvxBatchIDCalled                        func(ctx context.Context) (uint64, error)
+	GetLastKlvBatchIDCalled                        func(ctx context.Context) (uint64, error)
 	CloseCalled                                    func() error
 }
 
 // GetPendingBatch -
-func (stub *MultiversXClientStub) GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+func (stub *KleverchainClientStub) GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 	if stub.GetPendingBatchCalled != nil {
 		return stub.GetPendingBatchCalled(ctx)
 	}
@@ -52,7 +52,7 @@ func (stub *MultiversXClientStub) GetPendingBatch(ctx context.Context) (*bridgeC
 }
 
 // GetBatch -
-func (stub *MultiversXClientStub) GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error) {
+func (stub *KleverchainClientStub) GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error) {
 	if stub.GetBatchCalled != nil {
 		return stub.GetBatchCalled(ctx, batchID)
 	}
@@ -61,7 +61,7 @@ func (stub *MultiversXClientStub) GetBatch(ctx context.Context, batchID uint64) 
 }
 
 // GetCurrentBatchAsDataBytes -
-func (stub *MultiversXClientStub) GetCurrentBatchAsDataBytes(ctx context.Context) ([][]byte, error) {
+func (stub *KleverchainClientStub) GetCurrentBatchAsDataBytes(ctx context.Context) ([][]byte, error) {
 	if stub.GetCurrentBatchAsDataBytesCalled != nil {
 		return stub.GetCurrentBatchAsDataBytesCalled(ctx)
 	}
@@ -70,7 +70,7 @@ func (stub *MultiversXClientStub) GetCurrentBatchAsDataBytes(ctx context.Context
 }
 
 // WasProposedTransfer -
-func (stub *MultiversXClientStub) WasProposedTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (bool, error) {
+func (stub *KleverchainClientStub) WasProposedTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (bool, error) {
 	if stub.WasProposedTransferCalled != nil {
 		return stub.WasProposedTransferCalled(ctx, batch)
 	}
@@ -79,7 +79,7 @@ func (stub *MultiversXClientStub) WasProposedTransfer(ctx context.Context, batch
 }
 
 // QuorumReached -
-func (stub *MultiversXClientStub) QuorumReached(ctx context.Context, actionID uint64) (bool, error) {
+func (stub *KleverchainClientStub) QuorumReached(ctx context.Context, actionID uint64) (bool, error) {
 	if stub.QuorumReachedCalled != nil {
 		return stub.QuorumReachedCalled(ctx, actionID)
 	}
@@ -88,7 +88,7 @@ func (stub *MultiversXClientStub) QuorumReached(ctx context.Context, actionID ui
 }
 
 // WasExecuted -
-func (stub *MultiversXClientStub) WasExecuted(ctx context.Context, actionID uint64) (bool, error) {
+func (stub *KleverchainClientStub) WasExecuted(ctx context.Context, actionID uint64) (bool, error) {
 	if stub.WasExecutedCalled != nil {
 		return stub.WasExecutedCalled(ctx, actionID)
 	}
@@ -97,7 +97,7 @@ func (stub *MultiversXClientStub) WasExecuted(ctx context.Context, actionID uint
 }
 
 // GetActionIDForProposeTransfer -
-func (stub *MultiversXClientStub) GetActionIDForProposeTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error) {
+func (stub *KleverchainClientStub) GetActionIDForProposeTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error) {
 	if stub.GetActionIDForProposeTransferCalled != nil {
 		return stub.GetActionIDForProposeTransferCalled(ctx, batch)
 	}
@@ -106,7 +106,7 @@ func (stub *MultiversXClientStub) GetActionIDForProposeTransfer(ctx context.Cont
 }
 
 // WasProposedSetStatus -
-func (stub *MultiversXClientStub) WasProposedSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (bool, error) {
+func (stub *KleverchainClientStub) WasProposedSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (bool, error) {
 	if stub.WasProposedSetStatusCalled != nil {
 		return stub.WasProposedSetStatusCalled(ctx, batch)
 	}
@@ -115,7 +115,7 @@ func (stub *MultiversXClientStub) WasProposedSetStatus(ctx context.Context, batc
 }
 
 // GetTransactionsStatuses -
-func (stub *MultiversXClientStub) GetTransactionsStatuses(ctx context.Context, batchID uint64) ([]byte, error) {
+func (stub *KleverchainClientStub) GetTransactionsStatuses(ctx context.Context, batchID uint64) ([]byte, error) {
 	if stub.GetTransactionsStatusesCalled != nil {
 		return stub.GetTransactionsStatusesCalled(ctx, batchID)
 	}
@@ -124,7 +124,7 @@ func (stub *MultiversXClientStub) GetTransactionsStatuses(ctx context.Context, b
 }
 
 // GetActionIDForSetStatusOnPendingTransfer -
-func (stub *MultiversXClientStub) GetActionIDForSetStatusOnPendingTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error) {
+func (stub *KleverchainClientStub) GetActionIDForSetStatusOnPendingTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error) {
 	if stub.GetActionIDForSetStatusOnPendingTransferCalled != nil {
 		return stub.GetActionIDForSetStatusOnPendingTransferCalled(ctx, batch)
 	}
@@ -133,7 +133,7 @@ func (stub *MultiversXClientStub) GetActionIDForSetStatusOnPendingTransfer(ctx c
 }
 
 // GetLastExecutedEthBatchID -
-func (stub *MultiversXClientStub) GetLastExecutedEthBatchID(ctx context.Context) (uint64, error) {
+func (stub *KleverchainClientStub) GetLastExecutedEthBatchID(ctx context.Context) (uint64, error) {
 	if stub.GetLastExecutedEthBatchIDCalled != nil {
 		return stub.GetLastExecutedEthBatchIDCalled(ctx)
 	}
@@ -142,7 +142,7 @@ func (stub *MultiversXClientStub) GetLastExecutedEthBatchID(ctx context.Context)
 }
 
 // GetLastExecutedEthTxID -
-func (stub *MultiversXClientStub) GetLastExecutedEthTxID(ctx context.Context) (uint64, error) {
+func (stub *KleverchainClientStub) GetLastExecutedEthTxID(ctx context.Context) (uint64, error) {
 	if stub.GetLastExecutedEthTxIDCalled != nil {
 		return stub.GetLastExecutedEthTxIDCalled(ctx)
 	}
@@ -151,7 +151,7 @@ func (stub *MultiversXClientStub) GetLastExecutedEthTxID(ctx context.Context) (u
 }
 
 // GetCurrentNonce -
-func (stub *MultiversXClientStub) GetCurrentNonce(ctx context.Context) (uint64, error) {
+func (stub *KleverchainClientStub) GetCurrentNonce(ctx context.Context) (uint64, error) {
 	if stub.GetCurrentNonceCalled != nil {
 		return stub.GetCurrentNonceCalled(ctx)
 	}
@@ -160,7 +160,7 @@ func (stub *MultiversXClientStub) GetCurrentNonce(ctx context.Context) (uint64, 
 }
 
 // ProposeSetStatus -
-func (stub *MultiversXClientStub) ProposeSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
+func (stub *KleverchainClientStub) ProposeSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
 	if stub.ProposeSetStatusCalled != nil {
 		return stub.ProposeSetStatusCalled(ctx, batch)
 	}
@@ -169,7 +169,7 @@ func (stub *MultiversXClientStub) ProposeSetStatus(ctx context.Context, batch *b
 }
 
 // ProposeTransfer -
-func (stub *MultiversXClientStub) ProposeTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
+func (stub *KleverchainClientStub) ProposeTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
 	if stub.ProposeTransferCalled != nil {
 		return stub.ProposeTransferCalled(ctx, batch)
 	}
@@ -178,7 +178,7 @@ func (stub *MultiversXClientStub) ProposeTransfer(ctx context.Context, batch *br
 }
 
 // Sign -
-func (stub *MultiversXClientStub) Sign(ctx context.Context, actionID uint64) (string, error) {
+func (stub *KleverchainClientStub) Sign(ctx context.Context, actionID uint64) (string, error) {
 	if stub.SignCalled != nil {
 		return stub.SignCalled(ctx, actionID)
 	}
@@ -187,7 +187,7 @@ func (stub *MultiversXClientStub) Sign(ctx context.Context, actionID uint64) (st
 }
 
 // WasSigned -
-func (stub *MultiversXClientStub) WasSigned(ctx context.Context, actionID uint64) (bool, error) {
+func (stub *KleverchainClientStub) WasSigned(ctx context.Context, actionID uint64) (bool, error) {
 	if stub.WasSignedCalled != nil {
 		return stub.WasSignedCalled(ctx, actionID)
 	}
@@ -196,7 +196,7 @@ func (stub *MultiversXClientStub) WasSigned(ctx context.Context, actionID uint64
 }
 
 // PerformAction -
-func (stub *MultiversXClientStub) PerformAction(ctx context.Context, actionID uint64, batch *bridgeCore.TransferBatch) (string, error) {
+func (stub *KleverchainClientStub) PerformAction(ctx context.Context, actionID uint64, batch *bridgeCore.TransferBatch) (string, error) {
 	if stub.PerformActionCalled != nil {
 		return stub.PerformActionCalled(ctx, actionID, batch)
 	}
@@ -205,7 +205,7 @@ func (stub *MultiversXClientStub) PerformAction(ctx context.Context, actionID ui
 }
 
 // CheckClientAvailability -
-func (stub *MultiversXClientStub) CheckClientAvailability(ctx context.Context) error {
+func (stub *KleverchainClientStub) CheckClientAvailability(ctx context.Context) error {
 	if stub.CheckClientAvailabilityCalled != nil {
 		return stub.CheckClientAvailabilityCalled(ctx)
 	}
@@ -214,7 +214,7 @@ func (stub *MultiversXClientStub) CheckClientAvailability(ctx context.Context) e
 }
 
 // IsMintBurnToken -
-func (stub *MultiversXClientStub) IsMintBurnToken(ctx context.Context, token []byte) (bool, error) {
+func (stub *KleverchainClientStub) IsMintBurnToken(ctx context.Context, token []byte) (bool, error) {
 	if stub.IsMintBurnTokenCalled != nil {
 		return stub.IsMintBurnTokenCalled(ctx, token)
 	}
@@ -222,7 +222,7 @@ func (stub *MultiversXClientStub) IsMintBurnToken(ctx context.Context, token []b
 }
 
 // IsNativeToken -
-func (stub *MultiversXClientStub) IsNativeToken(ctx context.Context, token []byte) (bool, error) {
+func (stub *KleverchainClientStub) IsNativeToken(ctx context.Context, token []byte) (bool, error) {
 	if stub.IsNativeTokenCalled != nil {
 		return stub.IsNativeTokenCalled(ctx, token)
 	}
@@ -230,7 +230,7 @@ func (stub *MultiversXClientStub) IsNativeToken(ctx context.Context, token []byt
 }
 
 // TotalBalances -
-func (stub *MultiversXClientStub) TotalBalances(ctx context.Context, token []byte) (*big.Int, error) {
+func (stub *KleverchainClientStub) TotalBalances(ctx context.Context, token []byte) (*big.Int, error) {
 	if stub.TotalBalancesCalled != nil {
 		return stub.TotalBalancesCalled(ctx, token)
 	}
@@ -238,7 +238,7 @@ func (stub *MultiversXClientStub) TotalBalances(ctx context.Context, token []byt
 }
 
 // MintBalances -
-func (stub *MultiversXClientStub) MintBalances(ctx context.Context, token []byte) (*big.Int, error) {
+func (stub *KleverchainClientStub) MintBalances(ctx context.Context, token []byte) (*big.Int, error) {
 	if stub.MintBalancesCalled != nil {
 		return stub.MintBalancesCalled(ctx, token)
 	}
@@ -246,7 +246,7 @@ func (stub *MultiversXClientStub) MintBalances(ctx context.Context, token []byte
 }
 
 // BurnBalances -
-func (stub *MultiversXClientStub) BurnBalances(ctx context.Context, token []byte) (*big.Int, error) {
+func (stub *KleverchainClientStub) BurnBalances(ctx context.Context, token []byte) (*big.Int, error) {
 	if stub.BurnBalancesCalled != nil {
 		return stub.BurnBalancesCalled(ctx, token)
 	}
@@ -254,24 +254,24 @@ func (stub *MultiversXClientStub) BurnBalances(ctx context.Context, token []byte
 }
 
 // CheckRequiredBalance -
-func (stub *MultiversXClientStub) CheckRequiredBalance(ctx context.Context, token []byte, value *big.Int) error {
+func (stub *KleverchainClientStub) CheckRequiredBalance(ctx context.Context, token []byte, value *big.Int) error {
 	if stub.CheckRequiredBalanceCalled != nil {
 		return stub.CheckRequiredBalanceCalled(ctx, token, value)
 	}
 	return nil
 }
 
-// GetLastMvxBatchID -
-func (stub *MultiversXClientStub) GetLastMvxBatchID(ctx context.Context) (uint64, error) {
-	if stub.GetLastMvxBatchIDCalled != nil {
-		return stub.GetLastMvxBatchIDCalled(ctx)
+// GetLastKlvBatchID -
+func (stub *KleverchainClientStub) GetLastKlvBatchID(ctx context.Context) (uint64, error) {
+	if stub.GetLastKlvBatchIDCalled != nil {
+		return stub.GetLastKlvBatchIDCalled(ctx)
 	}
 
 	return 0, nil
 }
 
 // Close -
-func (stub *MultiversXClientStub) Close() error {
+func (stub *KleverchainClientStub) Close() error {
 	if stub.CloseCalled != nil {
 		return stub.CloseCalled()
 	}
@@ -280,6 +280,6 @@ func (stub *MultiversXClientStub) Close() error {
 }
 
 // IsInterfaceNil -
-func (stub *MultiversXClientStub) IsInterfaceNil() bool {
+func (stub *KleverchainClientStub) IsInterfaceNil() bool {
 	return stub == nil
 }

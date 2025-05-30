@@ -14,17 +14,17 @@ type performSetStatusStep struct {
 
 // Execute will execute this step returning the next step to be executed
 func (step *performSetStatusStep) Execute(ctx context.Context) core.StepIdentifier {
-	wasPerformed, err := step.bridge.WasActionPerformedOnMultiversX(ctx)
+	wasPerformed, err := step.bridge.WasActionPerformedOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error determining if the set status was proposed or not",
 			"action ID", step.bridge.GetStoredActionID(), "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	if wasPerformed {
 		step.bridge.PrintInfo(logger.LogInfo, "action ID performed",
 			"action ID", step.bridge.GetStoredActionID())
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	if !step.bridge.MyTurnAsLeader() {
@@ -32,11 +32,11 @@ func (step *performSetStatusStep) Execute(ctx context.Context) core.StepIdentifi
 		return step.Identifier()
 	}
 
-	err = step.bridge.PerformActionOnMultiversX(ctx)
+	err = step.bridge.PerformActionOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error performing action ID",
 			"action ID", step.bridge.GetStoredActionID(), "error", err)
-		return GettingPendingBatchFromMultiversX
+		return GettingPendingBatchFromKleverchain
 	}
 
 	return step.Identifier()

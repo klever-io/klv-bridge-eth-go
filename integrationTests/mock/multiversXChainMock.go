@@ -19,25 +19,25 @@ import (
 
 var log = logger.GetOrCreate("integrationTests/mock")
 
-// MultiversXChainMock -
-type MultiversXChainMock struct {
-	*multiversXContractStateMock
+// KleverChainMock -
+type KleverChainMock struct {
+	*kleverchainContractStateMock
 	mutState         sync.RWMutex
 	sentTransactions map[string]*transaction.FrontendTransaction
-	accounts         *multiversXAccountsMock
+	accounts         *kleverchainAccountsMock
 }
 
-// NewMultiversXChainMock -
-func NewMultiversXChainMock() *MultiversXChainMock {
-	return &MultiversXChainMock{
-		multiversXContractStateMock: newMultiversXContractStateMock(),
-		sentTransactions:            make(map[string]*transaction.FrontendTransaction),
-		accounts:                    newMultiversXAccountsMock(),
+// NewKleverChainMock -
+func NewKleverChainMock() *KleverChainMock {
+	return &KleverChainMock{
+		kleverchainContractStateMock: newKleverchainContractStateMock(),
+		sentTransactions:             make(map[string]*transaction.FrontendTransaction),
+		accounts:                     newKleverchainAccountsMock(),
 	}
 }
 
 // GetNetworkConfig -
-func (mock *MultiversXChainMock) GetNetworkConfig(_ context.Context) (*data.NetworkConfig, error) {
+func (mock *KleverChainMock) GetNetworkConfig(_ context.Context) (*data.NetworkConfig, error) {
 	return &data.NetworkConfig{
 		ChainID:                  "t",
 		LatestTagSoftwareVersion: "",
@@ -47,17 +47,17 @@ func (mock *MultiversXChainMock) GetNetworkConfig(_ context.Context) (*data.Netw
 }
 
 // GetNetworkStatus -
-func (mock *MultiversXChainMock) GetNetworkStatus(_ context.Context, _ uint32) (*data.NetworkStatus, error) {
+func (mock *KleverChainMock) GetNetworkStatus(_ context.Context, _ uint32) (*data.NetworkStatus, error) {
 	return &data.NetworkStatus{}, nil
 }
 
 // GetShardOfAddress -
-func (mock *MultiversXChainMock) GetShardOfAddress(_ context.Context, _ string) (uint32, error) {
+func (mock *KleverChainMock) GetShardOfAddress(_ context.Context, _ string) (uint32, error) {
 	return 0, nil
 }
 
 // SendTransaction -
-func (mock *MultiversXChainMock) SendTransaction(_ context.Context, transaction *transaction.FrontendTransaction) (string, error) {
+func (mock *KleverChainMock) SendTransaction(_ context.Context, transaction *transaction.FrontendTransaction) (string, error) {
 	if transaction == nil {
 		panic("nil transaction")
 	}
@@ -73,7 +73,7 @@ func (mock *MultiversXChainMock) SendTransaction(_ context.Context, transaction 
 		panic(err)
 	}
 
-	log.Info("sent MultiversX transaction", "sender", addrAsBech32, "data", string(transaction.Data))
+	log.Info("sent Kleverchain transaction", "sender", addrAsBech32, "data", string(transaction.Data))
 
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
@@ -87,7 +87,7 @@ func (mock *MultiversXChainMock) SendTransaction(_ context.Context, transaction 
 }
 
 // SendTransactions -
-func (mock *MultiversXChainMock) SendTransactions(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error) {
+func (mock *KleverChainMock) SendTransactions(ctx context.Context, txs []*transaction.FrontendTransaction) ([]string, error) {
 	hashes := make([]string, 0, len(txs))
 	for _, tx := range txs {
 		hash, _ := mock.SendTransaction(ctx, tx)
@@ -98,7 +98,7 @@ func (mock *MultiversXChainMock) SendTransactions(ctx context.Context, txs []*tr
 }
 
 // GetAllSentTransactions -
-func (mock *MultiversXChainMock) GetAllSentTransactions(_ context.Context) map[string]*transaction.FrontendTransaction {
+func (mock *KleverChainMock) GetAllSentTransactions(_ context.Context) map[string]*transaction.FrontendTransaction {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
@@ -111,7 +111,7 @@ func (mock *MultiversXChainMock) GetAllSentTransactions(_ context.Context) map[s
 }
 
 // ExecuteVMQuery -
-func (mock *MultiversXChainMock) ExecuteVMQuery(_ context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
+func (mock *KleverChainMock) ExecuteVMQuery(_ context.Context, vmRequest *data.VmValueRequest) (*data.VmValuesResponseData, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -119,7 +119,7 @@ func (mock *MultiversXChainMock) ExecuteVMQuery(_ context.Context, vmRequest *da
 }
 
 // GetAccount -
-func (mock *MultiversXChainMock) GetAccount(_ context.Context, address address.Address) (*data.Account, error) {
+func (mock *KleverChainMock) GetAccount(_ context.Context, address address.Address) (*data.Account, error) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -127,17 +127,17 @@ func (mock *MultiversXChainMock) GetAccount(_ context.Context, address address.A
 }
 
 // GetTransactionInfoWithResults -
-func (mock *MultiversXChainMock) GetTransactionInfoWithResults(_ context.Context, _ string) (*data.TransactionInfo, error) {
+func (mock *KleverChainMock) GetTransactionInfoWithResults(_ context.Context, _ string) (*data.TransactionInfo, error) {
 	return &data.TransactionInfo{}, nil
 }
 
 // ProcessTransactionStatus -
-func (mock *MultiversXChainMock) ProcessTransactionStatus(_ context.Context, _ string) (transaction.TxStatus, error) {
+func (mock *KleverChainMock) ProcessTransactionStatus(_ context.Context, _ string) (transaction.TxStatus, error) {
 	return "", nil
 }
 
 // AddRelayer -
-func (mock *MultiversXChainMock) AddRelayer(address address.Address) {
+func (mock *KleverChainMock) AddRelayer(address address.Address) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -145,7 +145,7 @@ func (mock *MultiversXChainMock) AddRelayer(address address.Address) {
 }
 
 // SetLastExecutedEthBatchID -
-func (mock *MultiversXChainMock) SetLastExecutedEthBatchID(lastExecutedEthBatchId uint64) {
+func (mock *KleverChainMock) SetLastExecutedEthBatchID(lastExecutedEthBatchId uint64) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -153,7 +153,7 @@ func (mock *MultiversXChainMock) SetLastExecutedEthBatchID(lastExecutedEthBatchI
 }
 
 // SetLastExecutedEthTxId -
-func (mock *MultiversXChainMock) SetLastExecutedEthTxId(lastExecutedEthTxId uint64) {
+func (mock *KleverChainMock) SetLastExecutedEthTxId(lastExecutedEthTxId uint64) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -161,7 +161,7 @@ func (mock *MultiversXChainMock) SetLastExecutedEthTxId(lastExecutedEthTxId uint
 }
 
 // AddTokensPair -
-func (mock *MultiversXChainMock) AddTokensPair(erc20 common.Address, ticker string, isNativeToken, isMintBurnToken bool, totalBalance, mintBalances, burnBalances *big.Int) {
+func (mock *KleverChainMock) AddTokensPair(erc20 common.Address, ticker string, isNativeToken, isMintBurnToken bool, totalBalance, mintBalances, burnBalances *big.Int) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -169,7 +169,7 @@ func (mock *MultiversXChainMock) AddTokensPair(erc20 common.Address, ticker stri
 }
 
 // SetQuorum -
-func (mock *MultiversXChainMock) SetQuorum(quorum int) {
+func (mock *KleverChainMock) SetQuorum(quorum int) {
 	mock.mutState.Lock()
 	defer mock.mutState.Unlock()
 
@@ -177,7 +177,7 @@ func (mock *MultiversXChainMock) SetQuorum(quorum int) {
 }
 
 // PerformedActionID returns the performed action ID
-func (mock *MultiversXChainMock) PerformedActionID() *big.Int {
+func (mock *KleverChainMock) PerformedActionID() *big.Int {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
@@ -185,7 +185,7 @@ func (mock *MultiversXChainMock) PerformedActionID() *big.Int {
 }
 
 // ProposedTransfer returns the proposed transfer that matches the performed action ID
-func (mock *MultiversXChainMock) ProposedTransfer() *multiversXProposedTransfer {
+func (mock *KleverChainMock) ProposedTransfer() *kleverchainProposedTransfer {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
@@ -203,21 +203,21 @@ func (mock *MultiversXChainMock) ProposedTransfer() *multiversXProposedTransfer 
 }
 
 // SetPendingBatch -
-func (mock *MultiversXChainMock) SetPendingBatch(pendingBatch *MultiversXPendingBatch) {
+func (mock *KleverChainMock) SetPendingBatch(pendingBatch *KleverchainPendingBatch) {
 	mock.mutState.Lock()
 	mock.setPendingBatch(pendingBatch)
 	mock.mutState.Unlock()
 }
 
 // AddDepositToCurrentBatch -
-func (mock *MultiversXChainMock) AddDepositToCurrentBatch(deposit MultiversXDeposit) {
+func (mock *KleverChainMock) AddDepositToCurrentBatch(deposit KleverchainDeposit) {
 	mock.mutState.Lock()
-	mock.pendingBatch.MultiversXDeposits = append(mock.pendingBatch.MultiversXDeposits, deposit)
+	mock.pendingBatch.KleverchainDeposits = append(mock.pendingBatch.KleverchainDeposits, deposit)
 	mock.mutState.Unlock()
 }
 
-// GetESDTTokenData -
-func (mock *MultiversXChainMock) GetESDTTokenData(_ context.Context, _ address.Address, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
+// GetKDATokenData -
+func (mock *KleverChainMock) GetKDATokenData(_ context.Context, _ address.Address, tokenIdentifier string, _ api.AccountQueryOptions) (*data.ESDTFungibleTokenData, error) {
 	mock.mutState.RLock()
 	defer mock.mutState.RUnlock()
 
@@ -234,6 +234,6 @@ func (mock *MultiversXChainMock) GetESDTTokenData(_ context.Context, _ address.A
 }
 
 // IsInterfaceNil -
-func (mock *MultiversXChainMock) IsInterfaceNil() bool {
+func (mock *KleverChainMock) IsInterfaceNil() bool {
 	return mock == nil
 }

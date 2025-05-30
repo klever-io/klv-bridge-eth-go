@@ -2,14 +2,14 @@ package testsCommon
 
 import "github.com/klever-io/klv-bridge-eth-go/parsers"
 
-// MultiversxCodecStub -
-type MultiversxCodecStub struct {
+// KleverchainCodecStub -
+type KleverchainCodecStub struct {
 	DecodeProxySCCompleteCallDataCalled  func(buff []byte) (parsers.ProxySCCompleteCallData, error)
 	ExtractGasLimitFromRawCallDataCalled func(buff []byte) (uint64, error)
 }
 
 // DecodeProxySCCompleteCallData -
-func (stub *MultiversxCodecStub) DecodeProxySCCompleteCallData(buff []byte) (parsers.ProxySCCompleteCallData, error) {
+func (stub *KleverchainCodecStub) DecodeProxySCCompleteCallData(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 	if stub.DecodeProxySCCompleteCallDataCalled != nil {
 		return stub.DecodeProxySCCompleteCallDataCalled(buff)
 	}
@@ -18,7 +18,7 @@ func (stub *MultiversxCodecStub) DecodeProxySCCompleteCallData(buff []byte) (par
 }
 
 // ExtractGasLimitFromRawCallData -
-func (stub *MultiversxCodecStub) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
+func (stub *KleverchainCodecStub) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
 	if stub.ExtractGasLimitFromRawCallDataCalled != nil {
 		return stub.ExtractGasLimitFromRawCallDataCalled(buff)
 	}
@@ -27,6 +27,6 @@ func (stub *MultiversxCodecStub) ExtractGasLimitFromRawCallData(buff []byte) (ui
 }
 
 // IsInterfaceNil -
-func (stub *MultiversxCodecStub) IsInterfaceNil() bool {
+func (stub *KleverchainCodecStub) IsInterfaceNil() bool {
 	return stub == nil
 }

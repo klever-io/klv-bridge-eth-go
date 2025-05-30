@@ -78,10 +78,10 @@ var (
 		Name:  "sc-proxy-address",
 		Usage: "The smart contract address in bech32 format to interact with",
 	}
-	// privateKeyFile is the MultiversX private key file used to issue transaction for the SC calls
+	// privateKeyFile is the Kleverchain private key file used to issue transaction for the SC calls
 	privateKeyFile = cli.StringFlag{
 		Name:  "private-key-file",
-		Usage: "The MultiversX private key file used to issue transaction for the SC calls",
+		Usage: "The Kleverchain private key file used to issue transaction for the SC calls",
 	}
 )
 

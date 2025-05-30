@@ -11,27 +11,27 @@ import (
 type Direction string
 
 const (
-	// FromMultiversX is the direction of the transfer
-	FromMultiversX Direction = "FromMultiversX"
-	// ToMultiversX is the direction of the transfer
-	ToMultiversX Direction = "ToMultiversX"
+	// FromKleverchain is the direction of the transfer
+	FromKleverchain Direction = "FromKleverchain"
+	// ToKleverchain is the direction of the transfer
+	ToKleverchain Direction = "ToKleverchain"
 )
 
 // ArgListsBatch is a struct that contains the batch data in a format that is easy to use
 type ArgListsBatch struct {
 	EthTokens     []common.Address
 	Recipients    []common.Address
-	MvxTokenBytes [][]byte
+	KdaTokenBytes [][]byte
 	Amounts       []*big.Int
 	Nonces        []*big.Int
 	Direction     Direction
 }
 
-// ExtractListMvxToEth will extract the batch data into a format that is easy to use
-// The transfer is from MultiversX to Ethereum
-func ExtractListMvxToEth(batch *bridgeCore.TransferBatch) *ArgListsBatch {
+// ExtractListKlvToEth will extract the batch data into a format that is easy to use
+// The transfer is from Kleverchain to Ethereum
+func ExtractListKlvToEth(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 	arg := &ArgListsBatch{
-		Direction: FromMultiversX,
+		Direction: FromKleverchain,
 	}
 
 	for _, dt := range batch.Deposits {
@@ -47,17 +47,17 @@ func ExtractListMvxToEth(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 		nonce := big.NewInt(0).SetUint64(dt.Nonce)
 		arg.Nonces = append(arg.Nonces, nonce)
 
-		arg.MvxTokenBytes = append(arg.MvxTokenBytes, dt.SourceTokenBytes)
+		arg.KdaTokenBytes = append(arg.KdaTokenBytes, dt.SourceTokenBytes)
 	}
 
 	return arg
 }
 
-// ExtractListEthToMvx will extract the batch data into a format that is easy to use
-// The transfer is from Ehtereum to MultiversX
-func ExtractListEthToMvx(batch *bridgeCore.TransferBatch) *ArgListsBatch {
+// ExtractListEthToKlv will extract the batch data into a format that is easy to use
+// The transfer is from Ehtereum to Kleverchain
+func ExtractListEthToKlv(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 	arg := &ArgListsBatch{
-		Direction: ToMultiversX,
+		Direction: ToKleverchain,
 	}
 
 	for _, dt := range batch.Deposits {
@@ -73,7 +73,7 @@ func ExtractListEthToMvx(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 		nonce := big.NewInt(0).SetUint64(dt.Nonce)
 		arg.Nonces = append(arg.Nonces, nonce)
 
-		arg.MvxTokenBytes = append(arg.MvxTokenBytes, dt.DestinationTokenBytes)
+		arg.KdaTokenBytes = append(arg.KdaTokenBytes, dt.DestinationTokenBytes)
 	}
 
 	return arg

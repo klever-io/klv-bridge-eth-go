@@ -42,14 +42,14 @@ func TestRelayerShouldExecuteSimultaneousSwapsAndNotCatchErrors(t *testing.T) {
 	usdcToken := GenerateTestUSDCToken()
 	usdcToken.TestOperations = []framework.TokenOperations{
 		{
-			ValueToTransferToMvx: big.NewInt(5000),
-			ValueToSendFromMvX:   big.NewInt(200),
-			MvxSCCallData:        nil,
-			MvxFaultySCCall:      false,
-			MvxForceSCCall:       false,
+			ValueToTransferToKlv: big.NewInt(5000),
+			ValueToSendFromKlv:   big.NewInt(200),
+			KlvSCCallData:        nil,
+			KlvFaultySCCall:      false,
+			KlvForceSCCall:       false,
 		},
 	}
-	usdcToken.ESDTSafeExtraBalance = big.NewInt(50)
+	usdcToken.KDASafeExtraBalance = big.NewInt(50)
 	usdcToken.EthTestAddrExtraBalance = big.NewInt(-5000 - 5000 + 200 - 50)
 
 	_ = testRelayersWithChainSimulatorAndTokensForSimultaneousSwaps(
@@ -69,8 +69,8 @@ func testRelayersWithChainSimulatorAndTokensForSimultaneousSwaps(tb testing.TB, 
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.MultiversxHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
-		setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.MultiversxHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+		setup.KleverchainHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KleverchainHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 	}
 
 	processFunc := func(tb testing.TB, setup *framework.TestSetup) bool {

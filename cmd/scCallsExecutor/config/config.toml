@@ -8,12 +8,12 @@ ProxyFinalityCheck = true
 ProxyCacherExpirationSeconds = 600
 ProxyRestAPIEntityType = "proxy"
 IntervalToResendTxsInSeconds = 60
-PrivateKeyFile = "keys/multiversx.pem"
+PrivateKeyFile = "keys/walletKey.pem"
 PollingIntervalInMillis = 6000
 
 [Filter]
     AllowedEthAddresses = ["*"]   # execute SC calls from all ETH addresses
-    AllowedMvxAddresses = ["*"]   # execute SC calls to all MvX contracts
+    AllowedKlvAddresses = ["*"]   # execute SC calls to all Klv contracts
     AllowedTokens = ["*"]         # execute SC calls for all tokens
 
 [Logs]

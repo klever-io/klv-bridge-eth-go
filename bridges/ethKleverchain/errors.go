@@ -11,8 +11,8 @@ var ErrInvalidDepositNonce = errors.New("invalid deposit nonce")
 // ErrNilLogger signals that a nil logger has been provided
 var ErrNilLogger = errors.New("nil logger")
 
-// ErrNilMultiversXClient signals that a nil MultiversX client has been provided
-var ErrNilMultiversXClient = errors.New("nil MultiversX client")
+// ErrNilKleverchainClient signals that a nil Kleverchain client has been provided
+var ErrNilKleverchainClient = errors.New("nil Kleverchain client")
 
 // ErrNilEthereumClient signals that a nil Ethereum client has been provided
 var ErrNilEthereumClient = errors.New("nil Ethereum client")

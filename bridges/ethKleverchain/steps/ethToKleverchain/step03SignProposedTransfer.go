@@ -21,7 +21,7 @@ func (step *signProposedTransferStep) Execute(ctx context.Context) core.StepIden
 		return GettingPendingBatchFromEthereum
 	}
 
-	actionID, err := step.bridge.GetAndStoreActionIDForProposeTransferOnMultiversX(ctx)
+	actionID, err := step.bridge.GetAndStoreActionIDForProposeTransferOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error fetching action ID", "batch ID", batch.ID, "error", err)
 		return GettingPendingBatchFromEthereum
@@ -34,7 +34,7 @@ func (step *signProposedTransferStep) Execute(ctx context.Context) core.StepIden
 
 	step.bridge.PrintInfo(logger.LogInfo, "fetched action ID", "action ID", actionID, "batch ID", batch.ID)
 
-	wasSigned, err := step.bridge.WasActionSignedOnMultiversX(ctx)
+	wasSigned, err := step.bridge.WasActionSignedOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error determining if the proposed transfer was signed or not",
 			"batch ID", batch.ID, "error", err)
@@ -45,7 +45,7 @@ func (step *signProposedTransferStep) Execute(ctx context.Context) core.StepIden
 		return WaitingForQuorum
 	}
 
-	err = step.bridge.SignActionOnMultiversX(ctx)
+	err = step.bridge.SignActionOnKleverchain(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error signing the proposed transfer",
 			"batch ID", batch.ID, "error", err)
@@ -57,7 +57,7 @@ func (step *signProposedTransferStep) Execute(ctx context.Context) core.StepIden
 
 // Identifier returns the step's identifier
 func (step *signProposedTransferStep) Identifier() core.StepIdentifier {
-	return SigningProposedTransferOnMultiversX
+	return SigningProposedTransferOnKleverchain
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

@@ -29,7 +29,7 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 	t.Run("max retries reached", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorProposeSetStatus()
-		bridgeStub.ProcessMaxRetriesOnWasTransferProposedOnMultiversXCalled = func() bool {
+		bridgeStub.ProcessMaxRetriesOnWasTransferProposedOnKleverchainCalled = func() bool {
 			return true
 		}
 
@@ -41,10 +41,10 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
 
-	t.Run("error on WasSetStatusProposedOnMultiversX", func(t *testing.T) {
+	t.Run("error on WasSetStatusProposedOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorProposeSetStatus()
-		bridgeStub.WasSetStatusProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasSetStatusProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
 
@@ -56,10 +56,10 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
 
-	t.Run("error on ProposeSetStatusOnMultiversX", func(t *testing.T) {
+	t.Run("error on ProposeSetStatusOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorProposeSetStatus()
-		bridgeStub.ProposeSetStatusOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.ProposeSetStatusOnKleverchainCalled = func(ctx context.Context) error {
 			return expectedError
 		}
 
@@ -73,10 +73,10 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
-		t.Run("if SetStatus was proposed it should go to SigningProposedSetStatusOnMultiversX", func(t *testing.T) {
+		t.Run("if SetStatus was proposed it should go to SigningProposedSetStatusOnKleverchain", func(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorProposeSetStatus()
-			bridgeStub.WasSetStatusProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+			bridgeStub.WasSetStatusProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 				return true, nil
 			}
 
@@ -85,7 +85,7 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 			}
 
 			assert.False(t, step.IsInterfaceNil())
-			expectedStep := bridgeCore.StepIdentifier(SigningProposedSetStatusOnMultiversX)
+			expectedStep := bridgeCore.StepIdentifier(SigningProposedSetStatusOnKleverchain)
 			stepIdentifier := step.Execute(context.Background())
 			assert.Equal(t, expectedStep, stepIdentifier)
 
@@ -106,7 +106,7 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 				assert.Equal(t, step.Identifier(), stepIdentifier)
 
 			})
-			t.Run("if leader, should go to SigningProposedTransferOnMultiversX", func(t *testing.T) {
+			t.Run("if leader, should go to SigningProposedTransferOnKleverchain", func(t *testing.T) {
 				t.Parallel()
 				bridgeStub := createStubExecutorProposeSetStatus()
 
@@ -114,7 +114,7 @@ func TestExecute_ProposeSetStatus(t *testing.T) {
 					bridge: bridgeStub,
 				}
 
-				expectedStep := bridgeCore.StepIdentifier(SigningProposedSetStatusOnMultiversX)
+				expectedStep := bridgeCore.StepIdentifier(SigningProposedSetStatusOnKleverchain)
 				stepIdentifier := step.Execute(context.Background())
 				assert.Equal(t, expectedStep, stepIdentifier)
 
@@ -129,13 +129,13 @@ func createStubExecutorProposeSetStatus() *bridgeTests.BridgeExecutorStub {
 	stub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 		return testBatch
 	}
-	stub.WasSetStatusProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+	stub.WasSetStatusProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	stub.MyTurnAsLeaderCalled = func() bool {
 		return true
 	}
-	stub.ProposeSetStatusOnMultiversXCalled = func(ctx context.Context) error {
+	stub.ProposeSetStatusOnKleverchainCalled = func(ctx context.Context) error {
 		return nil
 	}
 	return stub

@@ -15,34 +15,34 @@ type getPendingStep struct {
 
 // Execute will execute this step returning the next step to be executed
 func (step *getPendingStep) Execute(ctx context.Context) core.StepIdentifier {
-	err := step.bridge.CheckMultiversXClientAvailability(ctx)
+	err := step.bridge.CheckKleverchainClientAvailability(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogDebug, "MultiversX client unavailable", "message", err)
+		step.bridge.PrintInfo(logger.LogDebug, "Kleverchain client unavailable", "message", err)
 	}
 	err = step.bridge.CheckEthereumClientAvailability(ctx)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogDebug, "Ethereum client unavailable", "message", err)
 	}
 	step.bridge.ResetRetriesCountOnEthereum()
-	step.resetCountersOnMultiversX()
+	step.resetCountersOnKleverchain()
 
-	batch, err := step.bridge.GetBatchFromMultiversX(ctx)
+	batch, err := step.bridge.GetBatchFromKleverchain(ctx)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogDebug, "cannot fetch MultiversX batch", "message", err)
+		step.bridge.PrintInfo(logger.LogDebug, "cannot fetch Kleverchain batch", "message", err)
 		return step.Identifier()
 	}
 	if batch == nil {
-		step.bridge.PrintInfo(logger.LogDebug, "no new batch found on MultiversX")
+		step.bridge.PrintInfo(logger.LogDebug, "no new batch found on Kleverchain")
 		return step.Identifier()
 	}
 
-	err = step.bridge.StoreBatchFromMultiversX(batch)
+	err = step.bridge.StoreBatchFromKleverchain(batch)
 	if err != nil {
-		step.bridge.PrintInfo(logger.LogError, "error storing MultiversX batch", "error", err)
+		step.bridge.PrintInfo(logger.LogError, "error storing Kleverchain batch", "error", err)
 		return step.Identifier()
 	}
 
-	step.bridge.PrintInfo(logger.LogInfo, "fetched new batch from MultiversX "+batch.String())
+	step.bridge.PrintInfo(logger.LogInfo, "fetched new batch from Kleverchain "+batch.String())
 
 	wasPerformed, err := step.bridge.WasTransferPerformedOnEthereum(ctx)
 	if err != nil {
@@ -51,11 +51,11 @@ func (step *getPendingStep) Execute(ctx context.Context) core.StepIdentifier {
 	}
 	if wasPerformed {
 		step.bridge.PrintInfo(logger.LogInfo, "transfer performed")
-		return ResolvingSetStatusOnMultiversX
+		return ResolvingSetStatusOnKleverchain
 	}
 
-	argLists := batchProcessor.ExtractListMvxToEth(batch)
-	err = step.bridge.CheckAvailableTokens(ctx, argLists.EthTokens, argLists.MvxTokenBytes, argLists.Amounts, argLists.Direction)
+	argLists := batchProcessor.ExtractListKlvToEth(batch)
+	err = step.bridge.CheckAvailableTokens(ctx, argLists.EthTokens, argLists.KdaTokenBytes, argLists.Amounts, argLists.Direction)
 	if err != nil {
 		step.bridge.PrintInfo(logger.LogError, "error checking available tokens", "error", err, "batch", batch.String())
 		return step.Identifier()
@@ -66,7 +66,7 @@ func (step *getPendingStep) Execute(ctx context.Context) core.StepIdentifier {
 
 // Identifier returns the step's identifier
 func (step *getPendingStep) Identifier() core.StepIdentifier {
-	return GettingPendingBatchFromMultiversX
+	return GettingPendingBatchFromKleverchain
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
@@ -74,7 +74,7 @@ func (step *getPendingStep) IsInterfaceNil() bool {
 	return step == nil
 }
 
-func (step *getPendingStep) resetCountersOnMultiversX() {
-	step.bridge.ResetRetriesCountOnMultiversX()
-	step.bridge.ResetRetriesOnWasTransferProposedOnMultiversX()
+func (step *getPendingStep) resetCountersOnKleverchain() {
+	step.bridge.ResetRetriesCountOnKleverchain()
+	step.bridge.ResetRetriesOnWasTransferProposedOnKleverchain()
 }

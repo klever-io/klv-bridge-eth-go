@@ -108,8 +108,8 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 		},
 		P2P: config.ConfigP2P{},
 		StateMachine: map[string]config.ConfigStateMachine{
-			"EthereumToMultiversX": stateMachineConfig,
-			"MultiversXToEthereum": stateMachineConfig,
+			"EthereumToKleverchain": stateMachineConfig,
+			"KleverchainToEthereum": stateMachineConfig,
 		},
 		Relayer: config.ConfigRelayer{
 			Marshalizer: chainConfig.MarshalizerConfig{

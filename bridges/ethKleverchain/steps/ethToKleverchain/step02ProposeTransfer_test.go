@@ -27,13 +27,13 @@ func TestExecuteProposeTransfer(t *testing.T) {
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
 
-	t.Run("error on WasTransferProposedOnMultiversX", func(t *testing.T) {
+	t.Run("error on WasTransferProposedOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutor()
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasTransferProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasTransferProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
 
@@ -52,7 +52,7 @@ func TestExecuteProposeTransfer(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasTransferProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasTransferProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
 		bridgeStub.MyTurnAsLeaderCalled = func() bool {
@@ -68,19 +68,19 @@ func TestExecuteProposeTransfer(t *testing.T) {
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
 
-	t.Run("error on ProposeTransferOnMultiversX", func(t *testing.T) {
+	t.Run("error on ProposeTransferOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutor()
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasTransferProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasTransferProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
 		bridgeStub.MyTurnAsLeaderCalled = func() bool {
 			return true
 		}
-		bridgeStub.ProposeTransferOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.ProposeTransferOnKleverchainCalled = func(ctx context.Context) error {
 			return expectedError
 		}
 
@@ -99,7 +99,7 @@ func TestExecuteProposeTransfer(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasTransferProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasTransferProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return true, nil
 		}
 
@@ -107,7 +107,7 @@ func TestExecuteProposeTransfer(t *testing.T) {
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := bridgeCore.StepIdentifier(SigningProposedTransferOnMultiversX)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(SigningProposedTransferOnKleverchain)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -118,13 +118,13 @@ func TestExecuteProposeTransfer(t *testing.T) {
 		bridgeStub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 			return testBatch
 		}
-		bridgeStub.WasTransferProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasTransferProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
 		bridgeStub.MyTurnAsLeaderCalled = func() bool {
 			return true
 		}
-		bridgeStub.ProposeTransferOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.ProposeTransferOnKleverchainCalled = func(ctx context.Context) error {
 			return nil
 		}
 
@@ -134,7 +134,7 @@ func TestExecuteProposeTransfer(t *testing.T) {
 		// Test IsInterfaceNil
 		assert.NotNil(t, step.IsInterfaceNil())
 
-		expectedStepIdentifier := bridgeCore.StepIdentifier(SigningProposedTransferOnMultiversX)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(SigningProposedTransferOnKleverchain)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})

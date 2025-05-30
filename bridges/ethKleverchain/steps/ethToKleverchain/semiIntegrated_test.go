@@ -15,19 +15,19 @@ import (
 )
 
 const (
-	getAndStoreBatchFromEthereum                      = "GetAndStoreBatchFromEthereum"
-	getLastExecutedEthBatchIDFromMultiversX           = "GetLastExecutedEthBatchIDFromMultiversX"
-	verifyLastDepositNonceExecutedOnEthereumBatch     = "VerifyLastDepositNonceExecutedOnEthereumBatch"
-	wasTransferProposedOnMultiversX                   = "WasTransferProposedOnMultiversX"
-	wasActionSignedOnMultiversX                       = "WasActionSignedOnMultiversX"
-	signActionOnMultiversX                            = "SignActionOnMultiversX"
-	getAndStoreActionIDForProposeTransferOnMultiversX = "GetAndStoreActionIDForProposeTransferOnMultiversX"
-	ProcessMaxQuorumRetriesOnMultiversX               = "ProcessMaxQuorumRetriesOnMultiversX"
-	resetRetriesCountOnMultiversX                     = "ResetRetriesCountOnMultiversX"
-	processQuorumReachedOnMultiversX                  = "ProcessQuorumReachedOnMultiversX"
-	wasActionPerformedOnMultiversX                    = "WasActionPerformedOnMultiversX"
-	proposeTransferOnMultiversX                       = "ProposeTransferOnMultiversX"
-	performActionOnMultiversX                         = "PerformActionOnMultiversX"
+	getAndStoreBatchFromEthereum                       = "GetAndStoreBatchFromEthereum"
+	getLastExecutedEthBatchIDFromKleverchain           = "GetLastExecutedEthBatchIDFromKleverchain"
+	verifyLastDepositNonceExecutedOnEthereumBatch      = "VerifyLastDepositNonceExecutedOnEthereumBatch"
+	wasTransferProposedOnKleverchain                   = "WasTransferProposedOnKleverchain"
+	wasActionSignedOnKleverchain                       = "WasActionSignedOnKleverchain"
+	signActionOnKleverchain                            = "SignActionOnKleverchain"
+	getAndStoreActionIDForProposeTransferOnKleverchain = "GetAndStoreActionIDForProposeTransferOnKleverchain"
+	ProcessMaxQuorumRetriesOnKleverchain               = "ProcessMaxQuorumRetriesOnKleverchain"
+	resetRetriesCountOnKleverchain                     = "ResetRetriesCountOnKleverchain"
+	processQuorumReachedOnKleverchain                  = "ProcessQuorumReachedOnKleverchain"
+	wasActionPerformedOnKleverchain                    = "WasActionPerformedOnKleverchain"
+	proposeTransferOnKleverchain                       = "ProposeTransferOnKleverchain"
+	performActionOnKleverchain                         = "PerformActionOnKleverchain"
 )
 
 var trueHandler = func() bool { return true }
@@ -61,8 +61,8 @@ func createMockBridge(args argsBridgeStub) (*bridgeTests.BridgeExecutorStub, *er
 	stub.MyTurnAsLeaderCalled = func() bool {
 		return args.myTurnHandler()
 	}
-	stub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled = func(ctx context.Context) (uint64, error) {
-		if args.failingStep == getAndStoreActionIDForProposeTransferOnMultiversX {
+	stub.GetAndStoreActionIDForProposeTransferOnKleverchainCalled = func(ctx context.Context) (uint64, error) {
+		if args.failingStep == getAndStoreActionIDForProposeTransferOnKleverchain {
 			return 0, errHandler.storeAndReturnError(expectedErr)
 		}
 
@@ -81,8 +81,8 @@ func createMockBridge(args argsBridgeStub) (*bridgeTests.BridgeExecutorStub, *er
 	stub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 		return &bridgeCore.TransferBatch{}
 	}
-	stub.GetLastExecutedEthBatchIDFromMultiversXCalled = func(ctx context.Context) (uint64, error) {
-		if args.failingStep == getLastExecutedEthBatchIDFromMultiversX {
+	stub.GetLastExecutedEthBatchIDFromKleverchainCalled = func(ctx context.Context) (uint64, error) {
+		if args.failingStep == getLastExecutedEthBatchIDFromKleverchain {
 			return 0, errHandler.storeAndReturnError(expectedErr)
 		}
 
@@ -95,56 +95,56 @@ func createMockBridge(args argsBridgeStub) (*bridgeTests.BridgeExecutorStub, *er
 
 		return errHandler.storeAndReturnError(nil)
 	}
-	stub.WasTransferProposedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
-		if args.failingStep == wasTransferProposedOnMultiversX {
+	stub.WasTransferProposedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
+		if args.failingStep == wasTransferProposedOnKleverchain {
 			return false, errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return args.wasTransferProposedHandler(), errHandler.storeAndReturnError(nil)
 	}
-	stub.ProposeTransferOnMultiversXCalled = func(ctx context.Context) error {
-		if args.failingStep == proposeTransferOnMultiversX {
+	stub.ProposeTransferOnKleverchainCalled = func(ctx context.Context) error {
+		if args.failingStep == proposeTransferOnKleverchain {
 			return errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return errHandler.storeAndReturnError(nil)
 	}
-	stub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
-		if args.failingStep == wasActionSignedOnMultiversX {
+	stub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
+		if args.failingStep == wasActionSignedOnKleverchain {
 			return false, errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return args.wasActionSigned(), errHandler.storeAndReturnError(nil)
 	}
-	stub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
-		if args.failingStep == signActionOnMultiversX {
+	stub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
+		if args.failingStep == signActionOnKleverchain {
 			return errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return errHandler.storeAndReturnError(nil)
 	}
-	stub.ProcessQuorumReachedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
-		if args.failingStep == processQuorumReachedOnMultiversX {
+	stub.ProcessQuorumReachedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
+		if args.failingStep == processQuorumReachedOnKleverchain {
 			return false, errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return args.isQuorumReachedHandler(), errHandler.storeAndReturnError(nil)
 	}
-	stub.WasActionPerformedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
-		if args.failingStep == wasActionPerformedOnMultiversX {
+	stub.WasActionPerformedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
+		if args.failingStep == wasActionPerformedOnKleverchain {
 			return false, errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return args.wasActionIDPerformedHandler(), errHandler.storeAndReturnError(nil)
 	}
-	stub.PerformActionOnMultiversXCalled = func(ctx context.Context) error {
-		if args.failingStep == performActionOnMultiversX {
+	stub.PerformActionOnKleverchainCalled = func(ctx context.Context) error {
+		if args.failingStep == performActionOnKleverchain {
 			return errHandler.storeAndReturnError(expectedErr)
 		}
 
 		return errHandler.storeAndReturnError(nil)
 	}
-	stub.ProcessMaxQuorumRetriesOnMultiversXCalled = func() bool {
+	stub.ProcessMaxQuorumRetriesOnKleverchainCalled = func() bool {
 		return args.maxRetriesReachedHandler()
 	}
 
@@ -183,23 +183,23 @@ func TestHappyCaseWhenLeader(t *testing.T) {
 		require.Nil(t, err)
 	}
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(resetRetriesCountOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(getLastExecutedEthBatchIDFromMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(resetRetriesCountOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(getLastExecutedEthBatchIDFromKleverchain))
 	assert.Equal(t, 4, executor.GetFunctionCounter(getAndStoreBatchFromEthereum))
 	assert.Equal(t, 4, executor.GetFunctionCounter(verifyLastDepositNonceExecutedOnEthereumBatch))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(wasTransferProposedOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(proposeTransferOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(wasTransferProposedOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(proposeTransferOnKleverchain))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(getAndStoreActionIDForProposeTransferOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionSignedOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(signActionOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(getAndStoreActionIDForProposeTransferOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionSignedOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(signActionOnKleverchain))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(ProcessMaxQuorumRetriesOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(processQuorumReachedOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(ProcessMaxQuorumRetriesOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(processQuorumReachedOnKleverchain))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionPerformedOnMultiversX))
-	assert.Equal(t, 0, executor.GetFunctionCounter(performActionOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionPerformedOnKleverchain))
+	assert.Equal(t, 0, executor.GetFunctionCounter(performActionOnKleverchain))
 
 	assert.Nil(t, eh.lastError)
 }
@@ -229,40 +229,40 @@ func TestHappyCaseWhenLeaderAndActionIdNotPerformed(t *testing.T) {
 		require.Nil(t, err)
 	}
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(resetRetriesCountOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(getLastExecutedEthBatchIDFromMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(resetRetriesCountOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(getLastExecutedEthBatchIDFromKleverchain))
 	assert.Equal(t, 4, executor.GetFunctionCounter(getAndStoreBatchFromEthereum))
 	assert.Equal(t, 4, executor.GetFunctionCounter(verifyLastDepositNonceExecutedOnEthereumBatch))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(wasTransferProposedOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(proposeTransferOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(wasTransferProposedOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(proposeTransferOnKleverchain))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(getAndStoreActionIDForProposeTransferOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionSignedOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(signActionOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(getAndStoreActionIDForProposeTransferOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionSignedOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(signActionOnKleverchain))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(ProcessMaxQuorumRetriesOnMultiversX))
-	assert.Equal(t, 4, executor.GetFunctionCounter(processQuorumReachedOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(ProcessMaxQuorumRetriesOnKleverchain))
+	assert.Equal(t, 4, executor.GetFunctionCounter(processQuorumReachedOnKleverchain))
 
-	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionPerformedOnMultiversX))
-	assert.Equal(t, 1, executor.GetFunctionCounter(performActionOnMultiversX))
+	assert.Equal(t, 4, executor.GetFunctionCounter(wasActionPerformedOnKleverchain))
+	assert.Equal(t, 1, executor.GetFunctionCounter(performActionOnKleverchain))
 
 	assert.Nil(t, eh.lastError)
 }
 
 func TestOneStepErrors_ShouldReturnToPendingBatch(t *testing.T) {
 	stepsThatCanError := []bridgeCore.StepIdentifier{
-		getAndStoreActionIDForProposeTransferOnMultiversX,
+		getAndStoreActionIDForProposeTransferOnKleverchain,
 		getAndStoreBatchFromEthereum,
-		getLastExecutedEthBatchIDFromMultiversX,
+		getLastExecutedEthBatchIDFromKleverchain,
 		verifyLastDepositNonceExecutedOnEthereumBatch,
-		wasTransferProposedOnMultiversX,
-		proposeTransferOnMultiversX,
-		wasTransferProposedOnMultiversX,
-		signActionOnMultiversX,
-		processQuorumReachedOnMultiversX,
-		wasActionPerformedOnMultiversX,
-		performActionOnMultiversX,
+		wasTransferProposedOnKleverchain,
+		proposeTransferOnKleverchain,
+		wasTransferProposedOnKleverchain,
+		signActionOnKleverchain,
+		processQuorumReachedOnKleverchain,
+		wasActionPerformedOnKleverchain,
+		performActionOnKleverchain,
 	}
 
 	for _, stepThatError := range stepsThatCanError {

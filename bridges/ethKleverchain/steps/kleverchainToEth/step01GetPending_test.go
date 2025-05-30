@@ -23,10 +23,10 @@ var testBatch = &bridgeCore.TransferBatch{
 func TestExecute_GetPending(t *testing.T) {
 	t.Parallel()
 
-	t.Run("error on GetBatchFromMultiversX", func(t *testing.T) {
+	t.Run("error on GetBatchFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorGetPending()
-		bridgeStub.GetBatchFromMultiversXCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+		bridgeStub.GetBatchFromKleverchainCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 			return nil, expectedError
 		}
 
@@ -38,10 +38,10 @@ func TestExecute_GetPending(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
-	t.Run("nil batch on GetBatchFromMultiversX", func(t *testing.T) {
+	t.Run("nil batch on GetBatchFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorGetPending()
-		bridgeStub.GetBatchFromMultiversXCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+		bridgeStub.GetBatchFromKleverchainCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 			return nil, nil
 		}
 
@@ -53,10 +53,10 @@ func TestExecute_GetPending(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
-	t.Run("error on StoreBatchFromMultiversX", func(t *testing.T) {
+	t.Run("error on StoreBatchFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorGetPending()
-		bridgeStub.StoreBatchFromMultiversXCalled = func(batch *bridgeCore.TransferBatch) error {
+		bridgeStub.StoreBatchFromKleverchainCalled = func(batch *bridgeCore.TransferBatch) error {
 			return expectedError
 		}
 
@@ -89,7 +89,7 @@ func TestExecute_GetPending(t *testing.T) {
 		bridgeStub.WasTransferPerformedOnEthereumCalled = func(ctx context.Context) (bool, error) {
 			return false, nil
 		}
-		bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
+		bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
 			return expectedError
 		}
 
@@ -103,14 +103,14 @@ func TestExecute_GetPending(t *testing.T) {
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
-		t.Run("if transfer already performed next step should be ResolvingSetStatusOnMultiversX", func(t *testing.T) {
+		t.Run("if transfer already performed next step should be ResolvingSetStatusOnKleverchain", func(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorGetPending()
 			bridgeStub.WasTransferPerformedOnEthereumCalled = func(ctx context.Context) (bool, error) {
 				return true, nil
 			}
 			checkAvailableTokensCalled := false
-			bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
+			bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
 				checkAvailableTokensCalled = true
 				return nil
 			}
@@ -121,7 +121,7 @@ func TestExecute_GetPending(t *testing.T) {
 
 			assert.False(t, step.IsInterfaceNil())
 
-			expectedStepIdentifier := bridgeCore.StepIdentifier(ResolvingSetStatusOnMultiversX)
+			expectedStepIdentifier := bridgeCore.StepIdentifier(ResolvingSetStatusOnKleverchain)
 			stepIdentifier := step.Execute(context.Background())
 			assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 			assert.False(t, checkAvailableTokensCalled)
@@ -133,7 +133,7 @@ func TestExecute_GetPending(t *testing.T) {
 				return false, nil
 			}
 			checkAvailableTokensCalled := false
-			bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
+			bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
 				checkAvailableTokensCalled = true
 				return nil
 			}
@@ -152,10 +152,10 @@ func TestExecute_GetPending(t *testing.T) {
 
 func createStubExecutorGetPending() *bridgeTests.BridgeExecutorStub {
 	stub := bridgeTests.NewBridgeExecutorStub()
-	stub.GetBatchFromMultiversXCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+	stub.GetBatchFromKleverchainCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 		return testBatch, nil
 	}
-	stub.StoreBatchFromMultiversXCalled = func(batch *bridgeCore.TransferBatch) error {
+	stub.StoreBatchFromKleverchainCalled = func(batch *bridgeCore.TransferBatch) error {
 		return nil
 	}
 	return stub

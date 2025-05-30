@@ -11,16 +11,16 @@ type IssueTokenParams struct {
 	InitialSupplyParams
 	AbstractTokenIdentifier string
 
-	// MultiversX
+	// Kleverchain
 	NumOfDecimalsUniversal           int
 	NumOfDecimalsChainSpecific       byte
-	MvxUniversalTokenTicker          string
-	MvxChainSpecificTokenTicker      string
-	MvxUniversalTokenDisplayName     string
-	MvxChainSpecificTokenDisplayName string
-	ValueToMintOnMvx                 string
-	IsMintBurnOnMvX                  bool
-	IsNativeOnMvX                    bool
+	KlvUniversalTokenTicker          string
+	KlvChainSpecificTokenTicker      string
+	KlvUniversalTokenDisplayName     string
+	KlvChainSpecificTokenDisplayName string
+	ValueToMintOnKlv                 string
+	IsMintBurnOnKlv                  bool
+	IsNativeOnKlv                    bool
 	HasChainSpecificToken            bool
 
 	// Ethereum
@@ -38,18 +38,18 @@ type InitialSupplyParams struct {
 
 // TokenOperations defines a token operation in a test. Usually this can define one or to deposits in a batch
 type TokenOperations struct {
-	ValueToTransferToMvx *big.Int
-	ValueToSendFromMvX   *big.Int
-	MvxSCCallData        []byte
-	MvxFaultySCCall      bool
-	MvxForceSCCall       bool
+	ValueToTransferToKlv *big.Int
+	ValueToSendFromKlv   *big.Int
+	KlvSCCallData        []byte
+	KlvFaultySCCall      bool
+	KlvForceSCCall       bool
 }
 
 // TestTokenParams defines a token collection of operations in one or 2 batches
 type TestTokenParams struct {
 	IssueTokenParams
 	TestOperations          []TokenOperations
-	ESDTSafeExtraBalance    *big.Int
+	KDASafeExtraBalance     *big.Int
 	EthTestAddrExtraBalance *big.Int
 }
 
@@ -57,13 +57,13 @@ type TestTokenParams struct {
 type TokenData struct {
 	AbstractTokenIdentifier string
 
-	MvxUniversalTokenTicker     string
-	MvxChainSpecificTokenTicker string
+	KlvUniversalTokenTicker     string
+	KlvChainSpecificTokenTicker string
 	EthTokenName                string
 	EthTokenSymbol              string
 
-	MvxUniversalToken     string
-	MvxChainSpecificToken string
+	KlvUniversalToken     string
+	KlvChainSpecificToken string
 	EthErc20Address       common.Address
 	EthErc20Contract      ERC20Contract
 }

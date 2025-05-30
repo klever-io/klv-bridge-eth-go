@@ -34,7 +34,7 @@ func TestExecute_ResolveSetStatus(t *testing.T) {
 	t.Run("error on GetStoredBatch", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorResolveSetStatus()
-		bridgeStub.GetBatchFromMultiversXCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+		bridgeStub.GetBatchFromKleverchainCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 			return nil, expectedError
 		}
 		clearWasCalled := false
@@ -50,10 +50,10 @@ func TestExecute_ResolveSetStatus(t *testing.T) {
 		assert.Equal(t, initialStep, stepIdentifier)
 		assert.True(t, clearWasCalled)
 	})
-	t.Run("nil batch on GetBatchFromMultiversX", func(t *testing.T) {
+	t.Run("nil batch on GetBatchFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorResolveSetStatus()
-		bridgeStub.GetBatchFromMultiversXCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+		bridgeStub.GetBatchFromKleverchainCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 			return nil, nil
 		}
 		clearWasCalled := false
@@ -69,7 +69,7 @@ func TestExecute_ResolveSetStatus(t *testing.T) {
 		assert.Equal(t, initialStep, stepIdentifier)
 		assert.True(t, clearWasCalled)
 	})
-	t.Run("WaitAndReturnFinalBatchStatusesCalled returns nil, should go to GettingPendingBatchFromMultiversX", func(t *testing.T) {
+	t.Run("WaitAndReturnFinalBatchStatusesCalled returns nil, should go to GettingPendingBatchFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 
 		bridgeStub := createStubExecutorResolveSetStatus()
@@ -81,7 +81,7 @@ func TestExecute_ResolveSetStatus(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
-	t.Run("WaitAndReturnFinalBatchStatusesCalled returns empty slice, should go to GettingPendingBatchFromMultiversX", func(t *testing.T) {
+	t.Run("WaitAndReturnFinalBatchStatusesCalled returns empty slice, should go to GettingPendingBatchFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 
 		bridgeStub := createStubExecutorResolveSetStatus()
@@ -96,7 +96,7 @@ func TestExecute_ResolveSetStatus(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
-	t.Run("WaitAndReturnFinalBatchStatusesCalled should finish with success and go to ProposingSetStatusOnMultiversX", func(t *testing.T) {
+	t.Run("WaitAndReturnFinalBatchStatusesCalled should finish with success and go to ProposingSetStatusOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorResolveSetStatus()
 		bridgeStub.WaitAndReturnFinalBatchStatusesCalled = func(ctx context.Context) []byte {
@@ -118,7 +118,7 @@ func TestExecute_ResolveSetStatus(t *testing.T) {
 
 		assert.False(t, step.IsInterfaceNil())
 
-		expectedStep := bridgeCore.StepIdentifier(ProposingSetStatusOnMultiversX)
+		expectedStep := bridgeCore.StepIdentifier(ProposingSetStatusOnKleverchain)
 		stepIdentifier := step.Execute(context.Background())
 		assert.True(t, wasCalled)
 		assert.NotEqual(t, step.Identifier(), stepIdentifier)
@@ -132,7 +132,7 @@ func createStubExecutorResolveSetStatus() *bridgeTests.BridgeExecutorStub {
 	stub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 		return testBatch
 	}
-	stub.GetBatchFromMultiversXCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+	stub.GetBatchFromKleverchainCalled = func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 		return testBatch, nil
 	}
 	return stub

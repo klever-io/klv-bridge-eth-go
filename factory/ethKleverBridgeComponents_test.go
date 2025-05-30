@@ -261,7 +261,7 @@ func TestNewEthKleverBridgeComponents(t *testing.T) {
 		require.NotNil(t, components)
 		require.Equal(t, 7, len(components.closableHandlers))
 		require.False(t, check.IfNil(components.ethtoKleverStatusHandler))
-		require.False(t, check.IfNil(components.multiversXToEthStatusHandler))
+		require.False(t, check.IfNil(components.kleverchainToEthStatusHandler))
 	})
 }
 

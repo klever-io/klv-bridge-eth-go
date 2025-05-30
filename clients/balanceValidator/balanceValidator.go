@@ -17,15 +17,15 @@ import (
 
 // ArgsBalanceValidator represents the DTO struct used in the NewBalanceValidator constructor function
 type ArgsBalanceValidator struct {
-	Log              logger.Logger
-	MultiversXClient MultiversXClient
-	EthereumClient   EthereumClient
+	Log               logger.Logger
+	KleverchainClient KleverchainClient
+	EthereumClient    EthereumClient
 }
 
 type balanceValidator struct {
-	log              logger.Logger
-	multiversXClient MultiversXClient
-	ethereumClient   EthereumClient
+	log               logger.Logger
+	kleverchainClient KleverchainClient
+	ethereumClient    EthereumClient
 }
 
 // NewBalanceValidator creates a new instance of type balanceValidator
@@ -36,9 +36,9 @@ func NewBalanceValidator(args ArgsBalanceValidator) (*balanceValidator, error) {
 	}
 
 	return &balanceValidator{
-		log:              args.Log,
-		multiversXClient: args.MultiversXClient,
-		ethereumClient:   args.EthereumClient,
+		log:               args.Log,
+		kleverchainClient: args.KleverchainClient,
+		ethereumClient:    args.EthereumClient,
 	}, nil
 }
 
@@ -46,8 +46,8 @@ func checkArgs(args ArgsBalanceValidator) error {
 	if check.IfNil(args.Log) {
 		return ErrNilLogger
 	}
-	if check.IfNil(args.MultiversXClient) {
-		return ErrNilMultiversXClient
+	if check.IfNil(args.KleverchainClient) {
+		return ErrNilKleverchainClient
 	}
 	if check.IfNil(args.EthereumClient) {
 		return ErrNilEthereumClient
@@ -57,8 +57,8 @@ func checkArgs(args ArgsBalanceValidator) error {
 }
 
 // CheckToken returns error if the bridge can not happen to the provided token due to faulty balance values in the contracts
-func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken common.Address, mvxToken []byte, amount *big.Int, direction batchProcessor.Direction) error {
-	err := validator.checkRequiredBalance(ctx, ethToken, mvxToken, amount, direction)
+func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken common.Address, kdaToken []byte, amount *big.Int, direction batchProcessor.Direction) error {
+	err := validator.checkRequiredBalance(ctx, ethToken, kdaToken, amount, direction)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
-	isMintBurnOnMultiversX, err := validator.isMintBurnOnMultiversX(ctx, mvxToken)
+	isMintBurnOnKleverchain, err := validator.isMintBurnOnKleverchain(ctx, kdaToken)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
-	isNativeOnMultiversX, err := validator.isNativeOnMultiversX(ctx, mvxToken)
+	isNativeOnKleverchain, err := validator.isNativeOnKleverchain(ctx, kdaToken)
 	if err != nil {
 		return err
 	}
@@ -87,19 +87,19 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return fmt.Errorf("%w isNativeOnEthereum = %v, isMintBurnOnEthereum = %v", ErrInvalidSetup, isNativeOnEthereum, isMintBurnOnEthereum)
 	}
 
-	if !isNativeOnMultiversX && !isMintBurnOnMultiversX {
-		return fmt.Errorf("%w isNativeOnMultiversX = %v, isMintBurnOnMultiversX = %v", ErrInvalidSetup, isNativeOnMultiversX, isMintBurnOnMultiversX)
+	if !isNativeOnKleverchain && !isMintBurnOnKleverchain {
+		return fmt.Errorf("%w isNativeOnKleverchain = %v, isMintBurnOnKleverchain = %v", ErrInvalidSetup, isNativeOnKleverchain, isMintBurnOnKleverchain)
 	}
 
-	if isNativeOnEthereum == isNativeOnMultiversX {
-		return fmt.Errorf("%w isNativeOnEthereum = %v, isNativeOnMultiversX = %v", ErrInvalidSetup, isNativeOnEthereum, isNativeOnMultiversX)
+	if isNativeOnEthereum == isNativeOnKleverchain {
+		return fmt.Errorf("%w isNativeOnEthereum = %v, isNativeOnKleverchain = %v", ErrInvalidSetup, isNativeOnEthereum, isNativeOnKleverchain)
 	}
 
 	ethAmount, err := validator.computeEthAmount(ctx, ethToken, isMintBurnOnEthereum, isNativeOnEthereum)
 	if err != nil {
 		return err
 	}
-	mvxAmount, err := validator.computeMvxAmount(ctx, mvxToken, isMintBurnOnMultiversX, isNativeOnMultiversX)
+	kdaAmount, err := validator.computeKdaAmount(ctx, kdaToken, isMintBurnOnKleverchain, isNativeOnKleverchain)
 	if err != nil {
 		return err
 	}
@@ -107,24 +107,24 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 	validator.log.Debug("balanceValidator.CheckToken",
 		"ERC20 token", ethToken.String(),
 		"ERC20 balance", ethAmount.String(),
-		"ESDT token", mvxToken,
-		"ESDT balance", mvxAmount.String(),
+		"KDA token", kdaToken,
+		"KDA balance", kdaAmount.String(),
 		"amount", amount.String(),
 	)
 
-	if ethAmount.Cmp(mvxAmount) != 0 {
-		return fmt.Errorf("%w, balance for ERC20 token %s is %s and the balance for ESDT token %s is %s, direction %s",
-			ErrBalanceMismatch, ethToken.String(), ethAmount.String(), mvxToken, mvxAmount.String(), direction)
+	if ethAmount.Cmp(kdaAmount) != 0 {
+		return fmt.Errorf("%w, balance for ERC20 token %s is %s and the balance for KDA token %s is %s, direction %s",
+			ErrBalanceMismatch, ethToken.String(), ethAmount.String(), kdaToken, kdaAmount.String(), direction)
 	}
 	return nil
 }
 
-func (validator *balanceValidator) checkRequiredBalance(ctx context.Context, ethToken common.Address, mvxToken []byte, amount *big.Int, direction batchProcessor.Direction) error {
+func (validator *balanceValidator) checkRequiredBalance(ctx context.Context, ethToken common.Address, kdaToken []byte, amount *big.Int, direction batchProcessor.Direction) error {
 	switch direction {
-	case batchProcessor.FromMultiversX:
+	case batchProcessor.FromKleverchain:
 		return validator.ethereumClient.CheckRequiredBalance(ctx, ethToken, amount)
-	case batchProcessor.ToMultiversX:
-		return validator.multiversXClient.CheckRequiredBalance(ctx, mvxToken, amount)
+	case batchProcessor.ToKleverchain:
+		return validator.kleverchainClient.CheckRequiredBalance(ctx, kdaToken, amount)
 	default:
 		return fmt.Errorf("%w, direction: %s", ErrInvalidDirection, direction)
 	}
@@ -147,16 +147,16 @@ func (validator *balanceValidator) isNativeOnEthereum(ctx context.Context, erc20
 	return isNative, nil
 }
 
-func (validator *balanceValidator) isMintBurnOnMultiversX(ctx context.Context, token []byte) (bool, error) {
-	isMintBurn, err := validator.multiversXClient.IsMintBurnToken(ctx, token)
+func (validator *balanceValidator) isMintBurnOnKleverchain(ctx context.Context, token []byte) (bool, error) {
+	isMintBurn, err := validator.kleverchainClient.IsMintBurnToken(ctx, token)
 	if err != nil {
 		return false, err
 	}
 	return isMintBurn, nil
 }
 
-func (validator *balanceValidator) isNativeOnMultiversX(ctx context.Context, token []byte) (bool, error) {
-	isNative, err := validator.multiversXClient.IsNativeToken(ctx, token)
+func (validator *balanceValidator) isNativeOnKleverchain(ctx context.Context, token []byte) (bool, error) {
+	isNative, err := validator.kleverchainClient.IsNativeToken(ctx, token)
 	if err != nil {
 		return false, err
 	}
@@ -176,7 +176,7 @@ func (validator *balanceValidator) computeEthAmount(
 
 	if !isMintBurn {
 		// we need to subtract all locked balances on the Ethereum side (all pending, un-executed batches) so the balances
-		// with the minted MultiversX tokens will match
+		// with the minted Kleverchain tokens will match
 		total, errTotal := validator.ethereumClient.TotalBalances(ctx, token)
 		if errTotal != nil {
 			return nil, errTotal
@@ -210,51 +210,51 @@ func (validator *balanceValidator) computeEthAmount(
 	return ethAmount, nil
 }
 
-func (validator *balanceValidator) computeMvxAmount(
+func (validator *balanceValidator) computeKdaAmount(
 	ctx context.Context,
 	token []byte,
 	isMintBurn bool,
 	isNative bool,
 ) (*big.Int, error) {
-	mvxAmountInPendingBatches, err := validator.getTotalTransferAmountInPendingMvxBatches(ctx, token)
+	kdaAmountInPendingBatches, err := validator.getTotalTransferAmountInPendingKlvBatches(ctx, token)
 	if err != nil {
 		return nil, err
 	}
 
 	if !isMintBurn {
-		// we need to subtract all locked balances on the MultiversX side (all pending, un-executed batches) so the balances
+		// we need to subtract all locked balances on the Kleverchain side (all pending, un-executed batches) so the balances
 		// with the minted Ethereum tokens will match
-		total, errTotal := validator.multiversXClient.TotalBalances(ctx, token)
+		total, errTotal := validator.kleverchainClient.TotalBalances(ctx, token)
 		if errTotal != nil {
 			return nil, errTotal
 		}
 
-		return total.Sub(total, mvxAmountInPendingBatches), nil
+		return total.Sub(total, kdaAmountInPendingBatches), nil
 	}
 
-	burnBalances, err := validator.multiversXClient.BurnBalances(ctx, token)
+	burnBalances, err := validator.kleverchainClient.BurnBalances(ctx, token)
 	if err != nil {
 		return nil, err
 	}
-	mintBalances, err := validator.multiversXClient.MintBalances(ctx, token)
+	mintBalances, err := validator.kleverchainClient.MintBalances(ctx, token)
 	if err != nil {
 		return nil, err
 	}
-	var mvxAmount *big.Int
+	var kdaAmount *big.Int
 
 	// we need to cancel out what was burned in advance when the deposit was registered in the contract
-	burnBalances.Sub(burnBalances, mvxAmountInPendingBatches)
+	burnBalances.Sub(burnBalances, kdaAmountInPendingBatches)
 
 	if isNative {
-		mvxAmount = big.NewInt(0).Sub(burnBalances, mintBalances)
+		kdaAmount = big.NewInt(0).Sub(burnBalances, mintBalances)
 	} else {
-		mvxAmount = big.NewInt(0).Sub(mintBalances, burnBalances)
+		kdaAmount = big.NewInt(0).Sub(mintBalances, burnBalances)
 	}
 
-	if mvxAmount.Cmp(big.NewInt(0)) < 0 {
-		return big.NewInt(0), fmt.Errorf("%w, mvxAmount: %s", ErrNegativeAmount, mvxAmount.String())
+	if kdaAmount.Cmp(big.NewInt(0)) < 0 {
+		return big.NewInt(0), fmt.Errorf("%w, kdaAmount: %s", ErrNegativeAmount, kdaAmount.String())
 	}
-	return mvxAmount, nil
+	return kdaAmount, nil
 }
 
 func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big.Int {
@@ -268,8 +268,8 @@ func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big
 	return amount
 }
 
-func (validator *balanceValidator) getTotalTransferAmountInPendingMvxBatches(ctx context.Context, mvxToken []byte) (*big.Int, error) {
-	batchID, err := validator.multiversXClient.GetLastMvxBatchID(ctx)
+func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx context.Context, kdaToken []byte) (*big.Int, error) {
+	batchID, err := validator.kleverchainClient.GetLastKlvBatchID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func (validator *balanceValidator) getTotalTransferAmountInPendingMvxBatches(ctx
 	var batch *bridgeCore.TransferBatch
 	amount := big.NewInt(0)
 	for {
-		batch, err = validator.multiversXClient.GetBatch(ctx, batchID)
+		batch, err = validator.kleverchainClient.GetBatch(ctx, batchID)
 		if errors.Is(err, clients.ErrNoBatchAvailable) {
 			return amount, nil
 		}
@@ -293,14 +293,14 @@ func (validator *balanceValidator) getTotalTransferAmountInPendingMvxBatches(ctx
 			return amount, nil
 		}
 
-		amountFromBatch := getTotalAmountFromBatch(batch, mvxToken)
+		amountFromBatch := getTotalAmountFromBatch(batch, kdaToken)
 		amount.Add(amount, amountFromBatch)
 		batchID-- // go to the previous batch
 	}
 }
 
 func (validator *balanceValidator) getTotalTransferAmountInPendingEthBatches(ctx context.Context, ethToken common.Address) (*big.Int, error) {
-	batchID, err := validator.multiversXClient.GetLastExecutedEthBatchID(ctx)
+	batchID, err := validator.kleverchainClient.GetLastExecutedEthBatchID(ctx)
 	if err != nil {
 		return nil, err
 	}

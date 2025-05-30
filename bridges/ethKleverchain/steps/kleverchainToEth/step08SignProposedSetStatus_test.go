@@ -28,10 +28,10 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
-	t.Run("error on GetAndStoreActionIDForProposeSetStatusFromMultiversX", func(t *testing.T) {
+	t.Run("error on GetAndStoreActionIDForProposeSetStatusFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
-		bridgeStub.GetAndStoreActionIDForProposeSetStatusFromMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeSetStatusFromKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return ethKleverchain.InvalidActionID, expectedError
 		}
 
@@ -42,10 +42,10 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
-	t.Run("invalid actionID on GetAndStoreActionIDForProposeSetStatusFromMultiversX", func(t *testing.T) {
+	t.Run("invalid actionID on GetAndStoreActionIDForProposeSetStatusFromKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
-		bridgeStub.GetAndStoreActionIDForProposeSetStatusFromMultiversXCalled = func(ctx context.Context) (uint64, error) {
+		bridgeStub.GetAndStoreActionIDForProposeSetStatusFromKleverchainCalled = func(ctx context.Context) (uint64, error) {
 			return ethKleverchain.InvalidActionID, nil
 		}
 
@@ -56,10 +56,10 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
-	t.Run("error on WasActionSignedOnMultiversX", func(t *testing.T) {
+	t.Run("error on WasActionSignedOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
-		bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+		bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 			return false, expectedError
 		}
 
@@ -70,10 +70,10 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, initialStep, stepIdentifier)
 	})
-	t.Run("error on SignActionOnMultiversX", func(t *testing.T) {
+	t.Run("error on SignActionOnKleverchain", func(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
-		bridgeStub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
+		bridgeStub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
 			return expectedError
 		}
 
@@ -89,12 +89,12 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		t.Run("if proposed set status was signed, go to WaitingForQuorumOnSetStatus", func(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorSignProposedSetStatus()
-			bridgeStub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+			bridgeStub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 				return true, nil
 			}
 
 			wasCalled := false
-			bridgeStub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
+			bridgeStub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
 				wasCalled = true
 				return nil
 			}
@@ -112,7 +112,7 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 			t.Parallel()
 			bridgeStub := createStubExecutorSignProposedSetStatus()
 			wasCalled := false
-			bridgeStub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
+			bridgeStub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
 				wasCalled = true
 				return nil
 			}
@@ -137,13 +137,13 @@ func createStubExecutorSignProposedSetStatus() *bridgeTests.BridgeExecutorStub {
 	stub.GetStoredBatchCalled = func() *bridgeCore.TransferBatch {
 		return testBatch
 	}
-	stub.GetAndStoreActionIDForProposeSetStatusFromMultiversXCalled = func(ctx context.Context) (uint64, error) {
+	stub.GetAndStoreActionIDForProposeSetStatusFromKleverchainCalled = func(ctx context.Context) (uint64, error) {
 		return actionID, nil
 	}
-	stub.WasActionSignedOnMultiversXCalled = func(ctx context.Context) (bool, error) {
+	stub.WasActionSignedOnKleverchainCalled = func(ctx context.Context) (bool, error) {
 		return false, nil
 	}
-	stub.SignActionOnMultiversXCalled = func(ctx context.Context) error {
+	stub.SignActionOnKleverchainCalled = func(ctx context.Context) error {
 		return nil
 	}
 	return stub

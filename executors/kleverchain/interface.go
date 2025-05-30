@@ -22,7 +22,7 @@ type ScCallsExecuteFilter interface {
 	IsInterfaceNil() bool
 }
 
-// Codec defines the operations implemented by a MultiversX codec
+// Codec defines the operations implemented by a Kleverchain codec
 type Codec interface {
 	DecodeProxySCCompleteCallData(buff []byte) (parsers.ProxySCCompleteCallData, error)
 	ExtractGasLimitFromRawCallData(buff []byte) (uint64, error)

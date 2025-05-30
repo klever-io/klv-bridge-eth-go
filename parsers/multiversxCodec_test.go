@@ -27,20 +27,20 @@ func createTestProxySCCompleteCallData() ProxySCCompleteCallData {
 	return completeCallData
 }
 
-func TestMultiversxCodec_IsInterfaceNil(t *testing.T) {
+func TestKleverchainCodec_IsInterfaceNil(t *testing.T) {
 	t.Parallel()
 
-	var instance *MultiversxCodec
+	var instance *KleverchainCodec
 	assert.True(t, instance.IsInterfaceNil())
 
-	instance = &MultiversxCodec{}
+	instance = &KleverchainCodec{}
 	assert.False(t, instance.IsInterfaceNil())
 }
 
-func TestMultiversxCodec_ExtractGasLimitFromRawCallData(t *testing.T) {
+func TestKleverchainCodec_ExtractGasLimitFromRawCallData(t *testing.T) {
 	t.Parallel()
 
-	codec := &MultiversxCodec{}
+	codec := &KleverchainCodec{}
 
 	t.Run("empty buffer should error", func(t *testing.T) {
 		t.Parallel()
@@ -149,10 +149,10 @@ func TestMultiversxCodec_ExtractGasLimitFromRawCallData(t *testing.T) {
 	})
 }
 
-func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
+func TestKleverchainCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 	t.Parallel()
 
-	codec := MultiversxCodec{}
+	codec := KleverchainCodec{}
 	emptyCompleteCallData := ProxySCCompleteCallData{}
 
 	t.Run("buffer to short for Ethereum address should error", func(t *testing.T) {
@@ -163,20 +163,20 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 		assert.ErrorIs(t, err, errBufferTooShortForEthAddress)
 		assert.Equal(t, emptyCompleteCallData, completeCallData)
 	})
-	t.Run("buffer to short for MultiversX address should error", func(t *testing.T) {
+	t.Run("buffer to short for Kleverchain address should error", func(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)
 		buff = append(buff, 0x1)
 		completeCallData, err := codec.DecodeProxySCCompleteCallData(buff)
-		assert.ErrorIs(t, err, errBufferTooShortForMvxAddress)
+		assert.ErrorIs(t, err, errBufferTooShortForKlvAddress)
 		assert.Equal(t, emptyCompleteCallData, completeCallData)
 	})
 	t.Run("invalid token size bytes should error", func(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)                 // Eth address
-		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Mvx address
+		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Klv address
 		buff = append(buff, []byte{0x00, 0x01, 0x04}...)       // invalid token
 
 		completeCallData, err := codec.DecodeProxySCCompleteCallData(buff)
@@ -188,7 +188,7 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)                 // Eth address
-		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Mvx address
+		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Klv address
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x02}...) // token length
 		buff = append(buff, 0x04)                              // instead of 2 bytes for token we have only one
 
@@ -201,7 +201,7 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)                 // Eth address
-		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Mvx address
+		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Klv address
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x02}...) // token size
 		buff = append(buff, []byte{0x02, 0x03}...)             // token
 		buff = append(buff, []byte{0x00, 0x00, 0x00}...)       // invalid amount size
@@ -215,7 +215,7 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)                 // Eth address
-		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Mvx address
+		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Klv address
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x02}...) // token size
 		buff = append(buff, []byte{0x02, 0x03}...)             // token
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x05}...) // amount size
@@ -230,7 +230,7 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)                 // Eth address
-		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Mvx address
+		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...) // Klv address
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x02}...) // token size
 		buff = append(buff, []byte{0x02, 0x03}...)             // token
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x01}...) // amount size
@@ -246,7 +246,7 @@ func TestMultiversxCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 		t.Parallel()
 
 		buff := bytes.Repeat([]byte{0x01}, 20)                                         // Eth address
-		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...)                         // Mvx address
+		buff = append(buff, bytes.Repeat([]byte{0x01}, 32)...)                         // Klv address
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x02}...)                         // token size
 		buff = append(buff, []byte{0x02, 0x03}...)                                     // token
 		buff = append(buff, []byte{0x00, 0x00, 0x00, 0x00}...)                         // amount size = 0 => amount = 0

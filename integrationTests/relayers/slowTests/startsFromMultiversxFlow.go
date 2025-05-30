@@ -9,49 +9,49 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
 )
 
-type startsFromMultiversXFlow struct {
+type startsFromKleverchainFlow struct {
 	testing.TB
 	setup        *framework.TestSetup
-	ethToMvxDone bool
-	mvxToEthDone bool
+	ethToKlvDone bool
+	kdaToEthDone bool
 	tokens       []framework.TestTokenParams
 }
 
-func (flow *startsFromMultiversXFlow) process() (finished bool) {
+func (flow *startsFromKleverchainFlow) process() (finished bool) {
 	if len(flow.tokens) == 0 {
 		return true
 	}
-	if flow.mvxToEthDone && flow.ethToMvxDone {
+	if flow.kdaToEthDone && flow.ethToKlvDone {
 		return true
 	}
 
-	isTransferDoneFromMultiversX := flow.setup.IsTransferDoneFromMultiversX(flow.tokens...)
-	if !flow.mvxToEthDone && isTransferDoneFromMultiversX {
-		flow.mvxToEthDone = true
-		log.Info(fmt.Sprintf(framework.LogStepMarker, "MultiversX->Ethereum transfer finished, now sending back to MultiversX..."))
+	isTransferDoneFromKleverchain := flow.setup.IsTransferDoneFromKleverchain(flow.tokens...)
+	if !flow.kdaToEthDone && isTransferDoneFromKleverchain {
+		flow.kdaToEthDone = true
+		log.Info(fmt.Sprintf(framework.LogStepMarker, "Kleverchain->Ethereum transfer finished, now sending back to Kleverchain..."))
 
-		flow.setup.EthereumHandler.SendFromEthereumToMultiversX(flow.setup.Ctx, flow.setup.MultiversxHandler.TestCallerAddress, flow.tokens...)
+		flow.setup.EthereumHandler.SendFromEthereumToKleverchain(flow.setup.Ctx, flow.setup.KleverchainHandler.TestCallerAddress, flow.tokens...)
 	}
-	if !flow.mvxToEthDone {
+	if !flow.kdaToEthDone {
 		// return here, no reason to check downwards
 		return false
 	}
 
 	isTransferDoneFromEthereum := flow.setup.IsTransferDoneFromEthereum(flow.tokens...)
-	if !flow.ethToMvxDone && isTransferDoneFromEthereum {
-		flow.ethToMvxDone = true
-		log.Info(fmt.Sprintf(framework.LogStepMarker, "MultiversX<->Ethereum from MultiversX transfers done"))
+	if !flow.ethToKlvDone && isTransferDoneFromEthereum {
+		flow.ethToKlvDone = true
+		log.Info(fmt.Sprintf(framework.LogStepMarker, "Kleverchain<->Ethereum from Kleverchain transfers done"))
 		return true
 	}
 
 	return false
 }
 
-func (flow *startsFromMultiversXFlow) areTokensFullyRefunded() bool {
+func (flow *startsFromKleverchainFlow) areTokensFullyRefunded() bool {
 	if len(flow.tokens) == 0 {
 		return true
 	}
-	if !flow.ethToMvxDone {
+	if !flow.ethToKlvDone {
 		return false // regular flow is not completed
 	}
 

@@ -12,8 +12,8 @@ import (
 type startsFromEthereumEdgecaseFlow struct {
 	testing.TB
 	setup        *framework.TestSetup
-	ethToMvxDone bool
-	mvxToEthDone bool
+	ethToKlvDone bool
+	kdaToEthDone bool
 	tokens       []framework.TestTokenParams
 }
 
@@ -21,27 +21,27 @@ func (flow *startsFromEthereumEdgecaseFlow) process() (finished bool) {
 	if len(flow.tokens) == 0 {
 		return true
 	}
-	if flow.mvxToEthDone && flow.ethToMvxDone {
+	if flow.kdaToEthDone && flow.ethToKlvDone {
 		return true
 	}
 
 	isTransferDoneFromEthereum := flow.setup.IsTransferDoneFromEthereum(flow.tokens...)
-	if !flow.ethToMvxDone && isTransferDoneFromEthereum {
-		flow.ethToMvxDone = true
-		log.Info(fmt.Sprintf(framework.LogStepMarker, "Ethereum->MultiversX transfer finished, now sending back to Ethereum & another round from Ethereum..."))
+	if !flow.ethToKlvDone && isTransferDoneFromEthereum {
+		flow.ethToKlvDone = true
+		log.Info(fmt.Sprintf(framework.LogStepMarker, "Ethereum->Kleverchain transfer finished, now sending back to Ethereum & another round from Ethereum..."))
 
-		flow.setup.SendFromMultiversxToEthereum(flow.tokens...)
-		flow.setup.EthereumHandler.SendFromEthereumToMultiversX(flow.setup.Ctx, flow.setup.MultiversxHandler.TestCallerAddress, flow.tokens...)
+		flow.setup.SendFromKleverchainToEthereum(flow.tokens...)
+		flow.setup.EthereumHandler.SendFromEthereumToKleverchain(flow.setup.Ctx, flow.setup.KleverchainHandler.TestCallerAddress, flow.tokens...)
 	}
-	if !flow.ethToMvxDone {
+	if !flow.ethToKlvDone {
 		// return here, no reason to check downwards
 		return false
 	}
 
-	isTransferDoneFromMultiversX := flow.setup.IsTransferDoneFromMultiversX(flow.tokens...)
-	if !flow.mvxToEthDone && isTransferDoneFromMultiversX {
-		flow.mvxToEthDone = true
-		log.Info(fmt.Sprintf(framework.LogStepMarker, "MultiversX<->Ethereum from Ethereum transfers done"))
+	isTransferDoneFromKleverchain := flow.setup.IsTransferDoneFromKleverchain(flow.tokens...)
+	if !flow.kdaToEthDone && isTransferDoneFromKleverchain {
+		flow.kdaToEthDone = true
+		log.Info(fmt.Sprintf(framework.LogStepMarker, "Kleverchain<->Ethereum from Ethereum transfers done"))
 		return true
 	}
 
