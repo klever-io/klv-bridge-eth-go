@@ -12,8 +12,8 @@ import (
 	"github.com/klever-io/klever-go/tools"
 	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain"
 	"github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain/disabled"
-	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain/steps/ethToMultiversX"
-	multiversxtoeth "github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain/steps/multiversxToEth"
+	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain/steps/ethToKleverchain"
+	kleverchaintoeth "github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain/steps/kleverchainToEth"
 	"github.com/klever-io/klv-bridge-eth-go/bridges/ethKleverchain/topology"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	balanceValidatorManagement "github.com/klever-io/klv-bridge-eth-go/clients/balanceValidator"
@@ -613,7 +613,7 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumBridge(ar
 		return err
 	}
 
-	components.multiversXToEthMachineStates, err = multiversxtoeth.CreateSteps(bridge)
+	components.multiversXToEthMachineStates, err = kleverchaintoeth.CreateSteps(bridge)
 	if err != nil {
 		return err
 	}
@@ -715,7 +715,7 @@ func (components *ethKleverBridgeComponents) createMultiversXToEthereumStateMach
 	argsStateMachine := stateMachine.ArgsStateMachine{
 		StateMachineName:     multiversXToEthName,
 		Steps:                components.multiversXToEthMachineStates,
-		StartStateIdentifier: multiversxtoeth.GettingPendingBatchFromMultiversX,
+		StartStateIdentifier: kleverchaintoeth.GettingPendingBatchFromMultiversX,
 		Log:                  log,
 		StatusHandler:        components.multiversXToEthStatusHandler,
 	}

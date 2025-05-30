@@ -10,13 +10,13 @@ import (
 
 // tokensRegistryMock is not concurrent safe
 type tokensRegistryMock struct {
-	ethToMultiversX map[common.Address]string
-	multiversXToEth map[string]common.Address
-	mintBurnTokens  map[string]bool
-	nativeTokens    map[string]bool
-	totalBalances   map[string]*big.Int
-	mintBalances    map[string]*big.Int
-	burnBalances    map[string]*big.Int
+	ethToKleverchain map[common.Address]string
+	multiversXToEth  map[string]common.Address
+	mintBurnTokens   map[string]bool
+	nativeTokens     map[string]bool
+	totalBalances    map[string]*big.Int
+	mintBalances     map[string]*big.Int
+	burnBalances     map[string]*big.Int
 }
 
 func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticker string, isNativeToken, isMintBurnToken bool, totalBalance, mintBalances, burnBalances *big.Int) {
@@ -24,7 +24,7 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 		"erc20 address", erc20Address.String(), "is native token", isNativeToken, "is mint burn token", isMintBurnToken,
 		"total balance", totalBalance, "mint balances", mintBalances, "burn balances", burnBalances)
 
-	mock.ethToMultiversX[erc20Address] = ticker
+	mock.ethToKleverchain[erc20Address] = ticker
 
 	hexedTicker := hex.EncodeToString([]byte(ticker))
 	mock.multiversXToEth[hexedTicker] = erc20Address
@@ -42,7 +42,7 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 }
 
 func (mock *tokensRegistryMock) clearTokens() {
-	mock.ethToMultiversX = make(map[common.Address]string)
+	mock.ethToKleverchain = make(map[common.Address]string)
 	mock.multiversXToEth = make(map[string]common.Address)
 	mock.mintBurnTokens = make(map[string]bool)
 	mock.nativeTokens = make(map[string]bool)
@@ -52,7 +52,7 @@ func (mock *tokensRegistryMock) clearTokens() {
 }
 
 func (mock *tokensRegistryMock) getTicker(erc20Address common.Address) string {
-	ticker, found := mock.ethToMultiversX[erc20Address]
+	ticker, found := mock.ethToKleverchain[erc20Address]
 	if !found {
 		panic("tiker for erc20 address " + erc20Address.String() + " not found")
 	}

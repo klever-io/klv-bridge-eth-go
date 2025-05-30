@@ -255,7 +255,7 @@ func startRelay(ctx *cli.Context, version string) error {
 		KleverClientStatusHandler: kleverClientStatusHandler,
 	}
 
-	ethToMultiversXComponents, err := factory.NewEthKleverBridgeComponents(args)
+	ethToKleverchainComponents, err := factory.NewEthKleverBridgeComponents(args)
 	if err != nil {
 		return err
 	}
@@ -267,7 +267,7 @@ func startRelay(ctx *cli.Context, version string) error {
 
 	log.Info("Starting relay")
 
-	err = ethToMultiversXComponents.Start()
+	err = ethToKleverchainComponents.Start()
 	if err != nil {
 		return err
 	}
@@ -280,7 +280,7 @@ func startRelay(ctx *cli.Context, version string) error {
 	log.Info("application closing, calling Close on all subcomponents...")
 
 	var lastErr error
-	err = ethToMultiversXComponents.Close()
+	err = ethToKleverchainComponents.Close()
 	if err != nil {
 		lastErr = err
 	}
