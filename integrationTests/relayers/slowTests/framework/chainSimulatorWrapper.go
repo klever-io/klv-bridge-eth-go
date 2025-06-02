@@ -31,7 +31,7 @@ import (
 
 const (
 	proxyURL                                = "http://127.0.0.1:8085"
-	thousandEgld                            = "1000000000000000000000"
+	thousandKlv                             = "1000000000000000000000"
 	maxAllowedTimeout                       = time.Second
 	setMultipleEndpoint                     = "simulator/set-state-overwrite"
 	generateBlocksEndpoint                  = "simulator/generate-blocks/%d"
@@ -242,7 +242,7 @@ func (instance *chainSimulatorWrapper) FundWallets(ctx context.Context, wallets 
 		addressesState = append(addressesState, &dtos.AddressState{
 			Address: wallet,
 			Nonce:   new(uint64),
-			Balance: thousandEgld,
+			Balance: thousandKlv,
 		})
 	}
 

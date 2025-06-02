@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	minRelayerStake          = "10000000000000000000" // 10 EGLD
-	kdaIssueCost             = "50000000000000000"    // 0.05 EGLD
+	minRelayerStake          = "10000000000000000000" // 10 KLV
+	kdaIssueCost             = "50000000000000000"    // 0.05 KLV
 	emptyAddress             = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"
 	kdaSystemSCAddress       = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
 	slashAmount              = "00"
@@ -143,7 +143,7 @@ func (handler *KleverchainHandler) deployContracts(ctx context.Context) {
 	// deploy aggregator
 	stakeValue, _ := big.NewInt(0).SetString(minRelayerStake, 10)
 	aggregatorDeployParams := []string{
-		hex.EncodeToString([]byte("EGLD")),
+		hex.EncodeToString([]byte("KLV")),
 		hex.EncodeToString(stakeValue.Bytes()),
 		"01",
 		"02",
