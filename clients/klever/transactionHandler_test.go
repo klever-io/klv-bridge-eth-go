@@ -7,7 +7,9 @@ import (
 	"errors"
 	"testing"
 
+	factoryHasher "github.com/klever-io/klever-go/crypto/hashing/factory"
 	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klever-go/tools/marshal/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
@@ -34,6 +36,9 @@ func createTransactionHandlerWithMockComponents() *transactionHandler {
 	pkBytes, _ := pk.ToByteArray()
 	relayerAddress, _ := address.NewAddressFromBytes(pkBytes)
 
+	internalMarshalizer, _ := factory.NewInternalMarshalizer()
+	hasher, _ := factoryHasher.NewHasher("blake2b")
+
 	return &transactionHandler{
 		proxy:                   &interactors.ProxyStub{},
 		relayerAddress:          relayerAddress,
@@ -42,6 +47,8 @@ func createTransactionHandlerWithMockComponents() *transactionHandler {
 		relayerPrivateKey:       sk,
 		singleSigner:            testSigner,
 		roleProvider:            &roleproviders.KleverRoleProviderStub{},
+		internalMarshalizer:     internalMarshalizer,
+		hasher:                  hasher,
 	}
 }
 
@@ -160,14 +167,14 @@ func TestTransactionHandler_SendTransactionReturnHash(t *testing.T) {
 
 				scAddr, err := address.NewAddressFromBytes(sc.Address)
 				require.Nil(t, err)
-				assert.Equal(t, testMultisigAddress, scAddr)
+				assert.Equal(t, testMultisigAddress, scAddr.Bech32())
 
 				assert.Equal(t, nonce, tx.GetNonce())
 				require.Len(t, tx.GetData(), 1)
 				assert.Equal(t, "function@62756666@16", string(tx.GetData()[0]))
 
 				require.Len(t, tx.GetSignature(), 1)
-				assert.Equal(t, "4d1578a5ea204fa65b209b62a508add5a003de6c8cae2908fceadb810e137ebc74fcdce534cccd05502df697d41276faf3e7decf4896dd378d88b223eef53107", hex.EncodeToString(tx.Signature[0]))
+				assert.Equal(t, "79d92742619102c9f158d73f4f41f4df60d2e51936fa763832a51e716c35b0800bf702bf5545b6b1f1b0dd9eb04d8069ed63d5509983654a1bb009437a70a40e", hex.EncodeToString(tx.Signature[0]))
 				assert.Equal(t, chainID, string(tx.GetRawData().GetChainID()))
 
 				return txHash, nil
