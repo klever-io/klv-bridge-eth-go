@@ -15,8 +15,8 @@ import (
 const (
 	minRelayerStake          = "10000000000000000000" // 10 KLV
 	kdaIssueCost             = "50000000000000000"    // 0.05 KLV
-	emptyAddress             = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"
-	kdaSystemSCAddress       = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+	emptyAddress             = "klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpgm89z"
+	kdaSystemSCAddress       = "" // TODO: check if this address is available, or remove and change the tests
 	slashAmount              = "00"
 	zeroStringValue          = "0"
 	canAddSpecialRoles       = "canAddSpecialRoles"

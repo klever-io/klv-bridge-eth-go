@@ -277,7 +277,7 @@ func (instance *chainSimulatorWrapper) GetBlockchainTimeStamp(ctx context.Contex
 	resultStruct := struct {
 		Data struct {
 			Status struct {
-				ErdBlockTimestamp uint64 `json:"klv_block_timestamp"`
+				KlvBlockTimestamp uint64 `json:"klv_block_timestamp"`
 			} `json:"status"`
 		} `json:"data"`
 	}{}
@@ -285,7 +285,7 @@ func (instance *chainSimulatorWrapper) GetBlockchainTimeStamp(ctx context.Contex
 	err = json.Unmarshal(resultBytes, &resultStruct)
 	require.Nil(instance, err)
 
-	return resultStruct.Data.Status.ErdBlockTimestamp
+	return resultStruct.Data.Status.KlvBlockTimestamp
 }
 
 func (instance *chainSimulatorWrapper) getNonce(ctx context.Context, bech32Address string) (uint64, error) {

@@ -7,11 +7,11 @@ services:
       dockerfile: scCallsExecutor.Dockerfile
     restart: unless-stopped
     volumes:
-      - "../keys:/multiversx/keys"
+      - "../keys:/klever/keys"
     # change the `network-address`, `sc-proxy-address` and `private-key-file` accordingly
     entrypoint: "./scCallsExecutor \
     -log-level *:DEBUG \
     -log-save \
     -network-address https://devnet-gateway.multiversx.com \
-    -sc-proxy-address erd1qqqqqqqqqqqqqpgq5l0743nyv45vdptmfh3jydkqtyzjqpgsrcjq8yuzxk \
+    -sc-proxy-address klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3 \
     -private-key-file ./keys/walletKey.pem"
