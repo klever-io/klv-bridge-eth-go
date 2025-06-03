@@ -405,7 +405,7 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 	t.Parallel()
 
 	expectedConfig := ScCallsModuleConfig{
-		ScProxyBech32Address:            "erd1qqqqqqqqqqqqqpgqnef5f5aq32d63kljld8w5vnvz4gk5sy9hrrq2ld08s",
+		ScProxyBech32Address:            "klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3",
 		ExtraGasToExecute:               50000000,
 		MaxGasLimitToUse:                249999999,
 		GasLimitForOutOfGasTransactions: 30000000,
@@ -436,7 +436,7 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 	}
 
 	testString := `
-ScProxyBech32Address = "erd1qqqqqqqqqqqqqpgqnef5f5aq32d63kljld8w5vnvz4gk5sy9hrrq2ld08s"
+ScProxyBech32Address = "klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3"
 ExtraGasToExecute = 50000000
 MaxGasLimitToUse = 249999999 # this is a safe max gas limit to use both intra-shard & cross-shard
 GasLimitForOutOfGasTransactions = 30000000 # this value will be used when a transaction specified a gas limit > 249999999 

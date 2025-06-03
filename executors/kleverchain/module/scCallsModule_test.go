@@ -11,7 +11,7 @@ import (
 
 func createTestConfigs() config.ScCallsModuleConfig {
 	return config.ScCallsModuleConfig{
-		ScProxyBech32Address:            "erd1qqqqqqqqqqqqqpgqgftcwj09u0nhmskrw7xxqcqh8qmzwyexd8ss7ftcxx",
+		ScProxyBech32Address:            "klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3",
 		ExtraGasToExecute:               6000000,
 		MaxGasLimitToUse:                249999999,
 		GasLimitForOutOfGasTransactions: 30000000,

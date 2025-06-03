@@ -85,17 +85,17 @@ func TestConvertToken(t *testing.T) {
 			assert.Equal(t, expectedError, err)
 		})
 		t.Run("Erc20ToKleverchain: should work", func(t *testing.T) {
-			expectedErdAddress := []byte("klvAddress")
+			expectedKlvAddress := []byte("klvAddress")
 			dg := &bridgeTests.DataGetterStub{
 				GetTokenIdForErc20AddressCalled: func(ctx context.Context, erc20Address []byte) ([][]byte, error) {
-					return [][]byte{expectedErdAddress}, nil
+					return [][]byte{expectedKlvAddress}, nil
 				}}
 			mapper, err := NewErc20ToKleverchainMapper(dg)
 			assert.Nil(t, err)
 			assert.False(t, check.IfNil(mapper))
 			klvAddressReturned, err := mapper.ConvertToken(context.Background(), []byte("erc20Address"))
 			assert.Nil(t, err)
-			assert.Equal(t, expectedErdAddress, klvAddressReturned)
+			assert.Equal(t, expectedKlvAddress, klvAddressReturned)
 		})
 	}
 }
