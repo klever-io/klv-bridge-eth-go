@@ -43,7 +43,7 @@ func TestConfigs(t *testing.T) {
 			NetworkAddress:               "https://api.devnet.klever.finance",
 			MultisigContractAddress:      "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
 			SafeContractAddress:          "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
-			PrivateKeyFile:               "keys/multiversx.pem",
+			PrivateKeyFile:               "keys/walletKey.pem",
 			IntervalToResendTxsInSeconds: 60,
 			GasMap: KleverGasMapConfig{
 				Sign:                   8000000,
@@ -244,9 +244,9 @@ func TestConfigs(t *testing.T) {
 
 [Klever]
     NetworkAddress = "https://api.devnet.klever.finance" # the network address
-    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
-    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
-    PrivateKeyFile = "keys/multiversx.pem" # the path to the pem file containing the relayer multiversx wallet
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the Klever Blockchain address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the Klever Blockchain address for the safe contract
+    PrivateKeyFile = "keys/walletKey.pem" # the path to the pem file containing the relayer Klever Blockchain wallet
     IntervalToResendTxsInSeconds = 60 # the time in seconds between nonce reads
     MaxRetriesOnQuorumReached = 3
     MaxRetriesOnWasTransferProposed = 3
@@ -415,7 +415,7 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 		ProxyCacherExpirationSeconds:    600,
 		ProxyRestAPIEntityType:          "observer",
 		IntervalToResendTxsInSeconds:    60,
-		PrivateKeyFile:                  "keys/multiversx.pem",
+		PrivateKeyFile:                  "keys/walletKey.pem",
 		PollingIntervalInMillis:         6000,
 		Filter: PendingOperationsFilterConfig{
 			AllowedEthAddresses: []string{"*"},
@@ -446,7 +446,7 @@ ProxyFinalityCheck = true
 ProxyCacherExpirationSeconds = 600
 ProxyRestAPIEntityType = "observer"
 IntervalToResendTxsInSeconds = 60
-PrivateKeyFile = "keys/multiversx.pem"
+PrivateKeyFile = "keys/walletKey.pem"
 PollingIntervalInMillis = 6000
 
 [Filter]
