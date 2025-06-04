@@ -114,7 +114,7 @@ func (mock *KleverBlockchainMock) SendTransaction(ctx context.Context, transacti
 	}
 
 	addrAsBech32 := transaction.GetRawData().GetSender()
-	addressHandler, err := address.NewAddress(string(addrAsBech32))
+	addressHandler, err := address.NewAddressFromBytes(addrAsBech32)
 	if err != nil {
 		panic(fmt.Sprintf("%v while creating address handler for string %s", err, addrAsBech32))
 	}
