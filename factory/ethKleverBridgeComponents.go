@@ -174,12 +174,12 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 		return nil, err
 	}
 
-	err = components.createEthereumToMultiversXBridge(args)
+	err = components.createEthereumToKleverBlockchainBridge(args)
 	if err != nil {
 		return nil, err
 	}
 
-	err = components.createEthereumToMultiversXStateMachine()
+	err = components.createEthereumToKleverBlockchainStateMachine()
 	if err != nil {
 		return nil, err
 	}
@@ -484,7 +484,7 @@ func (components *ethKleverBridgeComponents) createEthereumRoleProvider(args Arg
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createEthereumToMultiversXBridge(args ArgsEthereumToKleverBridge) error {
+func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBridge(args ArgsEthereumToKleverBridge) error {
 	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(ethtokleverName), ethtokleverName)
 
@@ -671,7 +671,7 @@ func (components *ethKleverBridgeComponents) createBalanceValidator() (ethklever
 	return balanceValidatorManagement.NewBalanceValidator(argsBalanceValidator)
 }
 
-func (components *ethKleverBridgeComponents) createEthereumToMultiversXStateMachine() error {
+func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainStateMachine() error {
 	ethtokleverName := components.evmCompatibleChain.EvmCompatibleChainToKleverBlockchainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(ethtokleverName), ethtokleverName)
 

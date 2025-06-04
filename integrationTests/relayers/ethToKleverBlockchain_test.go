@@ -1,4 +1,4 @@
-//go:build !slow
+// go:build !slow
 
 package relayers
 
@@ -100,7 +100,7 @@ func testRelayersShouldExecuteTransfersFromEthToMultiversX(t *testing.T, withNat
 	ethereumChainMock.SetQuorum(numRelayers)
 	ethereumChainMock.SetFinalNonce(batchNonceOnEthereum + 1)
 
-	multiversXChainMock := mock.NewMultiversXChainMock()
+	multiversXChainMock := mock.NewKleverBlockchainMock()
 
 	if !withNativeTokens {
 		ethereumChainMock.UpdateNativeTokens(token1Erc20, true)
@@ -316,7 +316,7 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 		return []types.Log{scLog}, nil
 	}
 
-	multiversXChainMock := mock.NewMultiversXChainMock()
+	multiversXChainMock := mock.NewKleverBlockchainMock()
 	multiversXChainMock.AddTokensPair(token1Erc20, ticker1, false, true, zero, zero, zero)
 	multiversXChainMock.AddTokensPair(token2Erc20, ticker2, false, true, zero, zero, zero)
 	multiversXChainMock.AddTokensPair(token3Erc20, ticker3, false, true, zero, zero, zero)
@@ -396,7 +396,7 @@ func testRelayersShouldExecuteTransferFromEthToMultiversXHavingTxsWithSCcalls(t 
 func createMockBridgeComponentsArgs(
 	index int,
 	messenger p2p.Messenger,
-	multiversXChainMock *mock.MultiversXChainMock,
+	multiversXChainMock *mock.KleverBlockchainMock,
 	ethereumChainMock *mock.EthereumChainMock,
 ) factory.ArgsEthereumToKleverBridge {
 

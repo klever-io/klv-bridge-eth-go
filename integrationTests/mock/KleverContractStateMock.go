@@ -561,7 +561,7 @@ func createOkVmResponse(args [][]byte) *models.VmValuesResponseData {
 	return &models.VmValuesResponseData{
 		Data: &vm.VMOutputApi{
 			ReturnData: args,
-			ReturnCode: "ok",
+			ReturnCode: "Ok",
 		},
 	}
 }

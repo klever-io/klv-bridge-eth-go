@@ -58,7 +58,7 @@ func TestRelayersShouldExecuteSimpleTransfersFromMultiversXToEth(t *testing.T) {
 	ethereumChainMock.BalanceAtCalled = func(ctx context.Context, account common.Address, blockNumber *big.Int) (*big.Int, error) {
 		return relayerEthBalance, nil
 	}
-	multiversXChainMock := mock.NewMultiversXChainMock()
+	multiversXChainMock := mock.NewKleverBlockchainMock()
 	for i := 0; i < len(deposits); i++ {
 		ethereumChainMock.UpdateNativeTokens(tokensAddresses[i], false)
 		ethereumChainMock.UpdateMintBurnTokens(tokensAddresses[i], true)
@@ -67,9 +67,9 @@ func TestRelayersShouldExecuteSimpleTransfersFromMultiversXToEth(t *testing.T) {
 
 		multiversXChainMock.AddTokensPair(tokensAddresses[i], deposits[i].Ticker, true, true, zero, zero, deposits[i].Amount)
 	}
-	pendingBatch := mock.MultiversXPendingBatch{
-		Nonce:              big.NewInt(1),
-		MultiversXDeposits: deposits,
+	pendingBatch := mock.KleverBlockchainPendingBatch{
+		Nonce:                    big.NewInt(1),
+		KleverBlockchainDeposits: deposits,
 	}
 
 	multiversXChainMock.SetPendingBatch(&pendingBatch)
@@ -155,7 +155,7 @@ func testRelayersShouldExecuteTransfersFromMultiversXToEthIfTransactionsAppearIn
 	ethereumChainMock.BalanceAtCalled = func(ctx context.Context, account common.Address, blockNumber *big.Int) (*big.Int, error) {
 		return relayerEthBalance, nil
 	}
-	multiversXChainMock := mock.NewMultiversXChainMock()
+	multiversXChainMock := mock.NewKleverBlockchainMock()
 	for i := 0; i < len(deposits); i++ {
 		nativeBalanceValue := deposits[i].Amount
 
@@ -174,9 +174,9 @@ func testRelayersShouldExecuteTransfersFromMultiversXToEthIfTransactionsAppearIn
 			multiversXChainMock.AddTokensPair(tokensAddresses[i], deposits[i].Ticker, withNativeTokens, true, zero, zero, nativeBalanceValue)
 		}
 	}
-	pendingBatch := mock.MultiversXPendingBatch{
-		Nonce:              big.NewInt(1),
-		MultiversXDeposits: deposits,
+	pendingBatch := mock.KleverBlockchainPendingBatch{
+		Nonce:                    big.NewInt(1),
+		KleverBlockchainDeposits: deposits,
 	}
 	multiversXChainMock.SetPendingBatch(&pendingBatch)
 	multiversXChainMock.SetQuorum(numRelayers)
@@ -226,9 +226,9 @@ func testRelayersShouldExecuteTransfersFromMultiversXToEthIfTransactionsAppearIn
 	checkTestStatus(t, multiversXChainMock, ethereumChainMock, numTransactions, deposits, tokensAddresses)
 }
 
-func createTransactions(n int) ([]mock.MultiversXDeposit, []common.Address, map[common.Address]*big.Int) {
+func createTransactions(n int) ([]mock.KleverBlockchainDeposit, []common.Address, map[common.Address]*big.Int) {
 	tokensAddresses := make([]common.Address, 0, n)
-	deposits := make([]mock.MultiversXDeposit, 0, n)
+	deposits := make([]mock.KleverBlockchainDeposit, 0, n)
 	erc20 := make(map[common.Address]*big.Int)
 	for i := 0; i < n; i++ {
 		deposit, tokenAddress := createTransaction(i)
@@ -246,10 +246,10 @@ func createTransactions(n int) ([]mock.MultiversXDeposit, []common.Address, map[
 	return deposits, tokensAddresses, erc20
 }
 
-func createTransaction(index int) (mock.MultiversXDeposit, common.Address) {
+func createTransaction(index int) (mock.KleverBlockchainDeposit, common.Address) {
 	tokenAddress := testsCommon.CreateRandomEthereumAddress()
 
-	return mock.MultiversXDeposit{
+	return mock.KleverBlockchainDeposit{
 		From:   testsCommon.CreateRandomMultiversXAddress(),
 		To:     testsCommon.CreateRandomEthereumAddress(),
 		Ticker: fmt.Sprintf("tck-00000%d", index+1),
@@ -259,10 +259,10 @@ func createTransaction(index int) (mock.MultiversXDeposit, common.Address) {
 
 func checkTestStatus(
 	t *testing.T,
-	multiversXChainMock *mock.MultiversXChainMock,
+	multiversXChainMock *mock.KleverBlockchainMock,
 	ethereumChainMock *mock.EthereumChainMock,
 	numTransactions int,
-	deposits []mock.MultiversXDeposit,
+	deposits []mock.KleverBlockchainDeposit,
 	tokensAddresses []common.Address,
 ) {
 	transactions := multiversXChainMock.GetAllSentTransactions(context.Background())

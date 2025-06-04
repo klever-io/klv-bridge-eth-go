@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"sync"
 
+	"github.com/ethereum/go-ethereum/common"
 	factoryHasher "github.com/klever-io/klever-go/crypto/hashing/factory"
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klever-go/tools"
@@ -150,4 +151,97 @@ func (mock *KleverBlockchainMock) SendTransactions(ctx context.Context, txs []*t
 	}
 
 	return hashes, nil
+}
+
+// AddTokensPair -
+func (mock *KleverBlockchainMock) AddTokensPair(erc20 common.Address, ticker string, isNativeToken, isMintBurnToken bool, totalBalance, mintBalances, burnBalances *big.Int) {
+	mock.mutState.Lock()
+	defer mock.mutState.Unlock()
+
+	mock.addTokensPair(erc20, ticker, isNativeToken, isMintBurnToken, totalBalance, mintBalances, burnBalances)
+}
+
+// SetLastExecutedEthBatchID -
+func (mock *KleverBlockchainMock) SetLastExecutedEthBatchID(lastExecutedEthBatchId uint64) {
+	mock.mutState.Lock()
+	defer mock.mutState.Unlock()
+
+	mock.lastExecutedEthBatchId = lastExecutedEthBatchId
+}
+
+// SetLastExecutedEthTxId -
+func (mock *KleverBlockchainMock) SetLastExecutedEthTxId(lastExecutedEthTxId uint64) {
+	mock.mutState.Lock()
+	defer mock.mutState.Unlock()
+
+	mock.lastExecutedEthTxId = lastExecutedEthTxId
+}
+
+// SetQuorum -
+func (mock *KleverBlockchainMock) SetQuorum(quorum int) {
+	mock.mutState.Lock()
+	defer mock.mutState.Unlock()
+
+	mock.quorum = quorum
+}
+
+// AddRelayer -
+func (mock *KleverBlockchainMock) AddRelayer(address address.Address) {
+	mock.mutState.Lock()
+	defer mock.mutState.Unlock()
+
+	mock.relayers = append(mock.relayers, address.Bytes())
+}
+
+// PerformedActionID returns the performed action ID
+func (mock *KleverBlockchainMock) PerformedActionID() *big.Int {
+	mock.mutState.RLock()
+	defer mock.mutState.RUnlock()
+
+	return mock.performedAction
+}
+
+// ProposedTransfer returns the proposed transfer that matches the performed action ID
+func (mock *KleverBlockchainMock) ProposedTransfer() *kleverBlockchainProposedTransfer {
+	mock.mutState.RLock()
+	defer mock.mutState.RUnlock()
+
+	if mock.performedAction == nil {
+		return nil
+	}
+
+	for hash, transfer := range mock.proposedTransfers {
+		if HashToActionID(hash).String() == mock.performedAction.String() {
+			return transfer
+		}
+	}
+
+	return nil
+}
+
+// SetPendingBatch -
+func (mock *KleverBlockchainMock) SetPendingBatch(pendingBatch *KleverBlockchainPendingBatch) {
+	mock.mutState.Lock()
+	mock.setPendingBatch(pendingBatch)
+	mock.mutState.Unlock()
+}
+
+// AddDepositToCurrentBatch -
+func (mock *KleverBlockchainMock) AddDepositToCurrentBatch(deposit KleverBlockchainDeposit) {
+	mock.mutState.Lock()
+	mock.pendingBatch.KleverBlockchainDeposits = append(mock.pendingBatch.KleverBlockchainDeposits, deposit)
+	mock.mutState.Unlock()
+}
+
+// GetAllSentTransactions -
+func (mock *KleverBlockchainMock) GetAllSentTransactions(_ context.Context) map[string]*transaction.Transaction {
+	mock.mutState.RLock()
+	defer mock.mutState.RUnlock()
+
+	txs := make(map[string]*transaction.Transaction)
+	for hash, tx := range mock.sentTransactions {
+		txs[hash] = tx
+	}
+
+	return txs
 }

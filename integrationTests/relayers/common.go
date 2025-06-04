@@ -93,7 +93,7 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 			NetworkAddress:                  "mock",
 			MultisigContractAddress:         "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
 			SafeContractAddress:             "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
-			PrivateKeyFile:                  path.Join(workingDir, fmt.Sprintf("multiversx%d.pem", index)),
+			PrivateKeyFile:                  path.Join(workingDir, fmt.Sprintf("klever%d.pem", index)),
 			IntervalToResendTxsInSeconds:    10,
 			GasMap:                          testsCommon.CreateTestKleverGasMap(),
 			MaxRetriesOnQuorumReached:       1,
@@ -108,8 +108,8 @@ func CreateBridgeComponentsConfig(index int, workingDir string, gasStationURL st
 		},
 		P2P: config.ConfigP2P{},
 		StateMachine: map[string]config.ConfigStateMachine{
-			"EthereumToMultiversX": stateMachineConfig,
-			"MultiversXToEthereum": stateMachineConfig,
+			"EthereumToKleverBlockchain": stateMachineConfig,
+			"KleverBlockchainToEthereum": stateMachineConfig,
 		},
 		Relayer: config.ConfigRelayer{
 			Marshalizer: chainConfig.MarshalizerConfig{
