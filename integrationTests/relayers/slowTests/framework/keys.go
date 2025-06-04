@@ -19,7 +19,7 @@ import (
 
 // constants for the keys store
 const (
-	relayerPemPathFormat         = "multiversx%d.pem"
+	relayerPemPathFormat         = "klever%d.pem"
 	SCCallerFilename             = "scCaller.pem"
 	projectedShardForBridgeSetup = byte(0)
 	projectedShardForDepositor   = byte(1)
