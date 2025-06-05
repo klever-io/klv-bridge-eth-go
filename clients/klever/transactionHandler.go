@@ -2,9 +2,11 @@ package klever
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/klever-io/klever-go/crypto/hashing"
 	"github.com/klever-io/klever-go/data/transaction"
+	"github.com/klever-io/klever-go/tools"
+	"github.com/klever-io/klever-go/tools/marshal"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
@@ -19,6 +21,8 @@ type transactionHandler struct {
 	relayerPrivateKey       crypto.PrivateKey
 	singleSigner            crypto.SingleSigner
 	roleProvider            roleProvider
+	internalMarshalizer     marshal.Marshalizer
+	hasher                  hashing.Hasher
 }
 
 // SendTransactionReturnHash will try to assemble a transaction, sign it, send it and, if everything is OK, returns the transaction's hash
@@ -42,7 +46,7 @@ func (txHandler *transactionHandler) signTransaction(ctx context.Context, builde
 		return nil, err
 	}
 
-	dataBytes, err := builder.ToDataBytes()
+	scCallData, err := builder.ToDataBytes()
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +54,20 @@ func (txHandler *transactionHandler) signTransaction(ctx context.Context, builde
 	senderByteAddress := txHandler.relayerAddress.Bytes()
 
 	// building transaction to be signed, and send using proxy interface, but noncehandler as intermediare to help with nonce logic
-	tx := transaction.NewBaseTransaction(senderByteAddress, 0, [][]byte{dataBytes}, 0, 0)
+	tx := transaction.NewBaseTransaction(senderByteAddress, 0, [][]byte{scCallData}, 0, 0)
 	tx.SetChainID([]byte(networkConfig.ChainID))
+
+	addr, err := address.NewAddress(txHandler.multisigAddressAsBech32)
+	if err != nil {
+		return nil, err
+	}
+
+	contractRequest := &transaction.SmartContract{
+		Type:    transaction.SmartContract_SCInvoke,
+		Address: addr.Bytes(),
+	}
+
+	tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
 
 	// uses addressNonceHandler to fetch gas price using proxy endpoint GetNetworkConfig, in case of klever should
 	// use node simulate transaction probably
@@ -70,12 +86,12 @@ func (txHandler *transactionHandler) signTransaction(ctx context.Context, builde
 
 // signTransactionWithPrivateKey signs a transaction with the client's private key
 func (txHandler *transactionHandler) signTransactionWithPrivateKey(tx *transaction.Transaction) error {
-	bytes, err := json.Marshal(&tx)
+	hash, err := txHandler.computeTxHash(tx)
 	if err != nil {
 		return err
 	}
 
-	signature, err := txHandler.singleSigner.Sign(txHandler.relayerPrivateKey, bytes)
+	signature, err := txHandler.singleSigner.Sign(txHandler.relayerPrivateKey, hash)
 	if err != nil {
 		return err
 	}
@@ -83,6 +99,15 @@ func (txHandler *transactionHandler) signTransactionWithPrivateKey(tx *transacti
 	tx.AddSignature(signature)
 
 	return nil
+}
+
+func (txHandler *transactionHandler) computeTxHash(tx *transaction.Transaction) ([]byte, error) {
+	hash, err := tools.CalculateHash(txHandler.internalMarshalizer, txHandler.hasher, tx.GetRawData())
+	if err != nil {
+		return nil, err
+	}
+
+	return hash, nil
 }
 
 // Close will close any sub-components it uses
