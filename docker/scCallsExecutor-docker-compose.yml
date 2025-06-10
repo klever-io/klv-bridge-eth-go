@@ -12,6 +12,6 @@ services:
     entrypoint: "./scCallsExecutor \
     -log-level *:DEBUG \
     -log-save \
-    -network-address https://devnet-gateway.multiversx.com \
+    -network-address https://node.devnet.klever.org \
     -sc-proxy-address klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3 \
     -private-key-file ./keys/walletKey.pem"

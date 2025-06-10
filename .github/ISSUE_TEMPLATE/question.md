@@ -7,6 +7,3 @@ assignees: ''
 
 ---
 
-<!--
-Add here the question you want to ask. For a more immediate response, please use our validator's telegram page: https://t.me/MultiversXValidators
--->

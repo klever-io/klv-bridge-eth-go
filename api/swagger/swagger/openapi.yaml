@@ -3,7 +3,7 @@ info:
   version: "1.0.0"
   title: "Relayers API"
   contact:
-    email: "contact@multiversx.com"
+    email: "contact@klever.io"
 basePath: "/node"
 host: localhost:8080
 tags:

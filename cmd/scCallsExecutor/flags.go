@@ -71,7 +71,7 @@ var (
 	// networkAddress is used to specify the network address used
 	networkAddress = cli.StringFlag{
 		Name:  "network-address",
-		Usage: "The network address (gateway) to be used. Example: 'https://testnet-explorer.multiversx.com'",
+		Usage: "The network address (gateway) to be used. Example: 'https://node.testnet.klever.org'",
 	}
 	// scProxyBech32Address is the smart contract address used to interact with this tool
 	scProxyBech32Address = cli.StringFlag{
