@@ -15,7 +15,7 @@ import (
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
 
-var log = logger.GetOrCreate("mx-sdk-go/blockchain")
+var log = logger.GetOrCreate("klever-go-sdk/blockchain")
 
 const (
 	minimumCachingInterval = time.Second
