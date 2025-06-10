@@ -24,7 +24,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#components/schemas/MultiversXReply'
+                $ref: '#components/schemas/KleverBlockchainReply'
   /status?name={metric}:
     get:
       tags:
@@ -37,18 +37,18 @@ paths:
           required: true
           description: The wanted metric
           type: string
-          enum: [MultiversXToEth, EthToMultiversX, multiversx-client, eth-client]
+          enum: [KleverBlockchainToEth, EthToKleverBlockchain, klever-client, eth-client]
       responses:
         '200':
           description: Information of the requested metric
           content:
             application/json:
               schema:
-                $ref: '#components/schemas/MultiversXReply'
+                $ref: '#components/schemas/KleverBlockchainReply'
 
 components:
   schemas:
-    MultiversXReply:
+    KleverBlockchainReply:
       type: object
       properties:
         data:
