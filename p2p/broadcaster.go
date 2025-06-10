@@ -40,15 +40,15 @@ type ArgsBroadcaster struct {
 type broadcaster struct {
 	*relayerMessageHandler
 	*noncesOfPublicKeys
-	messenger             NetMessenger
-	log                   logger.Logger
-	multiversRoleProvider KleverChainRoleProvider
-	signatureProcessor    SignatureProcessor
-	name                  string
-	mutClients            sync.RWMutex
-	clients               []core.BroadcastClient
-	joinTopicName         string
-	signTopicName         string
+	messenger          NetMessenger
+	log                logger.Logger
+	kleverRoleProvider KleverChainRoleProvider
+	signatureProcessor SignatureProcessor
+	name               string
+	mutClients         sync.RWMutex
+	clients            []core.BroadcastClient
+	joinTopicName      string
+	signTopicName      string
 }
 
 // NewBroadcaster will create a new broadcaster able to pass messages and signatures
@@ -59,12 +59,12 @@ func NewBroadcaster(args ArgsBroadcaster) (*broadcaster, error) {
 	}
 
 	b := &broadcaster{
-		name:                  args.Name,
-		messenger:             args.Messenger,
-		noncesOfPublicKeys:    newNoncesOfPublicKeys(),
-		log:                   args.Log,
-		multiversRoleProvider: args.KleverchainRoleProvider,
-		signatureProcessor:    args.SignatureProcessor,
+		name:               args.Name,
+		messenger:          args.Messenger,
+		noncesOfPublicKeys: newNoncesOfPublicKeys(),
+		log:                args.Log,
+		kleverRoleProvider: args.KleverchainRoleProvider,
+		signatureProcessor: args.SignatureProcessor,
 		relayerMessageHandler: &relayerMessageHandler{
 			marshalizer:         &marshal.JsonMarshalizer{},
 			keyGen:              args.KeyGen,
@@ -153,7 +153,7 @@ func (b *broadcaster) ProcessReceivedMessage(message p2p.MessageP2P, fromConnect
 	}
 
 	hexPkBytes := hex.EncodeToString(msg.PublicKeyBytes)
-	if !b.multiversRoleProvider.IsWhitelisted(addr) {
+	if !b.kleverRoleProvider.IsWhitelisted(addr) {
 		return fmt.Errorf("%w for peer: %s", ErrPeerNotWhitelisted, hexPkBytes)
 	}
 
