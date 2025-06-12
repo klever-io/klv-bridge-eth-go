@@ -28,7 +28,7 @@ type SafeContractWrapper interface {
 	BatchesCount(opts *bind.CallOpts) (uint64, error)
 }
 
-// KlvDataGetter defines the operations for the data getter operating on Klever Blockchain chain
+// KlvDataGetter defines the operations for the data getter operating on Klever Blockchain
 type KlvDataGetter interface {
 	GetAllKnownTokens(ctx context.Context) ([][]byte, error)
 	GetERC20AddressForTokenId(ctx context.Context, tokenId []byte) ([][]byte, error)
