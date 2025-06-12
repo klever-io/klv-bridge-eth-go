@@ -17,8 +17,8 @@ var ErrNilPrivateKey = errors.New("nil private key")
 // ErrNilSingleSigner signals that a nil single signer was provided
 var ErrNilSingleSigner = errors.New("nil single signer")
 
-// ErrNilKleverchainRoleProvider signals that a nil Kleverchain role provider was given
-var ErrNilKleverchainRoleProvider = errors.New("nil Kleverchain role provider")
+// ErrNilKcRoleProvider signals that a nil klever blockchain role provider was given
+var ErrNilKcRoleProvider = errors.New("nil klever blockchain role provider")
 
 // ErrNilMessenger signals that a nil network messenger was provided
 var ErrNilMessenger = errors.New("nil network messenger")

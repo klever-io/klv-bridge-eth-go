@@ -31,15 +31,15 @@ func createMockArgsBroadcaster() ArgsBroadcaster {
 	}
 	ac, _ := factory.NewP2PAntiFloodComponents(context.Background(), cfg, &statusHandler.AppStatusHandlerStub{}, "")
 	return ArgsBroadcaster{
-		Messenger:               &p2pMocks.MessengerStub{},
-		Log:                     logger.GetOrCreate("test"),
-		KleverchainRoleProvider: &roleProvidersMock.KleverRoleProviderStub{},
-		KeyGen:                  &cryptoMocks.KeyGenStub{},
-		SingleSigner:            &cryptoMocks.SingleSignerStub{},
-		PrivateKey:              &cryptoMocks.PrivateKeyStub{},
-		SignatureProcessor:      &testsCommon.SignatureProcessorStub{},
-		Name:                    "test",
-		AntifloodComponents:     ac,
+		Messenger:           &p2pMocks.MessengerStub{},
+		Log:                 logger.GetOrCreate("test"),
+		KcRoleProvider:      &roleProvidersMock.KleverRoleProviderStub{},
+		KeyGen:              &cryptoMocks.KeyGenStub{},
+		SingleSigner:        &cryptoMocks.SingleSignerStub{},
+		PrivateKey:          &cryptoMocks.PrivateKeyStub{},
+		SignatureProcessor:  &testsCommon.SignatureProcessorStub{},
+		Name:                "test",
+		AntifloodComponents: ac,
 	}
 }
 
@@ -86,13 +86,13 @@ func TestNewBroadcaster(t *testing.T) {
 		assert.True(t, check.IfNil(b))
 		assert.Equal(t, ErrNilSingleSigner, err)
 	})
-	t.Run("nil Kleverchain role provider should error", func(t *testing.T) {
+	t.Run("nil klever blockchain role provider should error", func(t *testing.T) {
 		args := createMockArgsBroadcaster()
-		args.KleverchainRoleProvider = nil
+		args.KcRoleProvider = nil
 
 		b, err := NewBroadcaster(args)
 		assert.True(t, check.IfNil(b))
-		assert.Equal(t, ErrNilKleverchainRoleProvider, err)
+		assert.Equal(t, ErrNilKcRoleProvider, err)
 	})
 	t.Run("nil messenger should error", func(t *testing.T) {
 		args := createMockArgsBroadcaster()
@@ -221,7 +221,7 @@ func TestBroadcaster_ProcessReceivedMessage(t *testing.T) {
 		isWhiteListedCalled := false
 		msg, buff := createSignedMessageAndMarshaledBytes(0)
 
-		args.KleverchainRoleProvider = &roleProvidersMock.KleverRoleProviderStub{
+		args.KcRoleProvider = &roleProvidersMock.KleverRoleProviderStub{
 			IsWhitelistedCalled: func(address address.Address) bool {
 				assert.Equal(t, msg.PublicKeyBytes, address.Bytes())
 				isWhiteListedCalled = true
@@ -242,7 +242,7 @@ func TestBroadcaster_ProcessReceivedMessage(t *testing.T) {
 		args := createMockArgsBroadcaster()
 		msg, buff := createSignedMessageAndMarshaledBytes(0)
 
-		args.KleverchainRoleProvider = &roleProvidersMock.KleverRoleProviderStub{}
+		args.KcRoleProvider = &roleProvidersMock.KleverRoleProviderStub{}
 
 		b, _ := NewBroadcaster(args)
 		b.nonces[string(msg.PublicKeyBytes)] = msg.Nonce + 1

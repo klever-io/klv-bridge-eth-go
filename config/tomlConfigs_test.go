@@ -153,11 +153,11 @@ func TestConfigs(t *testing.T) {
 					DefaultMaxMessagesPerSec: 300,
 					MaxMessages: []chainConfig.TopicMaxMessagesConfig{
 						{
-							Topic:             "EthereumToKleverchain_join",
+							Topic:             "EthereumToKc_join",
 							NumMessagesPerSec: 100,
 						},
 						{
-							Topic:             "EthereumToKleverchain_sign",
+							Topic:             "EthereumToKc_sign",
 							NumMessagesPerSec: 100,
 						},
 					},
@@ -166,11 +166,11 @@ func TestConfigs(t *testing.T) {
 			},
 		},
 		StateMachine: map[string]ConfigStateMachine{
-			"EthereumToKleverchain": {
+			"EthereumToKc": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 120,
 			},
-			"KleverchainToEthereum": {
+			"KcToEthereum": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 720,
 			},
@@ -341,8 +341,8 @@ func TestConfigs(t *testing.T) {
             Type = "LRU"
         [P2P.AntifloodConfig.Topic]
             DefaultMaxMessagesPerSec = 300 # default number of messages per interval for a topic
-            MaxMessages = [{ Topic = "EthereumToKleverchain_join", NumMessagesPerSec = 100 },
-                           { Topic = "EthereumToKleverchain_sign", NumMessagesPerSec = 100 }]
+            MaxMessages = [{ Topic = "EthereumToKc_join", NumMessagesPerSec = 100 },
+                           { Topic = "EthereumToKc_sign", NumMessagesPerSec = 100 }]
 
 [Relayer]
     [Relayer.Marshalizer]
@@ -363,11 +363,11 @@ func TestConfigs(t *testing.T) {
             MaxOpenFiles = 10
 
 [StateMachine]
-    [StateMachine.EthereumToKleverchain]
+    [StateMachine.EthereumToKc]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 120 #2 minutes
 
-    [StateMachine.KleverchainToEthereum]
+    [StateMachine.KcToEthereum]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 720 #12 minutes
 
@@ -537,8 +537,8 @@ func TestMigrationToolConfig(t *testing.T) {
 
 [Klever]
     NetworkAddress = "https://api.devnet.klever.finance/" # the network address
-    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the kleverchain address for the bridge contract
-    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the kleverchain address for the safe contract
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the kc address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the kc address for the safe contract
     [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 

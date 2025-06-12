@@ -63,7 +63,7 @@ type chainSimulatorWrapper struct {
 // CreateChainSimulatorWrapper creates a new instance of the chain simulator wrapper
 func CreateChainSimulatorWrapper(args ArgChainSimulatorWrapper) *chainSimulatorWrapper {
 	// TODO: change this to use the real klever proxy when available
-	proxyInstance := mock.NewKleverChainMock()
+	proxyInstance := mock.NewKcMock()
 
 	pubKeyConverter, err := pubkeyConverter.NewBech32PubkeyConverter(32, "klv")
 	require.Nil(args.TB, err)

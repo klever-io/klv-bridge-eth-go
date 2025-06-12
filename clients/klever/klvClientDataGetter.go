@@ -429,7 +429,7 @@ func (dataGetter *klvClientDataGetter) WasSigned(ctx context.Context, actionID u
 	return dataGetter.executeQueryBoolFromBuilder(ctx, builder)
 }
 
-// GetAllStakedRelayers returns all staked relayers defined in Kleverchain SC
+// GetAllStakedRelayers returns all staked relayers defined in Klever Blockchain SC
 func (dataGetter *klvClientDataGetter) GetAllStakedRelayers(ctx context.Context) ([][]byte, error) {
 	builder := dataGetter.createMultisigDefaultVmQueryBuilder()
 	builder.Function(getAllStakedRelayersFuncName)

@@ -8,8 +8,8 @@ import (
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 )
 
-// KleverchainClient defines the behavior of the Kleverchain client able to communicate with the Kleverchain chain
-type KleverchainClient interface {
+// KcClient defines the behavior of the Klever Blockchain client able to communicate with the Klever Blockchain chain
+type KcClient interface {
 	GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error)
 	GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error)
 	GetLastExecutedEthBatchID(ctx context.Context) (uint64, error)

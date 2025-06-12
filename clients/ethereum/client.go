@@ -239,7 +239,7 @@ func (c *client) GetBatchSCMetadata(ctx context.Context, nonce uint64, blockNumb
 	return depositEvents, nil
 }
 
-// WasExecuted returns true if the Kleverchain batch ID was executed
+// WasExecuted returns true if the Klever Blockchain batch ID was executed
 func (c *client) WasExecuted(ctx context.Context, kdaBatchID uint64) (bool, error) {
 	return c.clientWrapper.WasBatchExecuted(ctx, big.NewInt(0).SetUint64(kdaBatchID))
 }
@@ -423,8 +423,8 @@ func (c *client) incrementRetriesAvailabilityCheck() {
 }
 
 func (c *client) setStatusForAvailabilityCheck(status bridgeCore.ClientStatus, message string, nonce uint64) {
-	c.clientWrapper.SetStringMetric(core.MetricKleverchainClientStatus, status.String())
-	c.clientWrapper.SetStringMetric(core.MetricLastKleverchainClientError, message)
+	c.clientWrapper.SetStringMetric(core.MetricKcClientStatus, status.String())
+	c.clientWrapper.SetStringMetric(core.MetricLastKcClientError, message)
 	c.clientWrapper.SetIntMetric(core.MetricLastBlockNonce, int(nonce))
 }
 

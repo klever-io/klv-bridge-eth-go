@@ -5,8 +5,8 @@ import "errors"
 // ErrNilLogger signals that a nil logger has been provided
 var ErrNilLogger = errors.New("nil logger")
 
-// ErrNilKleverchainClient signals that a nil Kleverchain client has been provided
-var ErrNilKleverchainClient = errors.New("nil Kleverchain client")
+// ErrNilKcClient signals that a nil Klever Blockchain client has been provided
+var ErrNilKcClient = errors.New("nil Klever Blockchain client")
 
 // ErrNilEthereumClient signals that a nil Ethereum client has been provided
 var ErrNilEthereumClient = errors.New("nil Ethereum client")

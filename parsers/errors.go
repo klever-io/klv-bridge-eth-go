@@ -10,7 +10,7 @@ var (
 	errBufferTooShortForUint64     = errors.New("buffer too short for uint64")
 	errBufferTooShortForUint32     = errors.New("buffer too short for uint32 length")
 	errBufferTooShortForEthAddress = errors.New("buffer too short for Ethereum address")
-	errBufferTooShortForKlvAddress = errors.New("buffer too short for Kleverchain address")
+	errBufferTooShortForKlvAddress = errors.New("buffer too short for Klever Blockchain address")
 	errBufferTooShortForBigInt     = errors.New("buffer too short while extracting the big.Int value")
 	errBufferLenMismatch           = errors.New("buffer length mismatch")
 )

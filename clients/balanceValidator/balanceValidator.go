@@ -17,15 +17,15 @@ import (
 
 // ArgsBalanceValidator represents the DTO struct used in the NewBalanceValidator constructor function
 type ArgsBalanceValidator struct {
-	Log               logger.Logger
-	KleverchainClient KleverchainClient
-	EthereumClient    EthereumClient
+	Log            logger.Logger
+	KcClient       KcClient
+	EthereumClient EthereumClient
 }
 
 type balanceValidator struct {
-	log               logger.Logger
-	kleverchainClient KleverchainClient
-	ethereumClient    EthereumClient
+	log            logger.Logger
+	kcClient       KcClient
+	ethereumClient EthereumClient
 }
 
 // NewBalanceValidator creates a new instance of type balanceValidator
@@ -36,9 +36,9 @@ func NewBalanceValidator(args ArgsBalanceValidator) (*balanceValidator, error) {
 	}
 
 	return &balanceValidator{
-		log:               args.Log,
-		kleverchainClient: args.KleverchainClient,
-		ethereumClient:    args.EthereumClient,
+		log:            args.Log,
+		kcClient:       args.KcClient,
+		ethereumClient: args.EthereumClient,
 	}, nil
 }
 
@@ -46,8 +46,8 @@ func checkArgs(args ArgsBalanceValidator) error {
 	if check.IfNil(args.Log) {
 		return ErrNilLogger
 	}
-	if check.IfNil(args.KleverchainClient) {
-		return ErrNilKleverchainClient
+	if check.IfNil(args.KcClient) {
+		return ErrNilKcClient
 	}
 	if check.IfNil(args.EthereumClient) {
 		return ErrNilEthereumClient
@@ -68,7 +68,7 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
-	isMintBurnOnKleverchain, err := validator.isMintBurnOnKleverchain(ctx, kdaToken)
+	isMintBurnOnKc, err := validator.isMintBurnOnKc(ctx, kdaToken)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
-	isNativeOnKleverchain, err := validator.isNativeOnKleverchain(ctx, kdaToken)
+	isNativeOnKc, err := validator.isNativeOnKc(ctx, kdaToken)
 	if err != nil {
 		return err
 	}
@@ -87,19 +87,19 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return fmt.Errorf("%w isNativeOnEthereum = %v, isMintBurnOnEthereum = %v", ErrInvalidSetup, isNativeOnEthereum, isMintBurnOnEthereum)
 	}
 
-	if !isNativeOnKleverchain && !isMintBurnOnKleverchain {
-		return fmt.Errorf("%w isNativeOnKleverchain = %v, isMintBurnOnKleverchain = %v", ErrInvalidSetup, isNativeOnKleverchain, isMintBurnOnKleverchain)
+	if !isNativeOnKc && !isMintBurnOnKc {
+		return fmt.Errorf("%w isNativeOnKc = %v, isMintBurnOnKc = %v", ErrInvalidSetup, isNativeOnKc, isMintBurnOnKc)
 	}
 
-	if isNativeOnEthereum == isNativeOnKleverchain {
-		return fmt.Errorf("%w isNativeOnEthereum = %v, isNativeOnKleverchain = %v", ErrInvalidSetup, isNativeOnEthereum, isNativeOnKleverchain)
+	if isNativeOnEthereum == isNativeOnKc {
+		return fmt.Errorf("%w isNativeOnEthereum = %v, isNativeOnKc = %v", ErrInvalidSetup, isNativeOnEthereum, isNativeOnKc)
 	}
 
 	ethAmount, err := validator.computeEthAmount(ctx, ethToken, isMintBurnOnEthereum, isNativeOnEthereum)
 	if err != nil {
 		return err
 	}
-	kdaAmount, err := validator.computeKdaAmount(ctx, kdaToken, isMintBurnOnKleverchain, isNativeOnKleverchain)
+	kdaAmount, err := validator.computeKdaAmount(ctx, kdaToken, isMintBurnOnKc, isNativeOnKc)
 	if err != nil {
 		return err
 	}
@@ -121,10 +121,10 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 
 func (validator *balanceValidator) checkRequiredBalance(ctx context.Context, ethToken common.Address, kdaToken []byte, amount *big.Int, direction batchProcessor.Direction) error {
 	switch direction {
-	case batchProcessor.FromKleverchain:
+	case batchProcessor.FromKc:
 		return validator.ethereumClient.CheckRequiredBalance(ctx, ethToken, amount)
-	case batchProcessor.ToKleverchain:
-		return validator.kleverchainClient.CheckRequiredBalance(ctx, kdaToken, amount)
+	case batchProcessor.ToKc:
+		return validator.kcClient.CheckRequiredBalance(ctx, kdaToken, amount)
 	default:
 		return fmt.Errorf("%w, direction: %s", ErrInvalidDirection, direction)
 	}
@@ -147,16 +147,16 @@ func (validator *balanceValidator) isNativeOnEthereum(ctx context.Context, erc20
 	return isNative, nil
 }
 
-func (validator *balanceValidator) isMintBurnOnKleverchain(ctx context.Context, token []byte) (bool, error) {
-	isMintBurn, err := validator.kleverchainClient.IsMintBurnToken(ctx, token)
+func (validator *balanceValidator) isMintBurnOnKc(ctx context.Context, token []byte) (bool, error) {
+	isMintBurn, err := validator.kcClient.IsMintBurnToken(ctx, token)
 	if err != nil {
 		return false, err
 	}
 	return isMintBurn, nil
 }
 
-func (validator *balanceValidator) isNativeOnKleverchain(ctx context.Context, token []byte) (bool, error) {
-	isNative, err := validator.kleverchainClient.IsNativeToken(ctx, token)
+func (validator *balanceValidator) isNativeOnKc(ctx context.Context, token []byte) (bool, error) {
+	isNative, err := validator.kcClient.IsNativeToken(ctx, token)
 	if err != nil {
 		return false, err
 	}
@@ -176,7 +176,7 @@ func (validator *balanceValidator) computeEthAmount(
 
 	if !isMintBurn {
 		// we need to subtract all locked balances on the Ethereum side (all pending, un-executed batches) so the balances
-		// with the minted Kleverchain tokens will match
+		// with the minted Klever Blockchain tokens will match
 		total, errTotal := validator.ethereumClient.TotalBalances(ctx, token)
 		if errTotal != nil {
 			return nil, errTotal
@@ -222,9 +222,9 @@ func (validator *balanceValidator) computeKdaAmount(
 	}
 
 	if !isMintBurn {
-		// we need to subtract all locked balances on the Kleverchain side (all pending, un-executed batches) so the balances
+		// we need to subtract all locked balances on the Klever Blockchain side (all pending, un-executed batches) so the balances
 		// with the minted Ethereum tokens will match
-		total, errTotal := validator.kleverchainClient.TotalBalances(ctx, token)
+		total, errTotal := validator.kcClient.TotalBalances(ctx, token)
 		if errTotal != nil {
 			return nil, errTotal
 		}
@@ -232,11 +232,11 @@ func (validator *balanceValidator) computeKdaAmount(
 		return total.Sub(total, kdaAmountInPendingBatches), nil
 	}
 
-	burnBalances, err := validator.kleverchainClient.BurnBalances(ctx, token)
+	burnBalances, err := validator.kcClient.BurnBalances(ctx, token)
 	if err != nil {
 		return nil, err
 	}
-	mintBalances, err := validator.kleverchainClient.MintBalances(ctx, token)
+	mintBalances, err := validator.kcClient.MintBalances(ctx, token)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big
 }
 
 func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx context.Context, kdaToken []byte) (*big.Int, error) {
-	batchID, err := validator.kleverchainClient.GetLastKlvBatchID(ctx)
+	batchID, err := validator.kcClient.GetLastKlvBatchID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx
 	var batch *bridgeCore.TransferBatch
 	amount := big.NewInt(0)
 	for {
-		batch, err = validator.kleverchainClient.GetBatch(ctx, batchID)
+		batch, err = validator.kcClient.GetBatch(ctx, batchID)
 		if errors.Is(err, clients.ErrNoBatchAvailable) {
 			return amount, nil
 		}
@@ -300,7 +300,7 @@ func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx
 }
 
 func (validator *balanceValidator) getTotalTransferAmountInPendingEthBatches(ctx context.Context, ethToken common.Address) (*big.Int, error) {
-	batchID, err := validator.kleverchainClient.GetLastExecutedEthBatchID(ctx)
+	batchID, err := validator.kcClient.GetLastExecutedEthBatchID(ctx)
 	if err != nil {
 		return nil, err
 	}

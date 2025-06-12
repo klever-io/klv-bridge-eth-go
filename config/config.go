@@ -153,7 +153,7 @@ type KleverConfig struct {
 	Proxy                           ProxyConfig
 }
 
-// ProxyConfig represents the configuration for the Kleverchain proxy
+// ProxyConfig represents the configuration for the Klever Blockchain proxy
 type ProxyConfig struct {
 	CacherExpirationSeconds uint64
 	RestAPIEntityType       string
@@ -161,7 +161,7 @@ type ProxyConfig struct {
 	FinalityCheck           bool
 }
 
-// KleverchainGasMapConfig represents the gas limits for Kleverchain operations
+// KcGasMapConfig represents the gas limits for Klever Blockchain operations
 type KleverGasMapConfig struct {
 	Sign                   uint64
 	ProposeTransferBase    uint64

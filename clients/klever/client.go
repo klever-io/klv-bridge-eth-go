@@ -538,8 +538,8 @@ func (c *client) incrementRetriesAvailabilityCheck() {
 }
 
 func (c *client) setStatusForAvailabilityCheck(status bridgeCore.ClientStatus, message string, nonce uint64) {
-	c.statusHandler.SetStringMetric(bridgeCore.MetricKleverchainClientStatus, status.String())
-	c.statusHandler.SetStringMetric(bridgeCore.MetricLastKleverchainClientError, message)
+	c.statusHandler.SetStringMetric(bridgeCore.MetricKcClientStatus, status.String())
+	c.statusHandler.SetStringMetric(bridgeCore.MetricLastKcClientError, message)
 	c.statusHandler.SetIntMetric(bridgeCore.MetricLastBlockNonce, int(nonce))
 }
 

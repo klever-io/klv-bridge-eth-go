@@ -4,7 +4,7 @@ import "errors"
 
 var (
 	errEmptyTokensList               = errors.New("empty tokens list")
-	errNilKlvDataGetter              = errors.New("nil Kleverchain data getter")
+	errNilKlvDataGetter              = errors.New("nil klever blockchain data getter")
 	errNilErc20ContractsHolder       = errors.New("nil ERC20 contracts holder")
 	errWrongERC20AddressResponse     = errors.New("wrong ERC20 address response")
 	errNilLogger                     = errors.New("nil logger")

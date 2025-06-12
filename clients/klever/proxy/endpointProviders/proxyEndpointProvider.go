@@ -8,7 +8,7 @@ const (
 	proxyVmQuery = "sc/query"
 )
 
-// proxyEndpointProvider is suitable to work with a Kleverchain Proxy
+// proxyEndpointProvider is suitable to work with a Klever Blockchain Proxy
 type proxyEndpointProvider struct {
 	*baseEndpointProvider
 }

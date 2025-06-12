@@ -24,9 +24,9 @@ var (
 
 func createMockArgsBalanceValidator() ArgsBalanceValidator {
 	return ArgsBalanceValidator{
-		Log:               &testscommon.LoggerStub{},
-		KleverchainClient: &bridge.KleverchainClientStub{},
-		EthereumClient:    &bridge.EthereumClientStub{},
+		Log:            &testscommon.LoggerStub{},
+		KcClient:       &bridge.KcClientStub{},
+		EthereumClient: &bridge.EthereumClientStub{},
 	}
 }
 
@@ -131,14 +131,14 @@ func TestNewBalanceValidator(t *testing.T) {
 		assert.Nil(t, instance)
 		assert.Equal(t, ErrNilLogger, err)
 	})
-	t.Run("nil Kleverchain client should error", func(t *testing.T) {
+	t.Run("nil Klever Blockchain client should error", func(t *testing.T) {
 		t.Parallel()
 
 		args := createMockArgsBalanceValidator()
-		args.KleverchainClient = nil
+		args.KcClient = nil
 		instance, err := NewBalanceValidator(args)
 		assert.Nil(t, instance)
-		assert.Equal(t, ErrNilKleverchainClient, err)
+		assert.Equal(t, ErrNilKcClient, err)
 	})
 	t.Run("nil Ethereum client should error", func(t *testing.T) {
 		t.Parallel()
@@ -187,7 +187,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 
 		t.Run("on isMintBurnOnEthereum", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction: batchProcessor.FromKleverchain,
+				direction: batchProcessor.FromKc,
 				errorsOnCalls: map[string]error{
 					"MintBurnTokensEth": expectedError,
 				},
@@ -197,9 +197,9 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.True(t, result.checkRequiredBalanceOnEthCalled)
 			assert.False(t, result.checkRequiredBalanceOnKlvCalled)
 		})
-		t.Run("on isMintBurnOnKleverchain", func(t *testing.T) {
+		t.Run("on isMintBurnOnKc", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction: batchProcessor.ToKleverchain,
+				direction: batchProcessor.ToKc,
 				errorsOnCalls: map[string]error{
 					"IsMintBurnTokenKlv": expectedError,
 				},
@@ -211,7 +211,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on isNativeOnEthereum", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction: batchProcessor.ToKleverchain,
+				direction: batchProcessor.ToKc,
 				errorsOnCalls: map[string]error{
 					"NativeTokensEth": expectedError,
 				},
@@ -221,9 +221,9 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
-		t.Run("on isNativeOnKleverchain", func(t *testing.T) {
+		t.Run("on isNativeOnKc", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction: batchProcessor.FromKleverchain,
+				direction: batchProcessor.FromKc,
 				errorsOnCalls: map[string]error{
 					"IsNativeTokenKlv": expectedError,
 				},
@@ -235,7 +235,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeEthAmount, TotalBalances", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.FromKleverchain,
+				direction:       batchProcessor.FromKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
@@ -249,7 +249,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeEthAmount, BurnBalances", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.FromKleverchain,
+				direction:       batchProcessor.FromKc,
 				isNativeOnKlv:   true,
 				isMintBurnOnEth: true,
 				errorsOnCalls: map[string]error{
@@ -263,7 +263,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeEthAmount, MintBalances", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.FromKleverchain,
+				direction:       batchProcessor.FromKc,
 				isNativeOnKlv:   true,
 				isMintBurnOnEth: true,
 				errorsOnCalls: map[string]error{
@@ -277,7 +277,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeEthAmount, GetLastExecutedEthBatchID", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.FromKleverchain,
+				direction:       batchProcessor.FromKc,
 				isNativeOnKlv:   true,
 				isMintBurnOnEth: true,
 				errorsOnCalls: map[string]error{
@@ -291,7 +291,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeEthAmount, GetBatch", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.FromKleverchain,
+				direction:       batchProcessor.FromKc,
 				isNativeOnKlv:   true,
 				isMintBurnOnEth: true,
 				errorsOnCalls: map[string]error{
@@ -305,7 +305,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeKlvAmount, TotalBalances", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isNativeOnKlv:   true,
 				isMintBurnOnEth: true,
 				errorsOnCalls: map[string]error{
@@ -319,7 +319,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeKlvAmount, BurnBalances", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
@@ -333,7 +333,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeKlvAmount, MintBalances", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
@@ -347,7 +347,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeKlvAmount, GetLastKlvBatchID", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
@@ -361,7 +361,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeKlvAmount, GetBatch", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
@@ -375,7 +375,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 		})
 		t.Run("on computeKlvAmount, WasExecuted", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
@@ -393,7 +393,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 
 		t.Run("on Ethereum is not native nor is mint/burn, should error", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:       batchProcessor.ToKleverchain,
+				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 			}
 			result := validatorTester(cfg)
@@ -402,26 +402,26 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
-		t.Run("on Kleverchain is not native nor is mint/burn, should error", func(t *testing.T) {
+		t.Run("on Klever Blockchain is not native nor is mint/burn, should error", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:     batchProcessor.ToKleverchain,
+				direction:     batchProcessor.ToKc,
 				isNativeOnEth: true,
 			}
 			result := validatorTester(cfg)
 			assert.ErrorIs(t, result.error, ErrInvalidSetup)
-			assert.Contains(t, result.error.Error(), "isNativeOnKleverchain = false, isMintBurnOnKleverchain = false")
+			assert.Contains(t, result.error.Error(), "isNativeOnKc = false, isMintBurnOnKc = false")
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
 		t.Run("native on both chains, should error", func(t *testing.T) {
 			cfg := testConfiguration{
-				direction:     batchProcessor.ToKleverchain,
+				direction:     batchProcessor.ToKc,
 				isNativeOnEth: true,
 				isNativeOnKlv: true,
 			}
 			result := validatorTester(cfg)
 			assert.ErrorIs(t, result.error, ErrInvalidSetup)
-			assert.Contains(t, result.error.Error(), "isNativeOnEthereum = true, isNativeOnKleverchain = true")
+			assert.Contains(t, result.error.Error(), "isNativeOnEthereum = true, isNativeOnKc = true")
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
@@ -433,7 +433,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			t.Parallel()
 
 			cfg := testConfiguration{
-				direction:         batchProcessor.ToKleverchain,
+				direction:         batchProcessor.ToKc,
 				isMintBurnOnEth:   true,
 				isNativeOnEth:     true,
 				isMintBurnOnKlv:   true,
@@ -450,7 +450,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			t.Parallel()
 
 			cfg := testConfiguration{
-				direction:         batchProcessor.ToKleverchain,
+				direction:         batchProcessor.ToKc,
 				isMintBurnOnEth:   true,
 				isNativeOnKlv:     true,
 				burnBalancesOnEth: big.NewInt(38),
@@ -462,11 +462,11 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
-		t.Run("on Kleverchain, native", func(t *testing.T) {
+		t.Run("on Kc, native", func(t *testing.T) {
 			t.Parallel()
 
 			cfg := testConfiguration{
-				direction:         batchProcessor.ToKleverchain,
+				direction:         batchProcessor.ToKc,
 				isMintBurnOnEth:   true,
 				isMintBurnOnKlv:   true,
 				isNativeOnKlv:     true,
@@ -479,11 +479,11 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
-		t.Run("on Kleverchain, non-native", func(t *testing.T) {
+		t.Run("on Kc, non-native", func(t *testing.T) {
 			t.Parallel()
 
 			cfg := testConfiguration{
-				direction:         batchProcessor.ToKleverchain,
+				direction:         batchProcessor.ToKc,
 				isNativeOnEth:     true,
 				isMintBurnOnKlv:   true,
 				burnBalancesOnKlv: big.NewInt(38),
@@ -506,7 +506,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.ToKleverchain,
+					direction:          batchProcessor.ToKc,
 					isMintBurnOnEth:    true,
 					isNativeOnKlv:      true,
 					burnBalancesOnEth:  big.NewInt(1100),  // initial burn (1000) + burn from this transfer (100)
@@ -535,7 +535,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.ToKleverchain,
+					direction:          batchProcessor.ToKc,
 					isMintBurnOnEth:    true,
 					isNativeOnKlv:      true,
 					burnBalancesOnEth:  big.NewInt(1220),  // initial burn (1000) + burn from this transfer (100) + burn from next batches (120)
@@ -566,7 +566,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.ToKleverchain,
+					direction:         batchProcessor.ToKc,
 					isMintBurnOnEth:   true,
 					isNativeOnKlv:     true,
 					isMintBurnOnKlv:   true,
@@ -597,7 +597,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.ToKleverchain,
+					direction:         batchProcessor.ToKc,
 					isMintBurnOnEth:   true,
 					isNativeOnKlv:     true,
 					isMintBurnOnKlv:   true,
@@ -630,7 +630,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.ToKleverchain,
+					direction:          batchProcessor.ToKc,
 					isMintBurnOnKlv:    true,
 					isNativeOnEth:      true,
 					burnBalancesOnKlv:  big.NewInt(1000),  // initial burn (1000)
@@ -659,7 +659,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.ToKleverchain,
+					direction:          batchProcessor.ToKc,
 					isMintBurnOnKlv:    true,
 					isNativeOnEth:      true,
 					burnBalancesOnKlv:  big.NewInt(1000),  // initial burn (1000)
@@ -690,7 +690,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.ToKleverchain,
+					direction:         batchProcessor.ToKc,
 					isMintBurnOnKlv:   true,
 					isNativeOnEth:     true,
 					isMintBurnOnEth:   true,
@@ -721,7 +721,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.ToKleverchain,
+					direction:         batchProcessor.ToKc,
 					isMintBurnOnKlv:   true,
 					isNativeOnEth:     true,
 					isMintBurnOnEth:   true,
@@ -759,7 +759,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.FromKleverchain,
+					direction:          batchProcessor.FromKc,
 					isMintBurnOnEth:    true,
 					isNativeOnKlv:      true,
 					burnBalancesOnEth:  big.NewInt(1000),  // initial burn (1000)
@@ -788,7 +788,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.FromKleverchain,
+					direction:          batchProcessor.FromKc,
 					isMintBurnOnEth:    true,
 					isNativeOnKlv:      true,
 					burnBalancesOnEth:  big.NewInt(1000),  // initial burn (1000)
@@ -819,7 +819,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.FromKleverchain,
+					direction:         batchProcessor.FromKc,
 					isMintBurnOnEth:   true,
 					isNativeOnKlv:     true,
 					isMintBurnOnKlv:   true,
@@ -850,7 +850,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.FromKleverchain,
+					direction:         batchProcessor.FromKc,
 					isMintBurnOnEth:   true,
 					isNativeOnKlv:     true,
 					isMintBurnOnKlv:   true,
@@ -883,7 +883,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.FromKleverchain,
+					direction:          batchProcessor.FromKc,
 					isMintBurnOnKlv:    true,
 					isNativeOnEth:      true,
 					burnBalancesOnKlv:  big.NewInt(1100),  // initial burn (1000) + transfer from this batch (100)
@@ -912,7 +912,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.FromKleverchain,
+					direction:          batchProcessor.FromKc,
 					isMintBurnOnKlv:    true,
 					isNativeOnEth:      true,
 					burnBalancesOnKlv:  big.NewInt(1220),  // initial burn (1000) + transfer from this batch (100) + next batches (120)
@@ -943,7 +943,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.FromKleverchain,
+					direction:         batchProcessor.FromKc,
 					isMintBurnOnKlv:   true,
 					isNativeOnEth:     true,
 					isMintBurnOnEth:   true,
@@ -974,7 +974,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				t.Parallel()
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.FromKleverchain,
+					direction:         batchProcessor.FromKc,
 					isMintBurnOnKlv:   true,
 					isNativeOnEth:     true,
 					isMintBurnOnEth:   true,
@@ -1016,7 +1016,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingMintEth := int64(160000)
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.ToKleverchain,
+					direction:          batchProcessor.ToKc,
 					isMintBurnOnEth:    true,
 					isNativeOnKlv:      true,
 					burnBalancesOnEth:  big.NewInt(existingBurnEth + 100 + 30 + 40 + 50),
@@ -1059,7 +1059,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingMintEth := int64(160000)
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.ToKleverchain,
+					direction:         batchProcessor.ToKc,
 					isMintBurnOnEth:   true,
 					isNativeOnKlv:     true,
 					isMintBurnOnKlv:   true,
@@ -1103,7 +1103,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingNativeBalanceEth := int64(10000)
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.ToKleverchain,
+					direction:          batchProcessor.ToKc,
 					isMintBurnOnKlv:    true,
 					isNativeOnEth:      true,
 					burnBalancesOnKlv:  big.NewInt(existingBurnKlv + 200 + 60 + 80 + 100),
@@ -1146,7 +1146,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingMintEth := int64(150000)
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.ToKleverchain,
+					direction:         batchProcessor.ToKc,
 					isMintBurnOnKlv:   true,
 					isNativeOnEth:     true,
 					isMintBurnOnEth:   true,
@@ -1190,7 +1190,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingMintEth := int64(160000)
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.FromKleverchain,
+					direction:          batchProcessor.FromKc,
 					isMintBurnOnEth:    true,
 					isNativeOnKlv:      true,
 					burnBalancesOnEth:  big.NewInt(existingBurnEth + 200 + 60 + 80 + 100),
@@ -1233,7 +1233,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingMintEth := int64(160000)
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.FromKleverchain,
+					direction:         batchProcessor.FromKc,
 					isMintBurnOnEth:   true,
 					isNativeOnKlv:     true,
 					isMintBurnOnKlv:   true,
@@ -1277,7 +1277,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingNativeBalanceEth := int64(10000)
 
 				cfg := testConfiguration{
-					direction:          batchProcessor.FromKleverchain,
+					direction:          batchProcessor.FromKc,
 					isMintBurnOnKlv:    true,
 					isNativeOnEth:      true,
 					burnBalancesOnKlv:  big.NewInt(existingBurnKlv + 100 + 30 + 40 + 50),
@@ -1320,7 +1320,7 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 				existingMintEth := int64(150000)
 
 				cfg := testConfiguration{
-					direction:         batchProcessor.FromKleverchain,
+					direction:         batchProcessor.FromKc,
 					isMintBurnOnKlv:   true,
 					isNativeOnEth:     true,
 					isMintBurnOnEth:   true,
@@ -1372,7 +1372,7 @@ func validatorTester(cfg testConfiguration) testResult {
 		}
 	}
 
-	args.KleverchainClient = &bridge.KleverchainClientStub{
+	args.KcClient = &bridge.KcClientStub{
 		CheckRequiredBalanceCalled: func(ctx context.Context, token []byte, value *big.Int) error {
 			result.checkRequiredBalanceOnKlvCalled = true
 			return nil

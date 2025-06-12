@@ -8,7 +8,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
 
-// Proxy defines the behavior of a proxy able to serve Kleverchain blockchain requests
+// Proxy defines the behavior of a proxy able to serve Klever Blockchain blockchain requests
 type Proxy interface {
 	GetNetworkConfig(ctx context.Context) (*models.NetworkConfig, error)
 	SendTransaction(ctx context.Context, tx *transaction.Transaction) (string, error)

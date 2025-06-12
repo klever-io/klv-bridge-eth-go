@@ -57,7 +57,7 @@ func main() {
 	app.Flags = getFlags()
 	app.Authors = []cli.Author{
 		{
-			Name:  "The Kleverchain Team",
+			Name:  "The Klever Blockchain Team",
 			Email: "contact@klever.io",
 		},
 	}

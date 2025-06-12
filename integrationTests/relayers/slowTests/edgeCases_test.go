@@ -69,8 +69,8 @@ func testRelayersWithChainSimulatorAndTokensForSimultaneousSwaps(tb testing.TB, 
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.KleverchainHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
-		setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KleverchainHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+		setup.KcHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KcHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 	}
 
 	processFunc := func(tb testing.TB, setup *framework.TestSetup) bool {

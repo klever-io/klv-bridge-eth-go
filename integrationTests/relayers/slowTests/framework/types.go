@@ -11,7 +11,7 @@ type IssueTokenParams struct {
 	InitialSupplyParams
 	AbstractTokenIdentifier string
 
-	// Kleverchain
+	// Klever Blockchain
 	NumOfDecimalsUniversal           int
 	NumOfDecimalsChainSpecific       byte
 	KlvUniversalTokenTicker          string

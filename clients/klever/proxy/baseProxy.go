@@ -37,7 +37,7 @@ type baseProxy struct {
 	endpointProvider    factory.EndpointProvider
 }
 
-// newBaseProxy will create a base kleverchain proxy with cache instance
+// newBaseProxy will create a base kc proxy with cache instance
 func newBaseProxy(args argsBaseProxy) (*baseProxy, error) {
 	err := checkArgsBaseProxy(args)
 	if err != nil {

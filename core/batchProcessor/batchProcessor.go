@@ -11,10 +11,10 @@ import (
 type Direction string
 
 const (
-	// FromKleverchain is the direction of the transfer
-	FromKleverchain Direction = "FromKleverchain"
-	// ToKleverchain is the direction of the transfer
-	ToKleverchain Direction = "ToKleverchain"
+	// FromKc is the direction of the transfer
+	FromKc Direction = "FromKc"
+	// ToKc is the direction of the transfer
+	ToKc Direction = "ToKc"
 )
 
 // ArgListsBatch is a struct that contains the batch data in a format that is easy to use
@@ -28,10 +28,10 @@ type ArgListsBatch struct {
 }
 
 // ExtractListKlvToEth will extract the batch data into a format that is easy to use
-// The transfer is from Kleverchain to Ethereum
+// The transfer is from Klever Blockchain to Ethereum
 func ExtractListKlvToEth(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 	arg := &ArgListsBatch{
-		Direction: FromKleverchain,
+		Direction: FromKc,
 	}
 
 	for _, dt := range batch.Deposits {
@@ -54,10 +54,10 @@ func ExtractListKlvToEth(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 }
 
 // ExtractListEthToKlv will extract the batch data into a format that is easy to use
-// The transfer is from Ehtereum to Kleverchain
+// The transfer is from Ehtereum to Klever Blockchain
 func ExtractListEthToKlv(batch *bridgeCore.TransferBatch) *ArgListsBatch {
 	arg := &ArgListsBatch{
-		Direction: ToKleverchain,
+		Direction: ToKc,
 	}
 
 	for _, dt := range batch.Deposits {

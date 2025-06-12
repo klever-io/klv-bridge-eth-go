@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// KlvAddress holds the different forms a Kleverchain address might have
+// KlvAddress holds the different forms a Klever Blockchain address might have
 type KlvAddress struct {
 	address.Address
 	bytes  []byte

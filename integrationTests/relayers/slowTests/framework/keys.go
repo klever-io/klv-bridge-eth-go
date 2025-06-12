@@ -160,8 +160,8 @@ func (keyStore *KeysStore) WalletsToFundOnEthereum() []common.Address {
 	return walletsToFund
 }
 
-// WalletsToFundOnKleverchain will return the wallets to fund on Kleverchain
-func (keyStore *KeysStore) WalletsToFundOnKleverchain() []string {
+// WalletsToFundOnKc will return the wallets to fund on Kc
+func (keyStore *KeysStore) WalletsToFundOnKc() []string {
 	allKeys := keyStore.getAllKeys()
 	walletsToFund := make([]string, 0, len(allKeys))
 
@@ -172,7 +172,7 @@ func (keyStore *KeysStore) WalletsToFundOnKleverchain() []string {
 	return walletsToFund
 }
 
-// GenerateKlvPrivatePublicKey will generate a new keys holder instance that will hold only the Kleverchain generated keys
+// GenerateKlvPrivatePublicKey will generate a new keys holder instance that will hold only the Kc generated keys
 func GenerateKlvPrivatePublicKey(tb testing.TB, projectedShard byte) KeysHolder {
 	sk, pkBytes := generateSkPkInShard(tb, projectedShard)
 
@@ -201,7 +201,7 @@ func generateSkPkInShard(tb testing.TB, projectedShard byte) (klvCrypto.PrivateK
 	}
 }
 
-// SaveKlvKey will save the Kleverchain key
+// SaveKlvKey will save the Klever Blockchain key
 func SaveKlvKey(tb testing.TB, filename string, key KeysHolder) {
 	blk := pem.Block{
 		Type:  "PRIVATE KEY for " + key.KlvAddress.Bech32(),

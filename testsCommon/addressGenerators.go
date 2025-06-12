@@ -15,8 +15,8 @@ func CreateRandomEthereumAddress() common.Address {
 	return common.BytesToAddress(buff)
 }
 
-// CreateRandomKleverchainAddress will create a random Kleverchain address
-func CreateRandomKleverchainAddress() address.Address {
+// CreateRandomKcAddress will create a random Klever Blockchain address
+func CreateRandomKcAddress() address.Address {
 	buff := make([]byte, 32)
 	_, _ = rand.Read(buff)
 
@@ -25,8 +25,8 @@ func CreateRandomKleverchainAddress() address.Address {
 	return addr
 }
 
-// CreateRandomKleverchainSCAddress will create a random Kleverchain smart contract address
-func CreateRandomKleverchainSCAddress() address.Address {
+// CreateRandomKcSCAddress will create a random Klever Blockchain smart contract address
+func CreateRandomKcSCAddress() address.Address {
 	buff := make([]byte, 22)
 	_, _ = rand.Read(buff)
 

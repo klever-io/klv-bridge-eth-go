@@ -46,7 +46,7 @@ import (
 const (
 	filePathPlaceholder      = "[path]"
 	defaultLogsPath          = "logs"
-	logFilePrefix            = "kleverchain-eth-bridge"
+	logFilePrefix            = "kc-eth-bridge"
 	p2pPeerNetworkDiscoverer = "optimized"
 	nilListSharderType       = "NilListSharder"
 	disabledWatcher          = "disabled"
@@ -78,7 +78,7 @@ func main() {
 	app.Version = fmt.Sprintf("%s/%s/%s-%s/%s", appVersion, runtime.Version(), runtime.GOOS, runtime.GOARCH, machineID)
 	app.Authors = []cli.Author{
 		{
-			Name:  "The Kleverchain Team",
+			Name:  "The Klever Blockchain Team",
 			Email: "contact@klever.io",
 		},
 	}
@@ -255,7 +255,7 @@ func startRelay(ctx *cli.Context, version string) error {
 		KleverClientStatusHandler: kleverClientStatusHandler,
 	}
 
-	ethToKleverchainComponents, err := factory.NewEthKleverBridgeComponents(args)
+	ethToKcComponents, err := factory.NewEthKleverBridgeComponents(args)
 	if err != nil {
 		return err
 	}
@@ -267,7 +267,7 @@ func startRelay(ctx *cli.Context, version string) error {
 
 	log.Info("Starting relay")
 
-	err = ethToKleverchainComponents.Start()
+	err = ethToKcComponents.Start()
 	if err != nil {
 		return err
 	}
@@ -280,7 +280,7 @@ func startRelay(ctx *cli.Context, version string) error {
 	log.Info("application closing, calling Close on all subcomponents...")
 
 	var lastErr error
-	err = ethToKleverchainComponents.Close()
+	err = ethToKcComponents.Close()
 	if err != nil {
 		lastErr = err
 	}

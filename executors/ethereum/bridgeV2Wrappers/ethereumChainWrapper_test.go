@@ -263,7 +263,7 @@ func TestEthClientWrapper_GetStatusesAfterExecution(t *testing.T) {
 	args, statusHandler := createMockArgsEthereumChainWrapper()
 	handlerCalled := false
 	args.MultiSigContract = &mock.MultiSigContractStub{
-		GetStatusesAfterExecutionCalled: func(opts *bind.CallOpts, batchNonceKleverchainETH *big.Int) ([]uint8, error) {
+		GetStatusesAfterExecutionCalled: func(opts *bind.CallOpts, batchNonceKcETH *big.Int) ([]uint8, error) {
 			handlerCalled = true
 			return nil, nil
 		},
