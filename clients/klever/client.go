@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	factoryHasher "github.com/klever-io/klever-go/crypto/hashing/factory"
+	"github.com/klever-io/klever-go/tools/marshal/factory"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/builders"
@@ -24,13 +26,13 @@ import (
 )
 
 const (
-	proposeTransferFuncName         = "proposeMultiTransferEsdtBatch"
-	proposeSetStatusFuncName        = "proposeEsdtSafeSetCurrentTransactionBatchStatus"
+	proposeTransferFuncName         = "proposeMultiTransferKdaBatch"
+	proposeSetStatusFuncName        = "proposeKdaSafeSetCurrentTransactionBatchStatus"
 	signFuncName                    = "sign"
 	performActionFuncName           = "performAction"
 	minClientAvailabilityAllowDelta = 1
 
-	multiversXDataGetterLogId = "MultiversXEth-MultiversXDataGetter"
+	kleverDataGetterLogId = "KleverEth-KleverDataGetter"
 )
 
 // ClientArgs represents the argument for the NewClient constructor function
@@ -48,7 +50,7 @@ type ClientArgs struct {
 	ClientAvailabilityAllowDelta uint64
 }
 
-// client represents the MultiversX Client implementation
+// client represents the Klever Blockchain Client implementation
 type client struct {
 	*klvClientDataGetter
 	txHandler                    txHandler
@@ -68,7 +70,7 @@ type client struct {
 	mut                      sync.RWMutex
 }
 
-// NewClient returns a new MultiversX Client instance
+// NewClient returns a new Klever Blockchain Client instance
 func NewClient(args ClientArgs) (*client, error) {
 	err := checkArgs(args)
 	if err != nil {
@@ -100,7 +102,7 @@ func NewClient(args ClientArgs) (*client, error) {
 		SafeContractAddress:     args.SafeContractAddress,
 		RelayerAddress:          relayerAddress,
 		Proxy:                   args.Proxy,
-		Log:                     bridgeCore.NewLoggerWithIdentifier(logger.GetOrCreate(multiversXDataGetterLogId), multiversXDataGetterLogId),
+		Log:                     bridgeCore.NewLoggerWithIdentifier(logger.GetOrCreate(kleverDataGetterLogId), kleverDataGetterLogId),
 	}
 	getter, err := NewKLVClientDataGetter(argsKLVClientDataGetter)
 	if err != nil {
@@ -116,6 +118,16 @@ func NewClient(args ClientArgs) (*client, error) {
 
 	bech23SafeAddress := args.SafeContractAddress.Bech32()
 
+	internalMarshalizer, err := factory.NewMarshalizer(factory.ProtoMarshalizer)
+	if err != nil {
+		return nil, err
+	}
+
+	hasher, err := factoryHasher.NewHasher("blake2b")
+	if err != nil {
+		return nil, err
+	}
+
 	c := &client{
 		txHandler: &transactionHandler{
 			proxy:                   args.Proxy,
@@ -125,6 +137,8 @@ func NewClient(args ClientArgs) (*client, error) {
 			relayerPrivateKey:       args.RelayerPrivateKey,
 			singleSigner:            &singlesig.Ed25519Signer{},
 			roleProvider:            args.RoleProvider,
+			internalMarshalizer:     internalMarshalizer,
+			hasher:                  hasher,
 		},
 		klvClientDataGetter:          getter,
 		relayerPublicKey:             publicKey,
@@ -140,7 +154,7 @@ func NewClient(args ClientArgs) (*client, error) {
 	}
 
 	bech32RelayerAddress := relayerAddress.Bech32()
-	c.log.Info("NewMultiversXClient",
+	c.log.Info("NewKleverBlockchainClient",
 		"relayer address", bech32RelayerAddress,
 		"multisig contract address", bech23MultisigAddress,
 		"safe contract address", bech23SafeAddress)
