@@ -29,7 +29,7 @@ var expectedErr = errors.New("expected error")
 
 func createMockArgsForMigrationBatchCreator() ArgsMigrationBatchCreator {
 	return ArgsMigrationBatchCreator{
-		MvxDataGetter: &bridge.DataGetterStub{
+		KlvDataGetter: &bridge.DataGetterStub{
 			GetAllKnownTokensCalled: func(ctx context.Context) ([][]byte, error) {
 				return [][]byte{
 					[]byte("tkn1"),
@@ -52,15 +52,15 @@ func createMockArgsForMigrationBatchCreator() ArgsMigrationBatchCreator {
 func TestNewMigrationBatchCreator(t *testing.T) {
 	t.Parallel()
 
-	t.Run("nil mvx data getter should error", func(t *testing.T) {
+	t.Run("nil kda data getter should error", func(t *testing.T) {
 		t.Parallel()
 
 		args := createMockArgsForMigrationBatchCreator()
-		args.MvxDataGetter = nil
+		args.KlvDataGetter = nil
 
 		creator, err := NewMigrationBatchCreator(args)
 		assert.Nil(t, creator)
-		assert.Equal(t, errNilMvxDataGetter, err)
+		assert.Equal(t, errNilKlvDataGetter, err)
 	})
 	t.Run("nil erc20 contracts holder should error", func(t *testing.T) {
 		t.Parallel()
@@ -310,7 +310,7 @@ func TestMigrationBatchCreator_CreateBatchInfo(t *testing.T) {
 				return batchNonce.Uint64() < firstFreeBatchId, nil
 			},
 		}
-		args.MvxDataGetter = &bridge.DataGetterStub{
+		args.KlvDataGetter = &bridge.DataGetterStub{
 			GetAllKnownTokensCalled: func(ctx context.Context) ([][]byte, error) {
 				return nil, expectedErr
 			},
@@ -330,7 +330,7 @@ func TestMigrationBatchCreator_CreateBatchInfo(t *testing.T) {
 				return batchNonce.Uint64() < firstFreeBatchId, nil
 			},
 		}
-		args.MvxDataGetter = &bridge.DataGetterStub{
+		args.KlvDataGetter = &bridge.DataGetterStub{
 			GetAllKnownTokensCalled: func(ctx context.Context) ([][]byte, error) {
 				return make([][]byte, 0), nil
 			},
@@ -350,7 +350,7 @@ func TestMigrationBatchCreator_CreateBatchInfo(t *testing.T) {
 				return batchNonce.Uint64() < firstFreeBatchId, nil
 			},
 		}
-		args.MvxDataGetter.(*bridge.DataGetterStub).GetERC20AddressForTokenIdCalled = func(ctx context.Context, sourceBytes []byte) ([][]byte, error) {
+		args.KlvDataGetter.(*bridge.DataGetterStub).GetERC20AddressForTokenIdCalled = func(ctx context.Context, sourceBytes []byte) ([][]byte, error) {
 			return nil, expectedErr
 		}
 
@@ -368,7 +368,7 @@ func TestMigrationBatchCreator_CreateBatchInfo(t *testing.T) {
 				return batchNonce.Uint64() < firstFreeBatchId, nil
 			},
 		}
-		args.MvxDataGetter.(*bridge.DataGetterStub).GetERC20AddressForTokenIdCalled = func(ctx context.Context, sourceBytes []byte) ([][]byte, error) {
+		args.KlvDataGetter.(*bridge.DataGetterStub).GetERC20AddressForTokenIdCalled = func(ctx context.Context, sourceBytes []byte) ([][]byte, error) {
 			return make([][]byte, 0), nil
 		}
 
@@ -401,7 +401,7 @@ func TestMigrationBatchCreator_CreateBatchInfo(t *testing.T) {
 		t.Parallel()
 
 		args := createMockArgsForMigrationBatchCreator()
-		args.MvxDataGetter.(*bridge.DataGetterStub).GetERC20AddressForTokenIdCalled = func(ctx context.Context, sourceBytes []byte) ([][]byte, error) {
+		args.KlvDataGetter.(*bridge.DataGetterStub).GetERC20AddressForTokenIdCalled = func(ctx context.Context, sourceBytes []byte) ([][]byte, error) {
 			if string(sourceBytes) == "tkn1" {
 				return [][]byte{tkn1Erc20Address}, nil
 			}
