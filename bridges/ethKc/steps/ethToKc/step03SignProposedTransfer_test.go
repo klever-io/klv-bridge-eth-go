@@ -183,7 +183,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 		expectedStepIdentifier := core.StepIdentifier(SigningProposedTransferOnKc)
 		assert.Equal(t, expectedStepIdentifier, step.Identifier())
 		// Test IsInterfaceNil
-		assert.NotNil(t, step.IsInterfaceNil())
+		assert.False(t, step.IsInterfaceNil())
 
 		expectedStepIdentifier = WaitingForQuorum
 		stepIdentifier := step.Execute(context.Background())

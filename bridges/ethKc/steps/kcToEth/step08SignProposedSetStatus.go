@@ -28,7 +28,7 @@ func (step *signProposedSetStatusStep) Execute(ctx context.Context) core.StepIde
 	}
 	if actionID == ethKc.InvalidActionID {
 		step.bridge.PrintInfo(logger.LogError, "contract error, got invalid action ID",
-			"batch ID", storedBatch.ID, "error", err, "action ID", actionID)
+			"batch ID", storedBatch.ID, "action ID", actionID)
 		return GettingPendingBatchFromKc
 	}
 

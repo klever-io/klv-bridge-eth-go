@@ -536,7 +536,7 @@ func TestMigrationToolConfig(t *testing.T) {
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
 [Klever]
-    NetworkAddress = "https://api.devnet.klever.finance/" # the network address
+    NetworkAddress = "https://api.devnet.klever.finance" # the network address
     MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the kc address for the bridge contract
     SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the kc address for the safe contract
     [Klever.Proxy]

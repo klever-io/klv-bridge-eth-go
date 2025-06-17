@@ -96,7 +96,7 @@ func TestRelayersShouldExecuteTransfersWithRefund(t *testing.T) {
 		memeToken := GenerateTestMEMEToken()
 		memeToken.TestOperations[2].KlvSCCallData = nil
 		memeToken.TestOperations[2].KlvFaultySCCall = true
-		usdcToken.TestOperations[2].KlvForceSCCall = true
+		memeToken.TestOperations[2].KlvForceSCCall = true
 
 		testRelayersWithChainSimulatorAndTokensAndRefund(
 			t,
