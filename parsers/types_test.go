@@ -25,7 +25,7 @@ func TestProxySCCompleteCallData_String(t *testing.T) {
 			Nonce:       1,
 		}
 
-		expectedString := "Eth address: 0x0000000000000000000000000000000000000000, MvX address: <nil>, token: tkn, amount: <nil>, nonce: 1, raw call data: 414243"
+		expectedString := "Eth address: 0x0000000000000000000000000000000000000000, Klv address: <nil>, token: tkn, amount: <nil>, nonce: 1, raw call data: 414243"
 		assert.Equal(t, expectedString, callData.String())
 	})
 	t.Run("not a Valid Klever address should work", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestProxySCCompleteCallData_String(t *testing.T) {
 			Nonce:       1,
 		}
 
-		expectedString := "Eth address: 0x0000000000000000000000000000000000000000, MvX address: <err>, token: tkn, amount: <nil>, nonce: 1, raw call data: 414243"
+		expectedString := "Eth address: 0x0000000000000000000000000000000000000000, Klv address: <err>, token: tkn, amount: <nil>, nonce: 1, raw call data: 414243"
 		assert.Equal(t, expectedString, callData.String())
 	})
 	t.Run("with valid data should work", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestProxySCCompleteCallData_String(t *testing.T) {
 		callData.From.SetBytes(ethUnhexed)
 		callData.To, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
 
-		expectedString := "Eth address: 0x880EC53Af800b5Cd051531672EF4fc4De233bD5d, MvX address: klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0, token: tkn, amount: 37, nonce: 1, raw call data: 414243"
+		expectedString := "Eth address: 0x880EC53Af800b5Cd051531672EF4fc4De233bD5d, Klv address: klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0, token: tkn, amount: 37, nonce: 1, raw call data: 414243"
 		assert.Equal(t, expectedString, callData.String())
 	})
 }

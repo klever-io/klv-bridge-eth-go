@@ -59,15 +59,15 @@ const (
 	// MetricLastEthereumClientError represents the metric used to store the last encountered error from the ethereum client
 	MetricLastEthereumClientError = "ethereum client last encountered error"
 
-	// MetricLastQueriedMultiversXBlockNumber represents the metric used to store the last MultiversX block number that was
-	// fetched from the MultiversX client
-	MetricLastQueriedMultiversXBlockNumber = "multiversx last queried block number"
+	// MetricLastQueriedKcBlockNumber represents the metric used to store the last Klever Blockchain block number that was
+	// fetched from the Klever Blockchain client
+	MetricLastQueriedKcBlockNumber = "klever blockchain last queried block number"
 
-	// MetricMultiversXClientStatus represents the metric used to store the status of the MultiversX client
-	MetricMultiversXClientStatus = "multiversx client status"
+	// MetricKcClientStatus represents the metric used to store the status of the Klever Blockchain client
+	MetricKcClientStatus = "klever blockchain client status"
 
-	// MetricLastMultiversXClientError represents the metric used to store the last encountered error from the MultiversX client
-	MetricLastMultiversXClientError = "multiversx client last encountered error"
+	// MetricLastKcClientError represents the metric used to store the last encountered error from the Klever Blockchain client
+	MetricLastKcClientError = "klever blockchain last encountered error"
 
 	// MetricRelayerP2PAddresses represents the metric used to store all the P2P addresses the messenger has bound to
 	MetricRelayerP2PAddresses = "relayer P2P addresses"
@@ -81,8 +81,8 @@ const (
 
 // PersistedMetrics represents the array of metrics that should be persisted
 var PersistedMetrics = []string{MetricNumBatches, MetricNumEthClientRequests, MetricNumEthClientTransactions,
-	MetricLastQueriedEthereumBlockNumber, MetricLastQueriedMultiversXBlockNumber, MetricEthereumClientStatus,
-	MetricMultiversXClientStatus, MetricLastEthereumClientError, MetricLastMultiversXClientError, MetricLastBlockNonce}
+	MetricLastQueriedEthereumBlockNumber, MetricLastQueriedKcBlockNumber, MetricEthereumClientStatus,
+	MetricKcClientStatus, MetricLastEthereumClientError, MetricLastKcClientError, MetricLastBlockNonce}
 
 const (
 	// EthClientStatusHandlerName is the Ethereum client status handler name

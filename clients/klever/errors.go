@@ -17,5 +17,5 @@ var (
 	errRelayerNotWhitelisted    = errors.New("relayer not whitelisted")
 	errNilNodeStatusResponse    = errors.New("nil node status response")
 	errInvalidBalance           = errors.New("invalid balance")
-	errInsufficientESDTBalance  = errors.New("insufficient ESDT balance")
+	errInsufficientKDABalance   = errors.New("insufficient KDA balance")
 )

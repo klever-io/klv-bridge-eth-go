@@ -1,5 +1,5 @@
-# KleverChain<->Eth Bridge
-The relayer code implemented in go that uses the smart contracts and powers the bridge between KleverChain and Ethereum.
+# KleverBlockchain<->Eth Bridge
+The relayer code implemented in go that uses the smart contracts and powers the bridge between KleverBlockchain and Ethereum.
 
 ## Installation and running for the relayer
 
@@ -18,9 +18,9 @@ For the documentation and how to setup swagger. Go to [README.md](api/swagger/RE
 
 
 ## Contribution
-Thank you for considering to help out with the source code! We welcome contributions from anyone on the internet, and are grateful for even the smallest of fixes to KleverChain!
+Thank you for considering to help out with the source code! We welcome contributions from anyone on the internet, and are grateful for even the smallest of fixes to KleverBlockchain!
 
-If you'd like to contribute to KleverChain, please fork, fix, commit and send a pull request for the maintainers to review and merge into the main code base. If you wish to submit more complex changes though, please check up with the core developers first on our [telegram channel]() to ensure those changes are in line with the general philosophy of the project and/or get some early feedback which can make both your efforts much lighter as well as our review and merge procedures quick and simple.
+If you'd like to contribute to KleverBlockchain, please fork, fix, commit and send a pull request for the maintainers to review and merge into the main code base. If you wish to submit more complex changes though, please check up with the core developers first on our [telegram channel]() to ensure those changes are in line with the general philosophy of the project and/or get some early feedback which can make both your efforts much lighter as well as our review and merge procedures quick and simple.
 
 Please make sure your contributions adhere to our coding guidelines:
 
@@ -30,4 +30,4 @@ Please make sure your contributions adhere to our coding guidelines:
 - Commit messages should be prefixed with the package(s) they modify.
     - E.g. "core/indexer: fixed a typo"
 
-Please see the [documentation](https://docs.klever.org/) for more details on the KleverChain project.
+Please see the [documentation](https://docs.klever.org/) for more details on the KleverBlockchain project.

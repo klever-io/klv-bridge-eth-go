@@ -28,25 +28,25 @@ type EthereumProposedTransfer struct {
 
 // EthereumChainMock -
 type EthereumChainMock struct {
-	mutState                            sync.RWMutex
-	nonces                              map[common.Address]uint64
-	batches                             map[uint64]*contract.Batch
-	deposits                            map[uint64][]contract.Deposit
-	proposedTransfer                    *EthereumProposedTransfer
-	totalBalances                       map[common.Address]*big.Int
-	mintBalances                        map[common.Address]*big.Int
-	burnBalances                        map[common.Address]*big.Int
-	mintBurnTokens                      map[common.Address]bool
-	nativeTokens                        map[common.Address]bool
-	whitelistedTokens                   map[common.Address]bool
-	GetStatusesAfterExecutionHandler    func() ([]byte, bool)
-	ProcessFinishedHandler              func()
-	quorum                              int
-	relayers                            []common.Address
-	ProposeMultiTransferEsdtBatchCalled func()
-	BalanceAtCalled                     func(ctx context.Context, account common.Address, blockNumber *big.Int) (*big.Int, error)
-	FilterLogsCalled                    func(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
-	finalNonce                          uint64
+	mutState                           sync.RWMutex
+	nonces                             map[common.Address]uint64
+	batches                            map[uint64]*contract.Batch
+	deposits                           map[uint64][]contract.Deposit
+	proposedTransfer                   *EthereumProposedTransfer
+	totalBalances                      map[common.Address]*big.Int
+	mintBalances                       map[common.Address]*big.Int
+	burnBalances                       map[common.Address]*big.Int
+	mintBurnTokens                     map[common.Address]bool
+	nativeTokens                       map[common.Address]bool
+	whitelistedTokens                  map[common.Address]bool
+	GetStatusesAfterExecutionHandler   func() ([]byte, bool)
+	ProcessFinishedHandler             func()
+	quorum                             int
+	relayers                           []common.Address
+	ProposeMultiTransferKdaBatchCalled func()
+	BalanceAtCalled                    func(ctx context.Context, account common.Address, blockNumber *big.Int) (*big.Int, error)
+	FilterLogsCalled                   func(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
+	finalNonce                         uint64
 }
 
 // NewEthereumChainMock -
@@ -232,8 +232,8 @@ func (mock *EthereumChainMock) ExecuteTransfer(_ *bind.TransactOpts, tokens []co
 	mock.proposedTransfer = proposedTransfer
 	mock.mutState.Unlock()
 
-	if mock.ProposeMultiTransferEsdtBatchCalled != nil {
-		mock.ProposeMultiTransferEsdtBatchCalled()
+	if mock.ProposeMultiTransferKdaBatchCalled != nil {
+		mock.ProposeMultiTransferKdaBatchCalled()
 	}
 
 	return tx, nil

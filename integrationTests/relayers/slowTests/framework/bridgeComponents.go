@@ -40,8 +40,8 @@ func NewBridgeComponents(
 	ethBackend *simulated.Backend,
 	numRelayers int,
 	ethSafeContractAddress string,
-	mvxSafeAddress *MvxAddress,
-	mvxMultisigAddress *MvxAddress,
+	kdaSafeAddress *KlvAddress,
+	kdaMultisigAddress *KlvAddress,
 ) *BridgeComponents {
 	bridge := &BridgeComponents{
 		TB:                 tb,
@@ -81,8 +81,8 @@ func NewBridgeComponents(
 		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = ethSafeContractAddress
 		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
 		argsBridgeComponents.Configs.GeneralConfig.Klever.NetworkAddress = chainSimulator.GetNetworkAddress()
-		argsBridgeComponents.Configs.GeneralConfig.Klever.SafeContractAddress = mvxSafeAddress.Bech32()
-		argsBridgeComponents.Configs.GeneralConfig.Klever.MultisigContractAddress = mvxMultisigAddress.Bech32()
+		argsBridgeComponents.Configs.GeneralConfig.Klever.SafeContractAddress = kdaSafeAddress.Bech32()
+		argsBridgeComponents.Configs.GeneralConfig.Klever.MultisigContractAddress = kdaMultisigAddress.Bech32()
 		argsBridgeComponents.Configs.GeneralConfig.Klever.GasMap = config.KleverGasMapConfig{
 			Sign:                   8000000,
 			ProposeTransferBase:    11000000,
