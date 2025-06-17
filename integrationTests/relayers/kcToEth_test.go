@@ -181,7 +181,7 @@ func testRelayersShouldExecuteTransfersFromKcToEthIfTransactionsAppearInBatch(t 
 	kcChainMock.SetPendingBatch(&pendingBatch)
 	kcChainMock.SetQuorum(numRelayers)
 
-	ethereumChainMock.ProposeMultiTransferEsdtBatchCalled = func() {
+	ethereumChainMock.ProposeMultiTransferKdaBatchCalled = func() {
 		deposit := deposits[0]
 
 		kcChainMock.AddDepositToCurrentBatch(deposit)

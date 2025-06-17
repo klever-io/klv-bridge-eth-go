@@ -42,40 +42,40 @@ const (
 	bridgeProxyContractPath   = "testdata/contracts/kda/bridge-proxy.wasm"
 	testCallerContractPath    = "testdata/contracts/kda/test-caller.wasm"
 
-	setBridgeProxyContractAddressFunction                = "setBridgeProxyContractAddress"
-	setWrappingContractAddressFunction                   = "setWrappingContractAddress"
-	changeOwnerAddressFunction                           = "ChangeOwnerAddress"
-	setEsdtSafeOnMultiTransferFunction                   = "setEsdtSafeOnMultiTransfer"
-	setEsdtSafeOnWrapperFunction                         = "setEsdtSafeContractAddress"
-	setEsdtSafeAddressFunction                           = "setEsdtSafeAddress"
-	stakeFunction                                        = "stake"
-	unpauseFunction                                      = "unpause"
-	unpauseEsdtSafeFunction                              = "unpauseEsdtSafe"
-	unpauseProxyFunction                                 = "unpauseProxy"
-	pauseEsdtSafeFunction                                = "pauseEsdtSafe"
-	pauseFunction                                        = "pause"
-	issueFunction                                        = "issue"
-	setSpecialRoleFunction                               = "setSpecialRole"
-	kdaTransferFunction                                  = "KDATransfer"
-	setPairDecimalsFunction                              = "setPairDecimals"
-	addWrappedTokenFunction                              = "addWrappedToken"
-	depositLiquidityFunction                             = "depositLiquidity"
-	whitelistTokenFunction                               = "whitelistToken"
-	addMappingFunction                                   = "addMapping"
-	kdaSafeAddTokenToWhitelistFunction                   = "kdaSafeAddTokenToWhitelist"
-	kdaSafeSetMaxBridgedAmountForTokenFunction           = "kdaSafeSetMaxBridgedAmountForToken"
-	multiTransferEsdtSetMaxBridgedAmountForTokenFunction = "multiTransferEsdtSetMaxBridgedAmountForToken"
-	submitBatchFunction                                  = "submitBatch"
-	unwrapTokenCreateTransactionFunction                 = "unwrapTokenCreateTransaction"
-	createTransactionFunction                            = "createTransaction"
-	setBridgedTokensWrapperAddressFunction               = "setBridgedTokensWrapperAddress"
-	setMultiTransferAddressFunction                      = "setMultiTransferAddress"
-	withdrawRefundFeesForEthereumFunction                = "withdrawRefundFeesForEthereum"
-	getRefundFeesForEthereumFunction                     = "getRefundFeesForEthereum"
-	withdrawTransactionFeesFunction                      = "withdrawTransactionFees"
-	getTransactionFeesFunction                           = "getTransactionFees"
-	initSupplyMintBurnEsdtSafe                           = "initSupplyMintBurnEsdtSafe"
-	initSupplyEsdtSafe                                   = "initSupplyEsdtSafe"
+	setBridgeProxyContractAddressFunction               = "setBridgeProxyContractAddress"
+	setWrappingContractAddressFunction                  = "setWrappingContractAddress"
+	changeOwnerAddressFunction                          = "ChangeOwnerAddress"
+	setKdaSafeOnMultiTransferFunction                   = "setKdaSafeOnMultiTransfer"
+	setKdaSafeOnWrapperFunction                         = "setKdaSafeContractAddress"
+	setKdaSafeAddressFunction                           = "setKdaSafeAddress"
+	stakeFunction                                       = "stake"
+	unpauseFunction                                     = "unpause"
+	unpauseKdaSafeFunction                              = "unpauseKdaSafe"
+	unpauseProxyFunction                                = "unpauseProxy"
+	pauseKdaSafeFunction                                = "pauseKdaSafe"
+	pauseFunction                                       = "pause"
+	issueFunction                                       = "issue"
+	setSpecialRoleFunction                              = "setSpecialRole"
+	kdaTransferFunction                                 = "KDATransfer"
+	setPairDecimalsFunction                             = "setPairDecimals"
+	addWrappedTokenFunction                             = "addWrappedToken"
+	depositLiquidityFunction                            = "depositLiquidity"
+	whitelistTokenFunction                              = "whitelistToken"
+	addMappingFunction                                  = "addMapping"
+	kdaSafeAddTokenToWhitelistFunction                  = "kdaSafeAddTokenToWhitelist"
+	kdaSafeSetMaxBridgedAmountForTokenFunction          = "kdaSafeSetMaxBridgedAmountForToken"
+	multiTransferKdaSetMaxBridgedAmountForTokenFunction = "multiTransferKdaSetMaxBridgedAmountForToken"
+	submitBatchFunction                                 = "submitBatch"
+	unwrapTokenCreateTransactionFunction                = "unwrapTokenCreateTransaction"
+	createTransactionFunction                           = "createTransaction"
+	setBridgedTokensWrapperAddressFunction              = "setBridgedTokensWrapperAddress"
+	setMultiTransferAddressFunction                     = "setMultiTransferAddress"
+	withdrawRefundFeesForEthereumFunction               = "withdrawRefundFeesForEthereum"
+	getRefundFeesForEthereumFunction                    = "getRefundFeesForEthereum"
+	withdrawTransactionFeesFunction                     = "withdrawTransactionFees"
+	getTransactionFeesFunction                          = "getTransactionFees"
+	initSupplyMintBurnKdaSafe                           = "initSupplyMintBurnKdaSafe"
+	initSupplyKdaSafe                                   = "initSupplyKdaSafe"
 )
 
 var (
@@ -309,14 +309,14 @@ func (handler *KcHandler) wireSCProxy(ctx context.Context) {
 	)
 	log.Info("Set in SC proxy contract the multi-transfer contract", "transaction hash", hash, "status", txResult.Status)
 
-	// setEsdtSafeAddress on bridge proxy
+	// setKdaSafeAddress on bridge proxy
 	hash, txResult = handler.ChainSimulator.ScCall(
 		ctx,
 		handler.OwnerKeys.KlvSk,
 		handler.ScProxyAddress,
 		zeroStringValue,
 		setCallsGasLimit,
-		setEsdtSafeAddressFunction,
+		setKdaSafeAddressFunction,
 		[]string{
 			handler.SafeAddress.Hex(),
 		},
@@ -403,14 +403,14 @@ func (handler *KcHandler) finishSettings(ctx context.Context) {
 	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, unpauseProxyFunction)
 	log.Info("Un-paused SC proxy contract", "transaction hash", hash, "status", txResult.Status)
 
-	// setEsdtSafeOnMultiTransfer
+	// setKdaSafeOnMultiTransfer
 	hash, txResult = handler.ChainSimulator.ScCall(
 		ctx,
 		handler.OwnerKeys.KlvSk,
 		handler.MultisigAddress,
 		zeroStringValue,
 		setCallsGasLimit,
-		setEsdtSafeOnMultiTransferFunction,
+		setKdaSafeOnMultiTransferFunction,
 		[]string{},
 	)
 	log.Info("Set in multisig contract the safe contract (automatically)", "transaction hash", hash, "status", txResult.Status)
@@ -493,7 +493,7 @@ func (handler *KcHandler) callContractNoParams(ctx context.Context, contract *Kl
 // UnPauseContractsAfterTokenChanges can unpause contracts after token changes
 func (handler *KcHandler) UnPauseContractsAfterTokenChanges(ctx context.Context) {
 	// unpause safe
-	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, unpauseEsdtSafeFunction)
+	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, unpauseKdaSafeFunction)
 	log.Info("unpaused safe executed", "hash", hash, "status", txResult.Status)
 
 	// unpause wrapper
@@ -508,7 +508,7 @@ func (handler *KcHandler) UnPauseContractsAfterTokenChanges(ctx context.Context)
 // PauseContractsForTokenChanges can pause contracts for token changes
 func (handler *KcHandler) PauseContractsForTokenChanges(ctx context.Context) {
 	// pause safe
-	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, pauseEsdtSafeFunction)
+	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, pauseKdaSafeFunction)
 	log.Info("paused safe executed", "hash", hash, "status", txResult.Status)
 
 	// pause aggregator
@@ -790,7 +790,7 @@ func (handler *KcHandler) setInitialSupply(ctx context.Context, params IssueToke
 				handler.MultisigAddress,
 				zeroStringValue,
 				setCallsGasLimit,
-				initSupplyMintBurnEsdtSafe,
+				initSupplyMintBurnKdaSafe,
 				[]string{
 					hex.EncodeToString([]byte(tkData.KlvChainSpecificToken)),
 					hex.EncodeToString(initialSupply.Bytes()),
@@ -810,7 +810,7 @@ func (handler *KcHandler) setInitialSupply(ctx context.Context, params IssueToke
 				[]string{
 					hex.EncodeToString([]byte(tkData.KlvChainSpecificToken)),
 					hex.EncodeToString(initialSupply.Bytes()),
-					hex.EncodeToString([]byte(initSupplyEsdtSafe)),
+					hex.EncodeToString([]byte(initSupplyKdaSafe)),
 					hex.EncodeToString([]byte(tkData.KlvChainSpecificToken)),
 					hex.EncodeToString(initialSupply.Bytes()),
 				})
@@ -866,7 +866,7 @@ func (handler *KcHandler) setMaxBridgeAmountOnMultitransfer(ctx context.Context,
 		handler.MultisigAddress,
 		zeroStringValue,
 		setCallsGasLimit,
-		multiTransferEsdtSetMaxBridgedAmountForTokenFunction,
+		multiTransferKdaSetMaxBridgedAmountForTokenFunction,
 		[]string{
 			hex.EncodeToString([]byte(tkData.KlvChainSpecificToken)),
 			hex.EncodeToString(maxBridgedAmountForTokenInt.Bytes())})

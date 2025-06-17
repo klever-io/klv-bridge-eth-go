@@ -286,9 +286,9 @@ func (setup *TestSetup) isTransferDoneFromKcForToken(params TestTokenParams) boo
 	ethTestBalance := setup.EthereumHandler.GetBalance(setup.TestKeys.EthAddress, params.AbstractTokenIdentifier)
 	isTransferDoneFromKc := ethTestBalance.String() == expectedReceiver.String()
 
-	expectedEsdtSafe := big.NewInt(0).Add(initialBalanceForSafe, params.KDASafeExtraBalance)
+	expectedKdaSafe := big.NewInt(0).Add(initialBalanceForSafe, params.KDASafeExtraBalance)
 	balanceForSafe := setup.KcHandler.GetKDAChainSpecificTokenBalance(setup.Ctx, setup.KcHandler.SafeAddress, params.AbstractTokenIdentifier)
-	isSafeContractOnCorrectBalance := expectedEsdtSafe.String() == balanceForSafe.String()
+	isSafeContractOnCorrectBalance := expectedKdaSafe.String() == balanceForSafe.String()
 
 	return isTransferDoneFromKc && isSafeContractOnCorrectBalance
 }
