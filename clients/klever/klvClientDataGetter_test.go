@@ -1539,7 +1539,7 @@ func TestKcClientDataGetter_getBurnBalances(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestKcClientDataGetter_GetLastKlvBatchID(t *testing.T) {
+func TestKcClientDataGetter_GetLastKcBatchID(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1566,7 +1566,7 @@ func TestKcClientDataGetter_GetLastKlvBatchID(t *testing.T) {
 
 	dg, _ := NewKLVClientDataGetter(args)
 
-	result, err := dg.GetLastKlvBatchID(context.Background())
+	result, err := dg.GetLastKcBatchID(context.Background())
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(3737), result)
 	assert.True(t, proxyCalled)

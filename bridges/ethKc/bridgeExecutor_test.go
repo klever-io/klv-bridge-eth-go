@@ -37,7 +37,7 @@ func createMockExecutorArgs() ArgsBridgeExecutor {
 		BalanceValidator:           &testsCommon.BalanceValidatorStub{},
 		MaxQuorumRetriesOnEthereum: minRetries,
 		MaxQuorumRetriesOnKc:       minRetries,
-		MaxRestriesOnWasProposed:   minRetries,
+		MaxRetriesOnWasProposed:    minRetries,
 	}
 }
 
@@ -146,16 +146,16 @@ func TestNewBridgeExecutor(t *testing.T) {
 		assert.True(t, errors.Is(err, clients.ErrInvalidValue))
 		assert.True(t, strings.Contains(err.Error(), "for args.MaxQuorumRetriesOnKc"))
 	})
-	t.Run("invalid MaxRestriesOnWasProposed value", func(t *testing.T) {
+	t.Run("invalid MaxRetriesOnWasProposed value", func(t *testing.T) {
 		t.Parallel()
 
 		args := createMockExecutorArgs()
-		args.MaxRestriesOnWasProposed = 0
+		args.MaxRetriesOnWasProposed = 0
 		executor, err := NewBridgeExecutor(args)
 
 		assert.True(t, check.IfNil(executor))
 		assert.True(t, errors.Is(err, clients.ErrInvalidValue))
-		assert.True(t, strings.Contains(err.Error(), "for args.MaxRestriesOnWasProposed"))
+		assert.True(t, strings.Contains(err.Error(), "for args.MaxRetriesOnWasProposed"))
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -949,7 +949,7 @@ func TestEthToKcBridgeExecutor_RetriesCountOnWasTransferProposedOnKc(t *testing.
 	t.Parallel()
 
 	args := createMockExecutorArgs()
-	args.MaxRestriesOnWasProposed = expectedMaxRetries
+	args.MaxRetriesOnWasProposed = expectedMaxRetries
 	executor, _ := NewBridgeExecutor(args)
 	for i := uint64(0); i < expectedMaxRetries; i++ {
 		assert.False(t, executor.ProcessMaxRetriesOnWasTransferProposedOnKc())

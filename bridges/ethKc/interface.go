@@ -24,7 +24,7 @@ type KcClient interface {
 	GetActionIDForSetStatusOnPendingTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error)
 	GetLastExecutedEthBatchID(ctx context.Context) (uint64, error)
 	GetLastExecutedEthTxID(ctx context.Context) (uint64, error)
-	GetLastKlvBatchID(ctx context.Context) (uint64, error)
+	GetLastKcBatchID(ctx context.Context) (uint64, error)
 	GetCurrentNonce(ctx context.Context) (uint64, error)
 
 	ProposeSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error)

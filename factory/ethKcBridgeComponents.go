@@ -537,7 +537,7 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBri
 		BalanceValidator:           balanceValidator,
 		MaxQuorumRetriesOnEthereum: args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
 		MaxQuorumRetriesOnKc:       args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
-		MaxRestriesOnWasProposed:   args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
+		MaxRetriesOnWasProposed:    args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
 	bridge, err := ethklever.NewBridgeExecutor(argsBridgeExecutor)
@@ -605,7 +605,7 @@ func (components *ethKleverBridgeComponents) createKcToEthereumBridge(args ArgsE
 		BalanceValidator:           balanceValidator,
 		MaxQuorumRetriesOnEthereum: args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
 		MaxQuorumRetriesOnKc:       args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
-		MaxRestriesOnWasProposed:   args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
+		MaxRetriesOnWasProposed:    args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
 	bridge, err := ethklever.NewBridgeExecutor(argsBridgeExecutor)

@@ -7,7 +7,7 @@ services:
       dockerfile: scCallsExecutor.Dockerfile
     restart: unless-stopped
     volumes:
-      - "../keys:/klever/keys"
+      - "../keys:/keys"
     # change the `network-address`, `sc-proxy-address` and `private-key-file` accordingly
     entrypoint: "./scCallsExecutor \
     -log-level *:DEBUG \

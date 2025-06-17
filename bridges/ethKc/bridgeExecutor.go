@@ -35,7 +35,7 @@ type ArgsBridgeExecutor struct {
 	BalanceValidator           BalanceValidator
 	MaxQuorumRetriesOnEthereum uint64
 	MaxQuorumRetriesOnKc       uint64
-	MaxRestriesOnWasProposed   uint64
+	MaxRetriesOnWasProposed    uint64
 }
 
 type bridgeExecutor struct {
@@ -103,9 +103,9 @@ func checkArgs(args ArgsBridgeExecutor) error {
 		return fmt.Errorf("%w for args.MaxQuorumRetriesOnKc, got: %d, minimum: %d",
 			clients.ErrInvalidValue, args.MaxQuorumRetriesOnKc, minRetries)
 	}
-	if args.MaxRestriesOnWasProposed < minRetries {
-		return fmt.Errorf("%w for args.MaxRestriesOnWasProposed, got: %d, minimum: %d",
-			clients.ErrInvalidValue, args.MaxRestriesOnWasProposed, minRetries)
+	if args.MaxRetriesOnWasProposed < minRetries {
+		return fmt.Errorf("%w for args.MaxRetriesOnWasProposed, got: %d, minimum: %d",
+			clients.ErrInvalidValue, args.MaxRetriesOnWasProposed, minRetries)
 	}
 	return nil
 }
@@ -122,7 +122,7 @@ func createBridgeExecutor(args ArgsBridgeExecutor) *bridgeExecutor {
 		balanceValidator:           args.BalanceValidator,
 		maxQuorumRetriesOnEthereum: args.MaxQuorumRetriesOnEthereum,
 		maxQuorumRetriesOnKc:       args.MaxQuorumRetriesOnKc,
-		maxRetriesOnWasProposed:    args.MaxRestriesOnWasProposed,
+		maxRetriesOnWasProposed:    args.MaxRetriesOnWasProposed,
 	}
 }
 

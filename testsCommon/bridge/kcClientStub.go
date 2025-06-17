@@ -38,7 +38,7 @@ type KcClientStub struct {
 	MintBalancesCalled                             func(ctx context.Context, token []byte) (*big.Int, error)
 	BurnBalancesCalled                             func(ctx context.Context, token []byte) (*big.Int, error)
 	CheckRequiredBalanceCalled                     func(ctx context.Context, token []byte, value *big.Int) error
-	GetLastKlvBatchIDCalled                        func(ctx context.Context) (uint64, error)
+	GetLastKcBatchIDCalled                         func(ctx context.Context) (uint64, error)
 	CloseCalled                                    func() error
 }
 
@@ -261,10 +261,10 @@ func (stub *KcClientStub) CheckRequiredBalance(ctx context.Context, token []byte
 	return nil
 }
 
-// GetLastKlvBatchID -
-func (stub *KcClientStub) GetLastKlvBatchID(ctx context.Context) (uint64, error) {
-	if stub.GetLastKlvBatchIDCalled != nil {
-		return stub.GetLastKlvBatchIDCalled(ctx)
+// GetLastKcBatchID -
+func (stub *KcClientStub) GetLastKcBatchID(ctx context.Context) (uint64, error) {
+	if stub.GetLastKcBatchIDCalled != nil {
+		return stub.GetLastKcBatchIDCalled(ctx)
 	}
 
 	return 0, nil

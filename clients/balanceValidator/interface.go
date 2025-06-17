@@ -13,7 +13,7 @@ type KcClient interface {
 	GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error)
 	GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error)
 	GetLastExecutedEthBatchID(ctx context.Context) (uint64, error)
-	GetLastKlvBatchID(ctx context.Context) (uint64, error)
+	GetLastKcBatchID(ctx context.Context) (uint64, error)
 	IsMintBurnToken(ctx context.Context, token []byte) (bool, error)
 	IsNativeToken(ctx context.Context, token []byte) (bool, error)
 	TotalBalances(ctx context.Context, token []byte) (*big.Int, error)

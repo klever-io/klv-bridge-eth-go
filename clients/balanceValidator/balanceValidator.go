@@ -269,7 +269,7 @@ func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big
 }
 
 func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx context.Context, kdaToken []byte) (*big.Int, error) {
-	batchID, err := validator.kcClient.GetLastKlvBatchID(ctx)
+	batchID, err := validator.kcClient.GetLastKcBatchID(ctx)
 	if err != nil {
 		return nil, err
 	}

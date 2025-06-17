@@ -345,13 +345,13 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
 		})
-		t.Run("on computeKlvAmount, GetLastKlvBatchID", func(t *testing.T) {
+		t.Run("on computeKlvAmount, GetLastKcBatchID", func(t *testing.T) {
 			cfg := testConfiguration{
 				direction:       batchProcessor.ToKc,
 				isMintBurnOnKlv: true,
 				isNativeOnEth:   true,
 				errorsOnCalls: map[string]error{
-					"GetLastKlvBatchID": expectedError,
+					"GetLastKcBatchID": expectedError,
 				},
 			}
 			result := validatorTester(cfg)
@@ -1454,8 +1454,8 @@ func validatorTester(cfg testConfiguration) testResult {
 
 			return cfg.lastExecutedEthBatch, nil
 		},
-		GetLastKlvBatchIDCalled: func(ctx context.Context) (uint64, error) {
-			err := cfg.errorsOnCalls["GetLastKlvBatchID"]
+		GetLastKcBatchIDCalled: func(ctx context.Context) (uint64, error) {
+			err := cfg.errorsOnCalls["GetLastKcBatchID"]
 			if err != nil {
 				return 0, err
 			}
