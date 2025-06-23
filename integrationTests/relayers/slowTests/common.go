@@ -18,19 +18,19 @@ var (
 
 // GenerateTestUSDCToken will generate a test USDC token
 func GenerateTestUSDCToken() framework.TestTokenParams {
-	// USDC is ethNative = true, ethMintBurn = false, mvxNative = false, mvxMintBurn = true
+	// USDC is ethNative = true, ethMintBurn = false, kdaNative = false, kdaMintBurn = true
 	return framework.TestTokenParams{
 		IssueTokenParams: framework.IssueTokenParams{
 			AbstractTokenIdentifier:          "USDC",
 			NumOfDecimalsUniversal:           6,
 			NumOfDecimalsChainSpecific:       6,
-			MvxUniversalTokenTicker:          "USDC",
-			MvxChainSpecificTokenTicker:      "ETHUSDC",
-			MvxUniversalTokenDisplayName:     "WrappedUSDC",
-			MvxChainSpecificTokenDisplayName: "EthereumWrappedUSDC",
-			ValueToMintOnMvx:                 "10000000000",
-			IsMintBurnOnMvX:                  true,
-			IsNativeOnMvX:                    false,
+			KlvUniversalTokenTicker:          "USDC",
+			KlvChainSpecificTokenTicker:      "ETHUSDC",
+			KlvUniversalTokenDisplayName:     "WrappedUSDC",
+			KlvChainSpecificTokenDisplayName: "EthereumWrappedUSDC",
+			ValueToMintOnKlv:                 "10000000000",
+			IsMintBurnOnKlv:                  true,
+			IsNativeOnKlv:                    false,
 			HasChainSpecificToken:            true,
 			EthTokenName:                     "EthUSDC",
 			EthTokenSymbol:                   "USDC",
@@ -40,39 +40,39 @@ func GenerateTestUSDCToken() framework.TestTokenParams {
 		},
 		TestOperations: []framework.TokenOperations{
 			{
-				ValueToTransferToMvx: big.NewInt(5000),
-				ValueToSendFromMvX:   big.NewInt(2500),
+				ValueToTransferToKlv: big.NewInt(5000),
+				ValueToSendFromKlv:   big.NewInt(2500),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(7000),
-				ValueToSendFromMvX:   big.NewInt(300),
+				ValueToTransferToKlv: big.NewInt(7000),
+				ValueToSendFromKlv:   big.NewInt(300),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(1000),
-				ValueToSendFromMvX:   nil,
-				MvxSCCallData:        createScCallData("callPayable", 50000000),
+				ValueToTransferToKlv: big.NewInt(1000),
+				ValueToSendFromKlv:   nil,
+				KlvSCCallData:        createScCallData("callPayable", 50000000),
 			},
 		},
-		ESDTSafeExtraBalance:    big.NewInt(100),                                        // extra is just for the fees for the 2 transfers mvx->eth
-		EthTestAddrExtraBalance: big.NewInt(-5000 + 2500 - 50 - 7000 + 300 - 50 - 1000), // -(eth->mvx) + (mvx->eth) - fees
+		KDASafeExtraBalance:     big.NewInt(100),                                        // extra is just for the fees for the 2 transfers kda->eth
+		EthTestAddrExtraBalance: big.NewInt(-5000 + 2500 - 50 - 7000 + 300 - 50 - 1000), // -(eth->kda) + (kda->eth) - fees
 	}
 }
 
 // GenerateTestMEMEToken will generate a test MEME token
 func GenerateTestMEMEToken() framework.TestTokenParams {
-	//MEME is ethNative = false, ethMintBurn = true, mvxNative = true, mvxMintBurn = false
+	//MEME is ethNative = false, ethMintBurn = true, kdaNative = true, kdaMintBurn = false
 	return framework.TestTokenParams{
 		IssueTokenParams: framework.IssueTokenParams{
 			AbstractTokenIdentifier:          "MEME",
 			NumOfDecimalsUniversal:           1,
 			NumOfDecimalsChainSpecific:       1,
-			MvxUniversalTokenTicker:          "MEME",
-			MvxChainSpecificTokenTicker:      "ETHMEME",
-			MvxUniversalTokenDisplayName:     "WrappedMEME",
-			MvxChainSpecificTokenDisplayName: "EthereumWrappedMEME",
-			ValueToMintOnMvx:                 "10000000000",
-			IsMintBurnOnMvX:                  false,
-			IsNativeOnMvX:                    true,
+			KlvUniversalTokenTicker:          "MEME",
+			KlvChainSpecificTokenTicker:      "ETHMEME",
+			KlvUniversalTokenDisplayName:     "WrappedMEME",
+			KlvChainSpecificTokenDisplayName: "EthereumWrappedMEME",
+			ValueToMintOnKlv:                 "10000000000",
+			IsMintBurnOnKlv:                  false,
+			IsNativeOnKlv:                    true,
 			HasChainSpecificToken:            true,
 			EthTokenName:                     "EthMEME",
 			EthTokenSymbol:                   "MEME",
@@ -82,39 +82,39 @@ func GenerateTestMEMEToken() framework.TestTokenParams {
 		},
 		TestOperations: []framework.TokenOperations{
 			{
-				ValueToTransferToMvx: big.NewInt(2400),
-				ValueToSendFromMvX:   big.NewInt(4000),
+				ValueToTransferToKlv: big.NewInt(2400),
+				ValueToSendFromKlv:   big.NewInt(4000),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(200),
-				ValueToSendFromMvX:   big.NewInt(6000),
+				ValueToTransferToKlv: big.NewInt(200),
+				ValueToSendFromKlv:   big.NewInt(6000),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(1000),
-				ValueToSendFromMvX:   big.NewInt(2000),
-				MvxSCCallData:        createScCallData("callPayable", 50000000),
+				ValueToTransferToKlv: big.NewInt(1000),
+				ValueToSendFromKlv:   big.NewInt(2000),
+				KlvSCCallData:        createScCallData("callPayable", 50000000),
 			},
 		},
-		ESDTSafeExtraBalance:    big.NewInt(4000 + 6000 + 2000), // everything is locked in the safe esdt contract
+		KDASafeExtraBalance:     big.NewInt(4000 + 6000 + 2000), // everything is locked in the safe kda contract
 		EthTestAddrExtraBalance: big.NewInt(4000 - 50 + 6000 - 50 + 2000 - 50),
 	}
 }
 
 // GenerateTestEUROCToken will generate a test EUROC token
 func GenerateTestEUROCToken() framework.TestTokenParams {
-	//EUROC is ethNative = true, ethMintBurn = true, mvxNative = false, mvxMintBurn = true
+	//EUROC is ethNative = true, ethMintBurn = true, kdaNative = false, kdaMintBurn = true
 	return framework.TestTokenParams{
 		IssueTokenParams: framework.IssueTokenParams{
 			AbstractTokenIdentifier:          "EUROC",
 			NumOfDecimalsUniversal:           6,
 			NumOfDecimalsChainSpecific:       6,
-			MvxUniversalTokenTicker:          "EUROC",
-			MvxChainSpecificTokenTicker:      "EUROC",
-			MvxUniversalTokenDisplayName:     "TestEUROC",
-			MvxChainSpecificTokenDisplayName: "TestEUROC",
-			ValueToMintOnMvx:                 "10000000000",
-			IsMintBurnOnMvX:                  true,
-			IsNativeOnMvX:                    false,
+			KlvUniversalTokenTicker:          "EUROC",
+			KlvChainSpecificTokenTicker:      "EUROC",
+			KlvUniversalTokenDisplayName:     "TestEUROC",
+			KlvChainSpecificTokenDisplayName: "TestEUROC",
+			ValueToMintOnKlv:                 "10000000000",
+			IsMintBurnOnKlv:                  true,
+			IsNativeOnKlv:                    false,
 			HasChainSpecificToken:            false,
 			EthTokenName:                     "EthEuroC",
 			EthTokenSymbol:                   "EUROC",
@@ -124,39 +124,39 @@ func GenerateTestEUROCToken() framework.TestTokenParams {
 		},
 		TestOperations: []framework.TokenOperations{
 			{
-				ValueToTransferToMvx: big.NewInt(5010),
-				ValueToSendFromMvX:   big.NewInt(2510),
+				ValueToTransferToKlv: big.NewInt(5010),
+				ValueToSendFromKlv:   big.NewInt(2510),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(7010),
-				ValueToSendFromMvX:   big.NewInt(310),
+				ValueToTransferToKlv: big.NewInt(7010),
+				ValueToSendFromKlv:   big.NewInt(310),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(1010),
-				ValueToSendFromMvX:   nil,
-				MvxSCCallData:        createScCallData("callPayable", 50000000),
+				ValueToTransferToKlv: big.NewInt(1010),
+				ValueToSendFromKlv:   nil,
+				KlvSCCallData:        createScCallData("callPayable", 50000000),
 			},
 		},
-		ESDTSafeExtraBalance:    big.NewInt(100),                                        // extra is just for the fees for the 2 transfers mvx->eth
-		EthTestAddrExtraBalance: big.NewInt(-5010 + 2510 - 50 - 7010 + 310 - 50 - 1010), // -(eth->mvx) + (mvx->eth) - fees
+		KDASafeExtraBalance:     big.NewInt(100),                                        // extra is just for the fees for the 2 transfers kda->eth
+		EthTestAddrExtraBalance: big.NewInt(-5010 + 2510 - 50 - 7010 + 310 - 50 - 1010), // -(eth->kda) + (kda->eth) - fees
 	}
 }
 
 // GenerateTestMEXToken will generate a test EUROC token
 func GenerateTestMEXToken() framework.TestTokenParams {
-	//MEX is ethNative = false, ethMintBurn = true, mvxNative = true, mvxMintBurn = true
+	//MEX is ethNative = false, ethMintBurn = true, kdaNative = true, kdaMintBurn = true
 	return framework.TestTokenParams{
 		IssueTokenParams: framework.IssueTokenParams{
 			AbstractTokenIdentifier:          "MEX",
 			NumOfDecimalsUniversal:           2,
 			NumOfDecimalsChainSpecific:       2,
-			MvxUniversalTokenTicker:          "MEX",
-			MvxChainSpecificTokenTicker:      "MEX",
-			MvxUniversalTokenDisplayName:     "TestMEX",
-			MvxChainSpecificTokenDisplayName: "TestMEX",
-			ValueToMintOnMvx:                 "10000000000",
-			IsMintBurnOnMvX:                  true,
-			IsNativeOnMvX:                    true,
+			KlvUniversalTokenTicker:          "MEX",
+			KlvChainSpecificTokenTicker:      "MEX",
+			KlvUniversalTokenDisplayName:     "TestMEX",
+			KlvChainSpecificTokenDisplayName: "TestMEX",
+			ValueToMintOnKlv:                 "10000000000",
+			IsMintBurnOnKlv:                  true,
+			IsNativeOnKlv:                    true,
 			HasChainSpecificToken:            false,
 			EthTokenName:                     "EthMex",
 			EthTokenSymbol:                   "MEX",
@@ -166,26 +166,26 @@ func GenerateTestMEXToken() framework.TestTokenParams {
 		},
 		TestOperations: []framework.TokenOperations{
 			{
-				ValueToTransferToMvx: big.NewInt(2410),
-				ValueToSendFromMvX:   big.NewInt(4010),
+				ValueToTransferToKlv: big.NewInt(2410),
+				ValueToSendFromKlv:   big.NewInt(4010),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(210),
-				ValueToSendFromMvX:   big.NewInt(6010),
+				ValueToTransferToKlv: big.NewInt(210),
+				ValueToSendFromKlv:   big.NewInt(6010),
 			},
 			{
-				ValueToTransferToMvx: big.NewInt(1010),
-				ValueToSendFromMvX:   big.NewInt(2010),
-				MvxSCCallData:        createScCallData("callPayable", 50000000),
+				ValueToTransferToKlv: big.NewInt(1010),
+				ValueToSendFromKlv:   big.NewInt(2010),
+				KlvSCCallData:        createScCallData("callPayable", 50000000),
 			},
 		},
-		ESDTSafeExtraBalance:    big.NewInt(150), // just the fees should be collected in ESDT safe
+		KDASafeExtraBalance:     big.NewInt(150), // just the fees should be collected in KDA safe
 		EthTestAddrExtraBalance: big.NewInt(4010 - 50 + 6010 - 50 + 2010 - 50),
 	}
 }
 
 func createScCallData(function string, gasLimit uint64, args ...string) []byte {
-	codec := testsCommon.TestMultiversXCodec{}
+	codec := testsCommon.TestKCCodec{}
 	callData := parsers.CallData{
 		Type:      bridgeCore.DataPresentProtocolMarker,
 		Function:  function,

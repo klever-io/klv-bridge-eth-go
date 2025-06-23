@@ -57,8 +57,8 @@ func main() {
 	app.Flags = getFlags()
 	app.Authors = []cli.Author{
 		{
-			Name:  "The MultiversX Team",
-			Email: "contact@multiversx.com",
+			Name:  "The Klever Blockchain Team",
+			Email: "contact@klever.io",
 		},
 	}
 
@@ -154,14 +154,14 @@ func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*
 		return nil, err
 	}
 
-	argsMXClientDataGetter := klever.ArgsKLVClientDataGetter{
+	argsKLVClientDataGetter := klever.ArgsKLVClientDataGetter{
 		MultisigContractAddress: multisigAddress,
 		SafeContractAddress:     safeAddress,
 		RelayerAddress:          dummyAddress,
 		Proxy:                   proxy,
 		Log:                     log,
 	}
-	mxDataGetter, err := klever.NewKLVClientDataGetter(argsMXClientDataGetter)
+	KLVDataGetter, err := klever.NewKLVClientDataGetter(argsKLVClientDataGetter)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func createInternalComponentsWithBatchCreator(cfg config.MigrationToolConfig) (*
 	}
 
 	argsCreator := ethereum.ArgsMigrationBatchCreator{
-		MvxDataGetter:        mxDataGetter,
+		KlvDataGetter:        KLVDataGetter,
 		Erc20ContractsHolder: erc20ContractsHolder,
 		SafeContractAddress:  safeEthAddress,
 		EthereumChainWrapper: ethereumChainWrapper,

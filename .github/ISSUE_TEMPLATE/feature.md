@@ -1,6 +1,6 @@
 ---
 name: Feature
-about: Suggest a new feature for mx-bridge-eth-go
+about: Suggest a new feature for klv-bridge-eth-go
 title: "[FEAT]"
 labels: enhancement
 assignees: ''

@@ -18,11 +18,11 @@
         # GasPriceSelector available options: "SafeGasPrice", "ProposeGasPrice", "FastGasPrice"
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
-[MultiversX]
+[Klever]
     NetworkAddress = "" # the network address
-    MultisigContractAddress = "erd1qqqqqqqqqqqqqpgq6pg5e8twgk6vvnzxzmvfyrphrfs3e3c3yfkqe6kx0x"
-    SafeContractAddress = "erd1qqqqqqqqqqqqqpgq2tf9zm9xxv96gz50p8jq5jesudhz45dvyfkqyefrss"
-    [MultiversX.Proxy]
+    MultisigContractAddress = ""
+    SafeContractAddress = ""
+    [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 
         # valid options for ProxyRestAPIEntityType are "observer" and "proxy". Any other value will trigger an error.

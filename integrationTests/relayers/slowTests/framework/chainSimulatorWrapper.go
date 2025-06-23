@@ -31,7 +31,7 @@ import (
 
 const (
 	proxyURL                                = "http://127.0.0.1:8085"
-	thousandEgld                            = "1000000000000000000000"
+	thousandKlv                             = "1000000000000000000000"
 	maxAllowedTimeout                       = time.Second
 	setMultipleEndpoint                     = "simulator/set-state-overwrite"
 	generateBlocksEndpoint                  = "simulator/generate-blocks/%d"
@@ -63,9 +63,9 @@ type chainSimulatorWrapper struct {
 // CreateChainSimulatorWrapper creates a new instance of the chain simulator wrapper
 func CreateChainSimulatorWrapper(args ArgChainSimulatorWrapper) *chainSimulatorWrapper {
 	// TODO: change this to use the real klever proxy when available
-	proxyInstance := mock.NewKleverChainMock()
+	proxyInstance := mock.NewKCMock()
 
-	pubKeyConverter, err := pubkeyConverter.NewBech32PubkeyConverter(32, "erd")
+	pubKeyConverter, err := pubkeyConverter.NewBech32PubkeyConverter(32, "klv")
 	require.Nil(args.TB, err)
 
 	instance := &chainSimulatorWrapper{
@@ -113,7 +113,7 @@ func (instance *chainSimulatorWrapper) GetNetworkAddress() string {
 }
 
 // DeploySC will deploy the provided smart contract and return its address
-func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePath string, ownerSK []byte, gasLimit uint64, parameters []string) (*MvxAddress, string, *data.TransactionOnNetwork) {
+func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePath string, ownerSK []byte, gasLimit uint64, parameters []string) (*KlvAddress, string, *data.TransactionOnNetwork) {
 	networkConfig, err := instance.proxyInstance.GetNetworkConfig(ctx)
 	require.Nil(instance.TB, err)
 
@@ -136,7 +136,7 @@ func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePat
 	hash := instance.signAndSend(ctx, ownerSK, tx, 1)
 	txResult := instance.GetTransactionResult(ctx, hash)
 
-	return NewMvxAddressFromBech32(instance.TB, txResult.Logs.Events[0].Address), hash, txResult
+	return NewKlvAddressFromBech32(instance.TB, txResult.Logs.Events[0].Address), hash, txResult
 }
 
 // GetTransactionResult tries to get a transaction result. It may wait a few blocks
@@ -188,12 +188,12 @@ func (instance *chainSimulatorWrapper) GenerateBlocksUntilTxProcessed(ctx contex
 }
 
 // ScCall will make the provided sc call
-func (instance *chainSimulatorWrapper) ScCall(ctx context.Context, senderSK []byte, contract *MvxAddress, value string, gasLimit uint64, function string, parameters []string) (string, *data.TransactionOnNetwork) {
+func (instance *chainSimulatorWrapper) ScCall(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) (string, *data.TransactionOnNetwork) {
 	return instance.SendTx(ctx, senderSK, contract, value, gasLimit, createTxData(function, parameters))
 }
 
 // ScCallWithoutGenerateBlocks will make the provided sc call and do not trigger the generate blocks command
-func (instance *chainSimulatorWrapper) ScCallWithoutGenerateBlocks(ctx context.Context, senderSK []byte, contract *MvxAddress, value string, gasLimit uint64, function string, parameters []string) string {
+func (instance *chainSimulatorWrapper) ScCallWithoutGenerateBlocks(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) string {
 	return instance.SendTxWithoutGenerateBlocks(ctx, senderSK, contract, value, gasLimit, createTxData(function, parameters))
 }
 
@@ -206,7 +206,7 @@ func createTxData(function string, parameters []string) []byte {
 }
 
 // SendTx will build and send a transaction
-func (instance *chainSimulatorWrapper) SendTx(ctx context.Context, senderSK []byte, receiver *MvxAddress, value string, gasLimit uint64, dataField []byte) (string, *data.TransactionOnNetwork) {
+func (instance *chainSimulatorWrapper) SendTx(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) (string, *data.TransactionOnNetwork) {
 	hash := instance.SendTxWithoutGenerateBlocks(ctx, senderSK, receiver, value, gasLimit, dataField)
 	instance.GenerateBlocks(ctx, 1)
 	txResult := instance.GetTransactionResult(ctx, hash)
@@ -215,7 +215,7 @@ func (instance *chainSimulatorWrapper) SendTx(ctx context.Context, senderSK []by
 }
 
 // SendTxWithoutGenerateBlocks will build and send a transaction and won't call the generate blocks command
-func (instance *chainSimulatorWrapper) SendTxWithoutGenerateBlocks(ctx context.Context, senderSK []byte, receiver *MvxAddress, value string, gasLimit uint64, dataField []byte) string {
+func (instance *chainSimulatorWrapper) SendTxWithoutGenerateBlocks(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) string {
 	networkConfig, err := instance.proxyInstance.GetNetworkConfig(ctx)
 	require.Nil(instance, err)
 
@@ -242,7 +242,7 @@ func (instance *chainSimulatorWrapper) FundWallets(ctx context.Context, wallets 
 		addressesState = append(addressesState, &dtos.AddressState{
 			Address: wallet,
 			Nonce:   new(uint64),
-			Balance: thousandEgld,
+			Balance: thousandKlv,
 		})
 	}
 
@@ -259,9 +259,9 @@ func (instance *chainSimulatorWrapper) FundWallets(ctx context.Context, wallets 
 	}
 }
 
-// GetESDTBalance returns the balance of the esdt token for the provided address
-func (instance *chainSimulatorWrapper) GetESDTBalance(ctx context.Context, address *MvxAddress, token string) string {
-	tokenData, err := instance.proxyInstance.GetESDTTokenData(ctx, address, token)
+// GetKDABalance returns the balance of the kda token for the provided address
+func (instance *chainSimulatorWrapper) GetKDABalance(ctx context.Context, address *KlvAddress, token string) string {
+	tokenData, err := instance.proxyInstance.GetKDATokenData(ctx, address, token)
 	require.Nil(instance, err)
 
 	return tokenData.Balance
@@ -277,7 +277,7 @@ func (instance *chainSimulatorWrapper) GetBlockchainTimeStamp(ctx context.Contex
 	resultStruct := struct {
 		Data struct {
 			Status struct {
-				ErdBlockTimestamp uint64 `json:"erd_block_timestamp"`
+				KlvBlockTimestamp uint64 `json:"klv_block_timestamp"`
 			} `json:"status"`
 		} `json:"data"`
 	}{}
@@ -285,7 +285,7 @@ func (instance *chainSimulatorWrapper) GetBlockchainTimeStamp(ctx context.Contex
 	err = json.Unmarshal(resultBytes, &resultStruct)
 	require.Nil(instance, err)
 
-	return resultStruct.Data.Status.ErdBlockTimestamp
+	return resultStruct.Data.Status.KlvBlockTimestamp
 }
 
 func (instance *chainSimulatorWrapper) getNonce(ctx context.Context, bech32Address string) (uint64, error) {
@@ -357,7 +357,7 @@ func computeTransactionSignature(senderSk []byte, tx *transaction.Transaction) (
 // ExecuteVMQuery will try to execute a VM query and return the results
 func (instance *chainSimulatorWrapper) ExecuteVMQuery(
 	ctx context.Context,
-	scAddress *MvxAddress,
+	scAddress *KlvAddress,
 	function string,
 	hexParams []string,
 ) [][]byte {

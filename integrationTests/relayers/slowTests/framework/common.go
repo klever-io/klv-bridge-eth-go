@@ -9,6 +9,6 @@ import (
 
 var (
 	log                       = logger.GetOrCreate("integrationtests/slowtests")
-	addressPubkeyConverter, _ = pubkeyConverter.NewBech32PubkeyConverter(32, "erd")
+	addressPubkeyConverter, _ = pubkeyConverter.NewBech32PubkeyConverter(32, "klv")
 	zeroValueBigInt           = big.NewInt(0)
 )

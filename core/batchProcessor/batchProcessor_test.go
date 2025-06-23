@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExtractListEthToMvx(t *testing.T) {
+func TestExtractListEthToKlv(t *testing.T) {
 	t.Parallel()
 
 	testBatch := &bridgeCore.TransferBatch{
@@ -35,7 +35,7 @@ func TestExtractListEthToMvx(t *testing.T) {
 		Statuses: nil,
 	}
 
-	args := ExtractListEthToMvx(testBatch)
+	args := ExtractListEthToKlv(testBatch)
 
 	expectedEthTokens := []common.Address{
 		common.BytesToAddress([]byte("source token 1")),
@@ -49,11 +49,11 @@ func TestExtractListEthToMvx(t *testing.T) {
 	}
 	assert.Equal(t, expectedRecipients, args.Recipients)
 
-	expectedMvxTokenBytes := [][]byte{
+	expectedKdaTokenBytes := [][]byte{
 		[]byte("destination token 1"),
 		[]byte("destination token 2"),
 	}
-	assert.Equal(t, expectedMvxTokenBytes, args.MvxTokenBytes)
+	assert.Equal(t, expectedKdaTokenBytes, args.KdaTokenBytes)
 
 	expectedAmounts := []*big.Int{
 		big.NewInt(11),
@@ -68,7 +68,7 @@ func TestExtractListEthToMvx(t *testing.T) {
 	assert.Equal(t, expectedNonces, args.Nonces)
 }
 
-func TestExtractListMvxToEth(t *testing.T) {
+func TestExtractListKlvToEth(t *testing.T) {
 	t.Parallel()
 
 	testBatch := &bridgeCore.TransferBatch{
@@ -94,7 +94,7 @@ func TestExtractListMvxToEth(t *testing.T) {
 		Statuses: nil,
 	}
 
-	args := ExtractListMvxToEth(testBatch)
+	args := ExtractListKlvToEth(testBatch)
 
 	expectedEthTokens := []common.Address{
 		common.BytesToAddress([]byte("destination token 1")),
@@ -108,11 +108,11 @@ func TestExtractListMvxToEth(t *testing.T) {
 	}
 	assert.Equal(t, expectedRecipients, args.Recipients)
 
-	expectedMvxTokenBytes := [][]byte{
+	expectedKdaTokenBytes := [][]byte{
 		[]byte("source token 1"),
 		[]byte("source token 2"),
 	}
-	assert.Equal(t, expectedMvxTokenBytes, args.MvxTokenBytes)
+	assert.Equal(t, expectedKdaTokenBytes, args.KdaTokenBytes)
 
 	expectedAmounts := []*big.Int{
 		big.NewInt(11),

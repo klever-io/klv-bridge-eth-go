@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in mx-bridge-eth-go node
+about: Report a bug in klv-bridge-eth-go node
 title: "[BUG]"
 labels: bug
 assignees: ''

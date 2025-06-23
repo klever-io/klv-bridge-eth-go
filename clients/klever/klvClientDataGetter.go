@@ -429,7 +429,7 @@ func (dataGetter *klvClientDataGetter) WasSigned(ctx context.Context, actionID u
 	return dataGetter.executeQueryBoolFromBuilder(ctx, builder)
 }
 
-// GetAllStakedRelayers returns all staked relayers defined in MultiversX SC
+// GetAllStakedRelayers returns all staked relayers defined in Klever Blockchain SC
 func (dataGetter *klvClientDataGetter) GetAllStakedRelayers(ctx context.Context) ([][]byte, error) {
 	builder := dataGetter.createMultisigDefaultVmQueryBuilder()
 	builder.Function(getAllStakedRelayersFuncName)
@@ -508,8 +508,8 @@ func (dataGetter *klvClientDataGetter) GetAllKnownTokens(ctx context.Context) ([
 	return dataGetter.executeQueryFromBuilder(ctx, builder)
 }
 
-// GetLastMvxBatchID returns the highest batch ID the safe contract reached. This might be a WIP batch that is not executable yet
-func (dataGetter *klvClientDataGetter) GetLastMvxBatchID(ctx context.Context) (uint64, error) {
+// GetLastKCBatchID returns the highest batch ID the safe contract reached. This might be a WIP batch that is not executable yet
+func (dataGetter *klvClientDataGetter) GetLastKCBatchID(ctx context.Context) (uint64, error) {
 	builder := dataGetter.createSafeDefaultVmQueryBuilder()
 	builder.Function(getLastBatchId)
 

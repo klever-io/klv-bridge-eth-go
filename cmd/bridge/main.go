@@ -46,7 +46,7 @@ import (
 const (
 	filePathPlaceholder      = "[path]"
 	defaultLogsPath          = "logs"
-	logFilePrefix            = "multiversx-eth-bridge"
+	logFilePrefix            = "kc-eth-bridge"
 	p2pPeerNetworkDiscoverer = "optimized"
 	nilListSharderType       = "NilListSharder"
 	disabledWatcher          = "disabled"
@@ -78,8 +78,8 @@ func main() {
 	app.Version = fmt.Sprintf("%s/%s/%s-%s/%s", appVersion, runtime.Version(), runtime.GOOS, runtime.GOARCH, machineID)
 	app.Authors = []cli.Author{
 		{
-			Name:  "The MultiversX Team",
-			Email: "contact@multiversx.com",
+			Name:  "The Klever Blockchain Team",
+			Email: "contact@klever.io",
 		},
 	}
 
@@ -255,7 +255,7 @@ func startRelay(ctx *cli.Context, version string) error {
 		KleverClientStatusHandler: kleverClientStatusHandler,
 	}
 
-	ethToMultiversXComponents, err := factory.NewEthKleverBridgeComponents(args)
+	ethToKCComponents, err := factory.NewEthKleverBridgeComponents(args)
 	if err != nil {
 		return err
 	}
@@ -267,7 +267,7 @@ func startRelay(ctx *cli.Context, version string) error {
 
 	log.Info("Starting relay")
 
-	err = ethToMultiversXComponents.Start()
+	err = ethToKCComponents.Start()
 	if err != nil {
 		return err
 	}
@@ -280,7 +280,7 @@ func startRelay(ctx *cli.Context, version string) error {
 	log.Info("application closing, calling Close on all subcomponents...")
 
 	var lastErr error
-	err = ethToMultiversXComponents.Close()
+	err = ethToKCComponents.Close()
 	if err != nil {
 		lastErr = err
 	}
