@@ -9,7 +9,7 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests/relayers/slowTests/framework"
 )
 
-type startsFromKcFlow struct {
+type startsFromKCFlow struct {
 	testing.TB
 	setup        *framework.TestSetup
 	ethToKlvDone bool
@@ -17,7 +17,7 @@ type startsFromKcFlow struct {
 	tokens       []framework.TestTokenParams
 }
 
-func (flow *startsFromKcFlow) process() (finished bool) {
+func (flow *startsFromKCFlow) process() (finished bool) {
 	if len(flow.tokens) == 0 {
 		return true
 	}
@@ -25,12 +25,12 @@ func (flow *startsFromKcFlow) process() (finished bool) {
 		return true
 	}
 
-	isTransferDoneFromKc := flow.setup.IsTransferDoneFromKc(flow.tokens...)
-	if !flow.kdaToEthDone && isTransferDoneFromKc {
+	isTransferDoneFromKC := flow.setup.IsTransferDoneFromKC(flow.tokens...)
+	if !flow.kdaToEthDone && isTransferDoneFromKC {
 		flow.kdaToEthDone = true
 		log.Info(fmt.Sprintf(framework.LogStepMarker, "Klever Blockchain->Ethereum transfer finished, now sending back to Klever Blockchain..."))
 
-		flow.setup.EthereumHandler.SendFromEthereumToKc(flow.setup.Ctx, flow.setup.KcHandler.TestCallerAddress, flow.tokens...)
+		flow.setup.EthereumHandler.SendFromEthereumToKC(flow.setup.Ctx, flow.setup.KCHandler.TestCallerAddress, flow.tokens...)
 	}
 	if !flow.kdaToEthDone {
 		// return here, no reason to check downwards
@@ -47,7 +47,7 @@ func (flow *startsFromKcFlow) process() (finished bool) {
 	return false
 }
 
-func (flow *startsFromKcFlow) areTokensFullyRefunded() bool {
+func (flow *startsFromKCFlow) areTokensFullyRefunded() bool {
 	if len(flow.tokens) == 0 {
 		return true
 	}

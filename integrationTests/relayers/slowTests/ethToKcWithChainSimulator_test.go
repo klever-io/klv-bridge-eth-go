@@ -157,12 +157,12 @@ func testRelayersWithChainSimulatorAndTokens(tb testing.TB, manualStopChan chan 
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.KcHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.KCHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
 		if len(startsFromEthFlow.tokens) > 0 {
-			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KcHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KCHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 		}
 		if len(startsFromKlvFlow.tokens) > 0 {
-			setup.CreateBatchOnKc(startsFromKlvFlow.tokens...)
+			setup.CreateBatchOnKC(startsFromKlvFlow.tokens...)
 		}
 	}
 
@@ -189,13 +189,13 @@ func testRelayersWithChainSimulatorAndTokens(tb testing.TB, manualStopChan chan 
 	)
 }
 
-func createFlowsBasedOnToken(tb testing.TB, tokens ...framework.TestTokenParams) (*startsFromEthereumFlow, *startsFromKcFlow) {
+func createFlowsBasedOnToken(tb testing.TB, tokens ...framework.TestTokenParams) (*startsFromEthereumFlow, *startsFromKCFlow) {
 	startsFromEthFlow := &startsFromEthereumFlow{
 		TB:     tb,
 		tokens: make([]framework.TestTokenParams, 0, len(tokens)),
 	}
 
-	startsFromKlvFlow := &startsFromKcFlow{
+	startsFromKlvFlow := &startsFromKCFlow{
 		TB:     tb,
 		tokens: make([]framework.TestTokenParams, 0, len(tokens)),
 	}
@@ -301,7 +301,7 @@ func TestRelayersShouldNotExecuteTransfers(t *testing.T) {
 		badToken.IsMintBurnOnKlv = false
 		badToken.HasChainSpecificToken = true
 
-		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnKc = true"
+		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnKC = true"
 		testRelayersShouldNotExecuteTransfers(t, expectedStringInLogs, badToken)
 	})
 	t.Run("isNativeOnEth = true, isMintBurnOnEth = false, isNativeOnKlv = true, isMintBurnOnKlv = true", func(t *testing.T) {
@@ -312,7 +312,7 @@ func TestRelayersShouldNotExecuteTransfers(t *testing.T) {
 		badToken.IsMintBurnOnKlv = true
 		badToken.HasChainSpecificToken = false
 
-		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnKc = true"
+		expectedStringInLogs := "error = invalid setup isNativeOnEthereum = true, isNativeOnKC = true"
 		testRelayersShouldNotExecuteTransfers(t, expectedStringInLogs, badToken)
 	})
 	t.Run("isNativeOnEth = true, isMintBurnOnEth = true, isNativeOnKlv = true, isMintBurnOnKlv = false", func(t *testing.T) {
@@ -349,12 +349,12 @@ func testRelayersShouldNotExecuteTransfers(
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.KcHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.KCHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
 		if len(startsFromEthFlow.tokens) > 0 {
-			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KcHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KCHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 		}
 		if len(startsFromKlvFlow.tokens) > 0 {
-			setup.CreateBatchOnKc(startsFromKlvFlow.tokens...)
+			setup.CreateBatchOnKC(startsFromKlvFlow.tokens...)
 		}
 	}
 
@@ -446,7 +446,7 @@ func testCallPayableWithParamsWasCalled(testSetup *framework.TestSetup, value ui
 	}
 
 	vmRequest := &data.VmValueRequest{
-		Address:  testSetup.KcHandler.TestCallerAddress.Bech32(),
+		Address:  testSetup.KCHandler.TestCallerAddress.Bech32(),
 		FuncName: "getCalledDataParams",
 	}
 

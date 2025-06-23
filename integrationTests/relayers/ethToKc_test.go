@@ -34,20 +34,20 @@ type argsForSCCallsTest struct {
 	expectedScCallData []byte
 }
 
-func TestRelayersShouldExecuteTransfersFromEthToKc(t *testing.T) {
+func TestRelayersShouldExecuteTransfersFromEthToKC(t *testing.T) {
 	if testing.Short() {
 		t.Skip("this is not a short test")
 	}
 
 	t.Run("simple tokens transfers", func(t *testing.T) {
-		testRelayersShouldExecuteTransfersFromEthToKc(t, false)
+		testRelayersShouldExecuteTransfersFromEthToKC(t, false)
 	})
 	t.Run("native tokens transfers", func(t *testing.T) {
-		testRelayersShouldExecuteTransfersFromEthToKc(t, true)
+		testRelayersShouldExecuteTransfersFromEthToKC(t, true)
 	})
 }
 
-func testRelayersShouldExecuteTransfersFromEthToKc(t *testing.T, withNativeTokens bool) {
+func testRelayersShouldExecuteTransfersFromEthToKC(t *testing.T, withNativeTokens bool) {
 	safeContractEthAddress := testsCommon.CreateRandomEthereumAddress()
 	token1Erc20 := testsCommon.CreateRandomEthereumAddress()
 	ticker1 := "tck-000001"
@@ -56,11 +56,11 @@ func testRelayersShouldExecuteTransfersFromEthToKc(t *testing.T, withNativeToken
 	ticker2 := "tck-000002"
 
 	value1 := big.NewInt(111111111)
-	destination1 := testsCommon.CreateRandomKcAddress()
+	destination1 := testsCommon.CreateRandomKCAddress()
 	depositor1 := testsCommon.CreateRandomEthereumAddress()
 
 	value2 := big.NewInt(222222222)
-	destination2 := testsCommon.CreateRandomKcAddress()
+	destination2 := testsCommon.CreateRandomKCAddress()
 	depositor2 := testsCommon.CreateRandomEthereumAddress()
 
 	tokens := []common.Address{token1Erc20, token2Erc20}
@@ -190,7 +190,7 @@ func testRelayersShouldExecuteTransfersFromEthToKc(t *testing.T, withNativeToken
 	assert.Equal(t, []byte{bridgeCore.MissingDataProtocolMarker}, transfer.Transfers[1].Data)
 }
 
-func TestRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t *testing.T) {
+func TestRelayersShouldExecuteTransferFromEthToKCHavingTxsWithSCcalls(t *testing.T) {
 	if testing.Short() {
 		t.Skip("this is not a short test")
 	}
@@ -201,7 +201,7 @@ func TestRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t *testing
 			expectedScCallData: bridge.CallDataMock,
 		}
 
-		testRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t, testArgs)
+		testRelayersShouldExecuteTransferFromEthToKCHavingTxsWithSCcalls(t, testArgs)
 	})
 	t.Run("no SC call", func(t *testing.T) {
 		testArgs := argsForSCCallsTest{
@@ -209,11 +209,11 @@ func TestRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t *testing
 			expectedScCallData: []byte{bridgeCore.MissingDataProtocolMarker},
 		}
 
-		testRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t, testArgs)
+		testRelayersShouldExecuteTransferFromEthToKCHavingTxsWithSCcalls(t, testArgs)
 	})
 }
 
-func testRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t *testing.T, args argsForSCCallsTest) {
+func testRelayersShouldExecuteTransferFromEthToKCHavingTxsWithSCcalls(t *testing.T, args argsForSCCallsTest) {
 	safeContractEthAddress := testsCommon.CreateRandomEthereumAddress()
 
 	token1Erc20 := testsCommon.CreateRandomEthereumAddress()
@@ -226,17 +226,17 @@ func testRelayersShouldExecuteTransferFromEthToKcHavingTxsWithSCcalls(t *testing
 	ticker3 := "tck-000003"
 
 	value1 := big.NewInt(111111111)
-	destination1 := testsCommon.CreateRandomKcAddress()
+	destination1 := testsCommon.CreateRandomKCAddress()
 	depositor1 := testsCommon.CreateRandomEthereumAddress()
 
 	value2 := big.NewInt(222222222)
-	destination2 := testsCommon.CreateRandomKcAddress()
+	destination2 := testsCommon.CreateRandomKCAddress()
 	depositor2 := testsCommon.CreateRandomEthereumAddress()
 
 	depositor3 := testsCommon.CreateRandomEthereumAddress()
 
 	value3 := big.NewInt(333333333)
-	destination3Sc := testsCommon.CreateRandomKcSCAddress()
+	destination3Sc := testsCommon.CreateRandomKCSCAddress()
 
 	tokens := []common.Address{token1Erc20, token2Erc20, token3Erc20}
 	availableBalances := []*big.Int{value1, value2, value3}

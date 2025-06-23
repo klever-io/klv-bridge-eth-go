@@ -2,14 +2,14 @@ package testsCommon
 
 import "github.com/klever-io/klv-bridge-eth-go/parsers"
 
-// KcCodecStub -
-type KcCodecStub struct {
+// KCCodecStub -
+type KCCodecStub struct {
 	DecodeProxySCCompleteCallDataCalled  func(buff []byte) (parsers.ProxySCCompleteCallData, error)
 	ExtractGasLimitFromRawCallDataCalled func(buff []byte) (uint64, error)
 }
 
 // DecodeProxySCCompleteCallData -
-func (stub *KcCodecStub) DecodeProxySCCompleteCallData(buff []byte) (parsers.ProxySCCompleteCallData, error) {
+func (stub *KCCodecStub) DecodeProxySCCompleteCallData(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 	if stub.DecodeProxySCCompleteCallDataCalled != nil {
 		return stub.DecodeProxySCCompleteCallDataCalled(buff)
 	}
@@ -18,7 +18,7 @@ func (stub *KcCodecStub) DecodeProxySCCompleteCallData(buff []byte) (parsers.Pro
 }
 
 // ExtractGasLimitFromRawCallData -
-func (stub *KcCodecStub) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
+func (stub *KCCodecStub) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
 	if stub.ExtractGasLimitFromRawCallDataCalled != nil {
 		return stub.ExtractGasLimitFromRawCallDataCalled(buff)
 	}
@@ -27,6 +27,6 @@ func (stub *KcCodecStub) ExtractGasLimitFromRawCallData(buff []byte) (uint64, er
 }
 
 // IsInterfaceNil -
-func (stub *KcCodecStub) IsInterfaceNil() bool {
+func (stub *KCCodecStub) IsInterfaceNil() bool {
 	return stub == nil
 }

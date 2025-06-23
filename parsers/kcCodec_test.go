@@ -27,20 +27,20 @@ func createTestProxySCCompleteCallData() ProxySCCompleteCallData {
 	return completeCallData
 }
 
-func TestKcCodec_IsInterfaceNil(t *testing.T) {
+func TestKCCodec_IsInterfaceNil(t *testing.T) {
 	t.Parallel()
 
-	var instance *KcCodec
+	var instance *KCCodec
 	assert.True(t, instance.IsInterfaceNil())
 
-	instance = &KcCodec{}
+	instance = &KCCodec{}
 	assert.False(t, instance.IsInterfaceNil())
 }
 
-func TestKcCodec_ExtractGasLimitFromRawCallData(t *testing.T) {
+func TestKCCodec_ExtractGasLimitFromRawCallData(t *testing.T) {
 	t.Parallel()
 
-	codec := &KcCodec{}
+	codec := &KCCodec{}
 
 	t.Run("empty buffer should error", func(t *testing.T) {
 		t.Parallel()
@@ -149,10 +149,10 @@ func TestKcCodec_ExtractGasLimitFromRawCallData(t *testing.T) {
 	})
 }
 
-func TestKcCodec_DecodeProxySCCompleteCallData(t *testing.T) {
+func TestKCCodec_DecodeProxySCCompleteCallData(t *testing.T) {
 	t.Parallel()
 
-	codec := KcCodec{}
+	codec := KCCodec{}
 	emptyCompleteCallData := ProxySCCompleteCallData{}
 
 	t.Run("buffer to short for Ethereum address should error", func(t *testing.T) {

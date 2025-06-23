@@ -24,8 +24,8 @@ type NetMessenger interface {
 	IsInterfaceNil() bool
 }
 
-// KcRoleProvider defines the operations for an Klever Blockchain role provider
-type KcRoleProvider interface {
+// KCRoleProvider defines the operations for an Klever Blockchain role provider
+type KCRoleProvider interface {
 	IsWhitelisted(address address.Address) bool
 	IsInterfaceNil() bool
 }

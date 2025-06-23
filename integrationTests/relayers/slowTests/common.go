@@ -185,7 +185,7 @@ func GenerateTestMEXToken() framework.TestTokenParams {
 }
 
 func createScCallData(function string, gasLimit uint64, args ...string) []byte {
-	codec := testsCommon.TestKcCodec{}
+	codec := testsCommon.TestKCCodec{}
 	callData := parsers.CallData{
 		Type:      bridgeCore.DataPresentProtocolMarker,
 		Function:  function,

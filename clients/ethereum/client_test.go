@@ -295,11 +295,11 @@ func TestClient_GetBatch(t *testing.T) {
 	t.Run("returns batch should work", func(t *testing.T) {
 		from1 := testsCommon.CreateRandomEthereumAddress()
 		token1 := testsCommon.CreateRandomEthereumAddress()
-		recipient1 := testsCommon.CreateRandomKcAddress()
+		recipient1 := testsCommon.CreateRandomKCAddress()
 
 		from2 := testsCommon.CreateRandomEthereumAddress()
 		token2 := testsCommon.CreateRandomEthereumAddress()
-		recipient2 := testsCommon.CreateRandomKcAddress()
+		recipient2 := testsCommon.CreateRandomKCAddress()
 
 		c.clientWrapper = &bridgeTests.EthereumClientWrapperStub{
 			GetBatchCalled: func(ctx context.Context, batchNonce *big.Int) (contract.Batch, bool, error) {
@@ -369,11 +369,11 @@ func TestClient_GetBatch(t *testing.T) {
 	t.Run("returns non final batch should work", func(t *testing.T) {
 		from1 := testsCommon.CreateRandomEthereumAddress()
 		token1 := testsCommon.CreateRandomEthereumAddress()
-		recipient1 := testsCommon.CreateRandomKcAddress()
+		recipient1 := testsCommon.CreateRandomKCAddress()
 
 		from2 := testsCommon.CreateRandomEthereumAddress()
 		token2 := testsCommon.CreateRandomEthereumAddress()
-		recipient2 := testsCommon.CreateRandomKcAddress()
+		recipient2 := testsCommon.CreateRandomKCAddress()
 
 		c.clientWrapper = &bridgeTests.EthereumClientWrapperStub{
 			GetBatchCalled: func(ctx context.Context, batchNonce *big.Int) (contract.Batch, bool, error) {
@@ -1199,8 +1199,8 @@ func TestClient_CheckClientAvailability(t *testing.T) {
 		incrementor = 0
 
 		// place a random message as to test it is reset
-		statusHandler.SetStringMetric(bridgeCore.MetricKcClientStatus, bridgeCore.ClientStatus(3).String())
-		statusHandler.SetStringMetric(bridgeCore.MetricLastKcClientError, "random")
+		statusHandler.SetStringMetric(bridgeCore.MetricKCClientStatus, bridgeCore.ClientStatus(3).String())
+		statusHandler.SetStringMetric(bridgeCore.MetricLastKCClientError, "random")
 
 		// this will just increment the retry counter
 		for i := 0; i < int(args.ClientAvailabilityAllowDelta); i++ {
@@ -1312,11 +1312,11 @@ func resetClient(c *client) {
 	c.mut.Lock()
 	c.retriesAvailabilityCheck = 0
 	c.mut.Unlock()
-	c.clientWrapper.SetStringMetric(bridgeCore.MetricKcClientStatus, "")
-	c.clientWrapper.SetStringMetric(bridgeCore.MetricLastKcClientError, "")
+	c.clientWrapper.SetStringMetric(bridgeCore.MetricKCClientStatus, "")
+	c.clientWrapper.SetStringMetric(bridgeCore.MetricLastKCClientError, "")
 }
 
 func checkStatusHandler(t *testing.T, statusHandler *testsCommon.StatusHandlerMock, status bridgeCore.ClientStatus, message string) {
-	assert.Equal(t, status.String(), statusHandler.GetStringMetric(bridgeCore.MetricKcClientStatus))
-	assert.Equal(t, message, statusHandler.GetStringMetric(bridgeCore.MetricLastKcClientError))
+	assert.Equal(t, status.String(), statusHandler.GetStringMetric(bridgeCore.MetricKCClientStatus))
+	assert.Equal(t, message, statusHandler.GetStringMetric(bridgeCore.MetricLastKCClientError))
 }

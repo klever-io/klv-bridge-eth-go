@@ -18,13 +18,13 @@ import (
 // ArgsBalanceValidator represents the DTO struct used in the NewBalanceValidator constructor function
 type ArgsBalanceValidator struct {
 	Log            logger.Logger
-	KcClient       KcClient
+	KCClient       KCClient
 	EthereumClient EthereumClient
 }
 
 type balanceValidator struct {
 	log            logger.Logger
-	kcClient       KcClient
+	kcClient       KCClient
 	ethereumClient EthereumClient
 }
 
@@ -37,7 +37,7 @@ func NewBalanceValidator(args ArgsBalanceValidator) (*balanceValidator, error) {
 
 	return &balanceValidator{
 		log:            args.Log,
-		kcClient:       args.KcClient,
+		kcClient:       args.KCClient,
 		ethereumClient: args.EthereumClient,
 	}, nil
 }
@@ -46,8 +46,8 @@ func checkArgs(args ArgsBalanceValidator) error {
 	if check.IfNil(args.Log) {
 		return ErrNilLogger
 	}
-	if check.IfNil(args.KcClient) {
-		return ErrNilKcClient
+	if check.IfNil(args.KCClient) {
+		return ErrNilKCClient
 	}
 	if check.IfNil(args.EthereumClient) {
 		return ErrNilEthereumClient
@@ -68,7 +68,7 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
-	isMintBurnOnKc, err := validator.isMintBurnOnKc(ctx, kdaToken)
+	isMintBurnOnKC, err := validator.isMintBurnOnKC(ctx, kdaToken)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
-	isNativeOnKc, err := validator.isNativeOnKc(ctx, kdaToken)
+	isNativeOnKC, err := validator.isNativeOnKC(ctx, kdaToken)
 	if err != nil {
 		return err
 	}
@@ -87,19 +87,19 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return fmt.Errorf("%w isNativeOnEthereum = %v, isMintBurnOnEthereum = %v", ErrInvalidSetup, isNativeOnEthereum, isMintBurnOnEthereum)
 	}
 
-	if !isNativeOnKc && !isMintBurnOnKc {
-		return fmt.Errorf("%w isNativeOnKc = %v, isMintBurnOnKc = %v", ErrInvalidSetup, isNativeOnKc, isMintBurnOnKc)
+	if !isNativeOnKC && !isMintBurnOnKC {
+		return fmt.Errorf("%w isNativeOnKC = %v, isMintBurnOnKC = %v", ErrInvalidSetup, isNativeOnKC, isMintBurnOnKC)
 	}
 
-	if isNativeOnEthereum == isNativeOnKc {
-		return fmt.Errorf("%w isNativeOnEthereum = %v, isNativeOnKc = %v", ErrInvalidSetup, isNativeOnEthereum, isNativeOnKc)
+	if isNativeOnEthereum == isNativeOnKC {
+		return fmt.Errorf("%w isNativeOnEthereum = %v, isNativeOnKC = %v", ErrInvalidSetup, isNativeOnEthereum, isNativeOnKC)
 	}
 
 	ethAmount, err := validator.computeEthAmount(ctx, ethToken, isMintBurnOnEthereum, isNativeOnEthereum)
 	if err != nil {
 		return err
 	}
-	kdaAmount, err := validator.computeKdaAmount(ctx, kdaToken, isMintBurnOnKc, isNativeOnKc)
+	kdaAmount, err := validator.computeKdaAmount(ctx, kdaToken, isMintBurnOnKC, isNativeOnKC)
 	if err != nil {
 		return err
 	}
@@ -121,9 +121,9 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 
 func (validator *balanceValidator) checkRequiredBalance(ctx context.Context, ethToken common.Address, kdaToken []byte, amount *big.Int, direction batchProcessor.Direction) error {
 	switch direction {
-	case batchProcessor.FromKc:
+	case batchProcessor.FromKC:
 		return validator.ethereumClient.CheckRequiredBalance(ctx, ethToken, amount)
-	case batchProcessor.ToKc:
+	case batchProcessor.ToKC:
 		return validator.kcClient.CheckRequiredBalance(ctx, kdaToken, amount)
 	default:
 		return fmt.Errorf("%w, direction: %s", ErrInvalidDirection, direction)
@@ -147,7 +147,7 @@ func (validator *balanceValidator) isNativeOnEthereum(ctx context.Context, erc20
 	return isNative, nil
 }
 
-func (validator *balanceValidator) isMintBurnOnKc(ctx context.Context, token []byte) (bool, error) {
+func (validator *balanceValidator) isMintBurnOnKC(ctx context.Context, token []byte) (bool, error) {
 	isMintBurn, err := validator.kcClient.IsMintBurnToken(ctx, token)
 	if err != nil {
 		return false, err
@@ -155,7 +155,7 @@ func (validator *balanceValidator) isMintBurnOnKc(ctx context.Context, token []b
 	return isMintBurn, nil
 }
 
-func (validator *balanceValidator) isNativeOnKc(ctx context.Context, token []byte) (bool, error) {
+func (validator *balanceValidator) isNativeOnKC(ctx context.Context, token []byte) (bool, error) {
 	isNative, err := validator.kcClient.IsNativeToken(ctx, token)
 	if err != nil {
 		return false, err
@@ -269,7 +269,7 @@ func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big
 }
 
 func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx context.Context, kdaToken []byte) (*big.Int, error) {
-	batchID, err := validator.kcClient.GetLastKcBatchID(ctx)
+	batchID, err := validator.kcClient.GetLastKCBatchID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -423,8 +423,8 @@ func (c *client) incrementRetriesAvailabilityCheck() {
 }
 
 func (c *client) setStatusForAvailabilityCheck(status bridgeCore.ClientStatus, message string, nonce uint64) {
-	c.clientWrapper.SetStringMetric(core.MetricKcClientStatus, status.String())
-	c.clientWrapper.SetStringMetric(core.MetricLastKcClientError, message)
+	c.clientWrapper.SetStringMetric(core.MetricKCClientStatus, status.String())
+	c.clientWrapper.SetStringMetric(core.MetricLastKCClientError, message)
 	c.clientWrapper.SetIntMetric(core.MetricLastBlockNonce, int(nonce))
 }
 

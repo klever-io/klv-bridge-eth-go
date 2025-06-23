@@ -33,7 +33,7 @@ func createMockArgsBroadcaster() ArgsBroadcaster {
 	return ArgsBroadcaster{
 		Messenger:           &p2pMocks.MessengerStub{},
 		Log:                 logger.GetOrCreate("test"),
-		KcRoleProvider:      &roleProvidersMock.KleverRoleProviderStub{},
+		KCRoleProvider:      &roleProvidersMock.KleverRoleProviderStub{},
 		KeyGen:              &cryptoMocks.KeyGenStub{},
 		SingleSigner:        &cryptoMocks.SingleSignerStub{},
 		PrivateKey:          &cryptoMocks.PrivateKeyStub{},
@@ -88,11 +88,11 @@ func TestNewBroadcaster(t *testing.T) {
 	})
 	t.Run("nil klever blockchain role provider should error", func(t *testing.T) {
 		args := createMockArgsBroadcaster()
-		args.KcRoleProvider = nil
+		args.KCRoleProvider = nil
 
 		b, err := NewBroadcaster(args)
 		assert.True(t, check.IfNil(b))
-		assert.Equal(t, ErrNilKcRoleProvider, err)
+		assert.Equal(t, ErrNilKCRoleProvider, err)
 	})
 	t.Run("nil messenger should error", func(t *testing.T) {
 		args := createMockArgsBroadcaster()
@@ -221,7 +221,7 @@ func TestBroadcaster_ProcessReceivedMessage(t *testing.T) {
 		isWhiteListedCalled := false
 		msg, buff := createSignedMessageAndMarshaledBytes(0)
 
-		args.KcRoleProvider = &roleProvidersMock.KleverRoleProviderStub{
+		args.KCRoleProvider = &roleProvidersMock.KleverRoleProviderStub{
 			IsWhitelistedCalled: func(address address.Address) bool {
 				assert.Equal(t, msg.PublicKeyBytes, address.Bytes())
 				isWhiteListedCalled = true
@@ -242,7 +242,7 @@ func TestBroadcaster_ProcessReceivedMessage(t *testing.T) {
 		args := createMockArgsBroadcaster()
 		msg, buff := createSignedMessageAndMarshaledBytes(0)
 
-		args.KcRoleProvider = &roleProvidersMock.KleverRoleProviderStub{}
+		args.KCRoleProvider = &roleProvidersMock.KleverRoleProviderStub{}
 
 		b, _ := NewBroadcaster(args)
 		b.nonces[string(msg.PublicKeyBytes)] = msg.Nonce + 1

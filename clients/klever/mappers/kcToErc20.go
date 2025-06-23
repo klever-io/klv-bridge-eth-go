@@ -13,8 +13,8 @@ type kcToErc20 struct {
 	dg DataGetter
 }
 
-// NewKcToErc20Mapper returns a new instance of kcToErc20
-func NewKcToErc20Mapper(dg DataGetter) (*kcToErc20, error) {
+// NewKCToErc20Mapper returns a new instance of kcToErc20
+func NewKCToErc20Mapper(dg DataGetter) (*kcToErc20, error) {
 	if check.IfNil(dg) {
 		return nil, clients.ErrNilDataGetter
 	}

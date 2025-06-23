@@ -8,12 +8,12 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
 )
 
-// TestKcCodec is the codec helper used in testing
-type TestKcCodec struct {
+// TestKCCodec is the codec helper used in testing
+type TestKCCodec struct {
 }
 
 // EncodeCallDataWithLenAndMarker will provide a valid data byte slice with encoded call data parameters along with the length and marker
-func (codec *TestKcCodec) EncodeCallDataWithLenAndMarker(callData parsers.CallData) []byte {
+func (codec *TestKCCodec) EncodeCallDataWithLenAndMarker(callData parsers.CallData) []byte {
 	initialAlloc := 1024 * 1024 // 1MB initial buffer
 	result := make([]byte, 0, initialAlloc)
 	buff32Bits := make([]byte, 4)
@@ -30,7 +30,7 @@ func (codec *TestKcCodec) EncodeCallDataWithLenAndMarker(callData parsers.CallDa
 }
 
 // EncodeCallDataStrict will encode just the provided call data. No length or marker will be added
-func (codec *TestKcCodec) EncodeCallDataStrict(callData parsers.CallData) []byte {
+func (codec *TestKCCodec) EncodeCallDataStrict(callData parsers.CallData) []byte {
 	initialAlloc := 1024 * 1024 // 1MB initial buffer
 	result := make([]byte, 0, initialAlloc)
 
@@ -60,7 +60,7 @@ func (codec *TestKcCodec) EncodeCallDataStrict(callData parsers.CallData) []byte
 	return result
 }
 
-func (codec *TestKcCodec) encodeArgs(args []string) []byte {
+func (codec *TestKCCodec) encodeArgs(args []string) []byte {
 	buff32Bits := make([]byte, 4)
 
 	initialAlloc := 1024 * 1024 // 1MB initial buffer
@@ -80,7 +80,7 @@ func (codec *TestKcCodec) encodeArgs(args []string) []byte {
 }
 
 // DecodeCallData will try to decode the provided bytes into a CallData struct
-func (codec *TestKcCodec) DecodeCallData(buff []byte) parsers.CallData {
+func (codec *TestKCCodec) DecodeCallData(buff []byte) parsers.CallData {
 	if len(buff) == 0 {
 		panic("empty buffer")
 	}

@@ -30,16 +30,16 @@ func (flow *startsFromEthereumEdgecaseFlow) process() (finished bool) {
 		flow.ethToKlvDone = true
 		log.Info(fmt.Sprintf(framework.LogStepMarker, "Ethereum->Klever Blockchain transfer finished, now sending back to Ethereum & another round from Ethereum..."))
 
-		flow.setup.SendFromKcToEthereum(flow.tokens...)
-		flow.setup.EthereumHandler.SendFromEthereumToKc(flow.setup.Ctx, flow.setup.KcHandler.TestCallerAddress, flow.tokens...)
+		flow.setup.SendFromKCToEthereum(flow.tokens...)
+		flow.setup.EthereumHandler.SendFromEthereumToKC(flow.setup.Ctx, flow.setup.KCHandler.TestCallerAddress, flow.tokens...)
 	}
 	if !flow.ethToKlvDone {
 		// return here, no reason to check downwards
 		return false
 	}
 
-	isTransferDoneFromKc := flow.setup.IsTransferDoneFromKc(flow.tokens...)
-	if !flow.kdaToEthDone && isTransferDoneFromKc {
+	isTransferDoneFromKC := flow.setup.IsTransferDoneFromKC(flow.tokens...)
+	if !flow.kdaToEthDone && isTransferDoneFromKC {
 		flow.kdaToEthDone = true
 		log.Info(fmt.Sprintf(framework.LogStepMarker, "Klever Blockchain<->Ethereum from Ethereum transfers done"))
 		return true

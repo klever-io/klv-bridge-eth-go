@@ -8,12 +8,12 @@ import (
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 )
 
-// KcClient defines the behavior of the Klever Blockchain client able to communicate with the Klever Blockchain chain
-type KcClient interface {
+// KCClient defines the behavior of the Klever Blockchain client able to communicate with the Klever Blockchain chain
+type KCClient interface {
 	GetPendingBatch(ctx context.Context) (*bridgeCore.TransferBatch, error)
 	GetBatch(ctx context.Context, batchID uint64) (*bridgeCore.TransferBatch, error)
 	GetLastExecutedEthBatchID(ctx context.Context) (uint64, error)
-	GetLastKcBatchID(ctx context.Context) (uint64, error)
+	GetLastKCBatchID(ctx context.Context) (uint64, error)
 	IsMintBurnToken(ctx context.Context, token []byte) (bool, error)
 	IsNativeToken(ctx context.Context, token []byte) (bool, error)
 	TotalBalances(ctx context.Context, token []byte) (*big.Int, error)

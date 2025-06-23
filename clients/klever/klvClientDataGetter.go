@@ -508,8 +508,8 @@ func (dataGetter *klvClientDataGetter) GetAllKnownTokens(ctx context.Context) ([
 	return dataGetter.executeQueryFromBuilder(ctx, builder)
 }
 
-// GetLastKcBatchID returns the highest batch ID the safe contract reached. This might be a WIP batch that is not executable yet
-func (dataGetter *klvClientDataGetter) GetLastKcBatchID(ctx context.Context) (uint64, error) {
+// GetLastKCBatchID returns the highest batch ID the safe contract reached. This might be a WIP batch that is not executable yet
+func (dataGetter *klvClientDataGetter) GetLastKCBatchID(ctx context.Context) (uint64, error) {
 	builder := dataGetter.createSafeDefaultVmQueryBuilder()
 	builder.Function(getLastBatchId)
 

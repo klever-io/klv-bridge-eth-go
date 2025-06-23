@@ -160,8 +160,8 @@ func (keyStore *KeysStore) WalletsToFundOnEthereum() []common.Address {
 	return walletsToFund
 }
 
-// WalletsToFundOnKc will return the wallets to fund on Kc
-func (keyStore *KeysStore) WalletsToFundOnKc() []string {
+// WalletsToFundOnKC will return the wallets to fund on KC
+func (keyStore *KeysStore) WalletsToFundOnKC() []string {
 	allKeys := keyStore.getAllKeys()
 	walletsToFund := make([]string, 0, len(allKeys))
 
@@ -172,7 +172,7 @@ func (keyStore *KeysStore) WalletsToFundOnKc() []string {
 	return walletsToFund
 }
 
-// GenerateKlvPrivatePublicKey will generate a new keys holder instance that will hold only the Kc generated keys
+// GenerateKlvPrivatePublicKey will generate a new keys holder instance that will hold only the KC generated keys
 func GenerateKlvPrivatePublicKey(tb testing.TB, projectedShard byte) KeysHolder {
 	sk, pkBytes := generateSkPkInShard(tb, projectedShard)
 

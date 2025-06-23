@@ -82,8 +82,8 @@ var (
 	feeInt = big.NewInt(50)
 )
 
-// KcHandler will handle all the operations on the Klever Blockchain side
-type KcHandler struct {
+// KCHandler will handle all the operations on the Klever Blockchain side
+type KCHandler struct {
 	testing.TB
 	*KeysStore
 	Quorum         string
@@ -100,16 +100,16 @@ type KcHandler struct {
 	KDASystemContractAddress *KlvAddress
 }
 
-// NewKcHandler will create the handler that will adapt all test operations on Kc
-func NewKcHandler(
+// NewKCHandler will create the handler that will adapt all test operations on KC
+func NewKCHandler(
 	tb testing.TB,
 	ctx context.Context,
 	keysStore *KeysStore,
 	tokensRegistry TokensRegistry,
 	chainSimulator ChainSimulatorWrapper,
 	quorum string,
-) *KcHandler {
-	handler := &KcHandler{
+) *KCHandler {
+	handler := &KCHandler{
 		TB:             tb,
 		KeysStore:      keysStore,
 		TokensRegistry: tokensRegistry,
@@ -121,14 +121,14 @@ func NewKcHandler(
 
 	handler.ChainSimulator.GenerateBlocksUntilEpochReached(ctx, 1)
 
-	handler.ChainSimulator.FundWallets(ctx, handler.WalletsToFundOnKc())
+	handler.ChainSimulator.FundWallets(ctx, handler.WalletsToFundOnKC())
 	handler.ChainSimulator.GenerateBlocks(ctx, 1)
 
 	return handler
 }
 
 // DeployAndSetContracts will deploy all required contracts on Klever Blockchain side and do the proper wiring
-func (handler *KcHandler) DeployAndSetContracts(ctx context.Context) {
+func (handler *KCHandler) DeployAndSetContracts(ctx context.Context) {
 	handler.deployContracts(ctx)
 
 	handler.wireMultiTransfer(ctx)
@@ -139,7 +139,7 @@ func (handler *KcHandler) DeployAndSetContracts(ctx context.Context) {
 	handler.finishSettings(ctx)
 }
 
-func (handler *KcHandler) deployContracts(ctx context.Context) {
+func (handler *KCHandler) deployContracts(ctx context.Context) {
 	// deploy aggregator
 	stakeValue, _ := big.NewInt(0).SetString(minRelayerStake, 10)
 	aggregatorDeployParams := []string{
@@ -250,7 +250,7 @@ func (handler *KcHandler) deployContracts(ctx context.Context) {
 	log.Info("Deploy: test-caller contract", "address", handler.TestCallerAddress, "transaction hash", hash)
 }
 
-func (handler *KcHandler) wireMultiTransfer(ctx context.Context) {
+func (handler *KCHandler) wireMultiTransfer(ctx context.Context) {
 	// setBridgeProxyContractAddress
 	hash, txResult := handler.ChainSimulator.ScCall(
 		ctx,
@@ -280,7 +280,7 @@ func (handler *KcHandler) wireMultiTransfer(ctx context.Context) {
 	log.Info("Set in multi-transfer contract the wrapper contract", "transaction hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) wireSCProxy(ctx context.Context) {
+func (handler *KCHandler) wireSCProxy(ctx context.Context) {
 	// setBridgedTokensWrapper in SC bridge proxy
 	hash, txResult := handler.ChainSimulator.ScCall(
 		ctx,
@@ -324,7 +324,7 @@ func (handler *KcHandler) wireSCProxy(ctx context.Context) {
 	log.Info("Set in SC proxy contract the safe contract", "transaction hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) wireSafe(ctx context.Context) {
+func (handler *KCHandler) wireSafe(ctx context.Context) {
 	// setBridgedTokensWrapperAddress
 	hash, txResult := handler.ChainSimulator.ScCall(
 		ctx,
@@ -354,7 +354,7 @@ func (handler *KcHandler) wireSafe(ctx context.Context) {
 	log.Info("Set in safe contract the SC proxy contract", "transaction hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) changeOwners(ctx context.Context) {
+func (handler *KCHandler) changeOwners(ctx context.Context) {
 	// ChangeOwnerAddress for safe
 	hash, txResult := handler.ChainSimulator.ScCall(
 		ctx,
@@ -398,7 +398,7 @@ func (handler *KcHandler) changeOwners(ctx context.Context) {
 	log.Info("ChangeOwnerAddress for SC proxy contract", "transaction hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) finishSettings(ctx context.Context) {
+func (handler *KCHandler) finishSettings(ctx context.Context) {
 	// unpause sc proxy
 	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, unpauseProxyFunction)
 	log.Info("Un-paused SC proxy contract", "transaction hash", hash, "status", txResult.Status)
@@ -429,14 +429,14 @@ func (handler *KcHandler) finishSettings(ctx context.Context) {
 }
 
 // CheckForZeroBalanceOnReceivers will check that the balances for all provided tokens are 0 for the test address and the test SC call address
-func (handler *KcHandler) CheckForZeroBalanceOnReceivers(ctx context.Context, tokens ...TestTokenParams) {
+func (handler *KCHandler) CheckForZeroBalanceOnReceivers(ctx context.Context, tokens ...TestTokenParams) {
 	for _, params := range tokens {
 		handler.CheckForZeroBalanceOnReceiversForToken(ctx, params)
 	}
 }
 
 // CheckForZeroBalanceOnReceiversForToken will check that the balance for the test address and the test SC call address is 0
-func (handler *KcHandler) CheckForZeroBalanceOnReceiversForToken(ctx context.Context, token TestTokenParams) {
+func (handler *KCHandler) CheckForZeroBalanceOnReceiversForToken(ctx context.Context, token TestTokenParams) {
 	balance := handler.GetKDAUniversalTokenBalance(ctx, handler.TestKeys.KlvAddress, token.AbstractTokenIdentifier)
 	require.Equal(handler, big.NewInt(0).String(), balance.String())
 
@@ -445,7 +445,7 @@ func (handler *KcHandler) CheckForZeroBalanceOnReceiversForToken(ctx context.Con
 }
 
 // GetKDAUniversalTokenBalance will return the universal KDA token's balance
-func (handler *KcHandler) GetKDAUniversalTokenBalance(
+func (handler *KCHandler) GetKDAUniversalTokenBalance(
 	ctx context.Context,
 	address *KlvAddress,
 	abstractTokenIdentifier string,
@@ -462,7 +462,7 @@ func (handler *KcHandler) GetKDAUniversalTokenBalance(
 }
 
 // GetKDAChainSpecificTokenBalance will return the chain specific KDA token's balance
-func (handler *KcHandler) GetKDAChainSpecificTokenBalance(
+func (handler *KCHandler) GetKDAChainSpecificTokenBalance(
 	ctx context.Context,
 	address *KlvAddress,
 	abstractTokenIdentifier string,
@@ -478,7 +478,7 @@ func (handler *KcHandler) GetKDAChainSpecificTokenBalance(
 	return balance
 }
 
-func (handler *KcHandler) callContractNoParams(ctx context.Context, contract *KlvAddress, endpoint string) (string, *data.TransactionOnNetwork) {
+func (handler *KCHandler) callContractNoParams(ctx context.Context, contract *KlvAddress, endpoint string) (string, *data.TransactionOnNetwork) {
 	return handler.ChainSimulator.ScCall(
 		ctx,
 		handler.OwnerKeys.KlvSk,
@@ -491,7 +491,7 @@ func (handler *KcHandler) callContractNoParams(ctx context.Context, contract *Kl
 }
 
 // UnPauseContractsAfterTokenChanges can unpause contracts after token changes
-func (handler *KcHandler) UnPauseContractsAfterTokenChanges(ctx context.Context) {
+func (handler *KCHandler) UnPauseContractsAfterTokenChanges(ctx context.Context) {
 	// unpause safe
 	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, unpauseKdaSafeFunction)
 	log.Info("unpaused safe executed", "hash", hash, "status", txResult.Status)
@@ -506,7 +506,7 @@ func (handler *KcHandler) UnPauseContractsAfterTokenChanges(ctx context.Context)
 }
 
 // PauseContractsForTokenChanges can pause contracts for token changes
-func (handler *KcHandler) PauseContractsForTokenChanges(ctx context.Context) {
+func (handler *KCHandler) PauseContractsForTokenChanges(ctx context.Context) {
 	// pause safe
 	hash, txResult := handler.callContractNoParams(ctx, handler.MultisigAddress, pauseKdaSafeFunction)
 	log.Info("paused safe executed", "hash", hash, "status", txResult.Status)
@@ -520,7 +520,7 @@ func (handler *KcHandler) PauseContractsForTokenChanges(ctx context.Context) {
 	log.Info("paused wrapper executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) stakeAddressesOnContract(ctx context.Context, contract *KlvAddress, allKeys []KeysHolder) {
+func (handler *KCHandler) stakeAddressesOnContract(ctx context.Context, contract *KlvAddress, allKeys []KeysHolder) {
 	for _, keys := range allKeys {
 		hash, txResult := handler.ChainSimulator.SendTx(
 			ctx,
@@ -534,8 +534,8 @@ func (handler *KcHandler) stakeAddressesOnContract(ctx context.Context, contract
 	}
 }
 
-// IssueAndWhitelistToken will issue and whitelist the token on Kc
-func (handler *KcHandler) IssueAndWhitelistToken(ctx context.Context, params IssueTokenParams) {
+// IssueAndWhitelistToken will issue and whitelist the token on KC
+func (handler *KCHandler) IssueAndWhitelistToken(ctx context.Context, params IssueTokenParams) {
 	if params.HasChainSpecificToken {
 		handler.issueAndWhitelistTokensWithChainSpecific(ctx, params)
 	} else {
@@ -543,7 +543,7 @@ func (handler *KcHandler) IssueAndWhitelistToken(ctx context.Context, params Iss
 	}
 }
 
-func (handler *KcHandler) issueAndWhitelistTokensWithChainSpecific(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) issueAndWhitelistTokensWithChainSpecific(ctx context.Context, params IssueTokenParams) {
 	handler.issueUniversalToken(ctx, params)
 	handler.issueChainSpecificToken(ctx, params)
 	handler.setLocalRolesForUniversalTokenOnWrapper(ctx, params)
@@ -559,7 +559,7 @@ func (handler *KcHandler) issueAndWhitelistTokensWithChainSpecific(ctx context.C
 	handler.setMaxBridgeAmountOnMultitransfer(ctx, params)
 }
 
-func (handler *KcHandler) issueAndWhitelistTokens(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) issueAndWhitelistTokens(ctx context.Context, params IssueTokenParams) {
 	handler.issueUniversalToken(ctx, params)
 
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
@@ -574,7 +574,7 @@ func (handler *KcHandler) issueAndWhitelistTokens(ctx context.Context, params Is
 	handler.setMaxBridgeAmountOnMultitransfer(ctx, params)
 }
 
-func (handler *KcHandler) issueUniversalToken(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) issueUniversalToken(ctx context.Context, params IssueTokenParams) {
 	token := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 	require.NotNil(handler, token)
 
@@ -602,7 +602,7 @@ func (handler *KcHandler) issueUniversalToken(ctx context.Context, params IssueT
 	log.Info("issue universal token tx executed", "hash", hash, "status", txResult.Status, "token", kdaUniversalToken, "owner", handler.OwnerKeys.KlvAddress)
 }
 
-func (handler *KcHandler) issueChainSpecificToken(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) issueChainSpecificToken(ctx context.Context, params IssueTokenParams) {
 	valueToMintInt, ok := big.NewInt(0).SetString(params.ValueToMintOnKlv, 10)
 	require.True(handler, ok)
 
@@ -626,7 +626,7 @@ func (handler *KcHandler) issueChainSpecificToken(ctx context.Context, params Is
 	log.Info("issue chain specific token tx executed", "hash", hash, "status", txResult.Status, "token", kdaChainSpecificToken, "owner", handler.OwnerKeys.KlvAddress)
 }
 
-func (handler *KcHandler) setLocalRolesForUniversalTokenOnWrapper(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) setLocalRolesForUniversalTokenOnWrapper(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// set local roles bridged tokens wrapper
@@ -645,7 +645,7 @@ func (handler *KcHandler) setLocalRolesForUniversalTokenOnWrapper(ctx context.Co
 	log.Info("set local roles bridged tokens wrapper tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) transferChainSpecificTokenToSCs(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) transferChainSpecificTokenToSCs(ctx context.Context, params IssueTokenParams) {
 	valueToMintInt, ok := big.NewInt(0).SetString(params.ValueToMintOnKlv, 10)
 	require.True(handler, ok)
 
@@ -680,7 +680,7 @@ func (handler *KcHandler) transferChainSpecificTokenToSCs(ctx context.Context, p
 	log.Info("transfer to safe sc tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) addUniversalTokenToWrapper(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) addUniversalTokenToWrapper(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// add wrapped token
@@ -698,7 +698,7 @@ func (handler *KcHandler) addUniversalTokenToWrapper(ctx context.Context, params
 	log.Info("add wrapped token tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) whitelistTokenOnWrapper(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) whitelistTokenOnWrapper(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// wrapper whitelist token
@@ -716,7 +716,7 @@ func (handler *KcHandler) whitelistTokenOnWrapper(ctx context.Context, params Is
 	log.Info("wrapper whitelist token tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) setRolesForSpecificTokenOnSafe(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) setRolesForSpecificTokenOnSafe(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// set local roles kda safe
@@ -735,7 +735,7 @@ func (handler *KcHandler) setRolesForSpecificTokenOnSafe(ctx context.Context, pa
 	log.Info("set local roles kda safe tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) addMappingInMultisig(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) addMappingInMultisig(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// add mapping
@@ -752,7 +752,7 @@ func (handler *KcHandler) addMappingInMultisig(ctx context.Context, params Issue
 	log.Info("add mapping tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) whitelistTokenOnMultisig(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) whitelistTokenOnMultisig(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// whitelist token
@@ -775,7 +775,7 @@ func (handler *KcHandler) whitelistTokenOnMultisig(ctx context.Context, params I
 	log.Info("whitelist token tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) setInitialSupply(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) setInitialSupply(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// set initial supply
@@ -821,7 +821,7 @@ func (handler *KcHandler) setInitialSupply(ctx context.Context, params IssueToke
 	}
 }
 
-func (handler *KcHandler) setPairDecimalsOnAggregator(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) setPairDecimalsOnAggregator(ctx context.Context, params IssueTokenParams) {
 	// setPairDecimals on aggregator
 	hash, txResult := handler.ChainSimulator.ScCall(
 		ctx,
@@ -837,7 +837,7 @@ func (handler *KcHandler) setPairDecimalsOnAggregator(ctx context.Context, param
 	log.Info("setPairDecimals tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) setMaxBridgeAmountOnSafe(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) setMaxBridgeAmountOnSafe(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// safe set max bridge amount for token
@@ -855,7 +855,7 @@ func (handler *KcHandler) setMaxBridgeAmountOnSafe(ctx context.Context, params I
 	log.Info("safe set max bridge amount for token tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) setMaxBridgeAmountOnMultitransfer(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) setMaxBridgeAmountOnMultitransfer(ctx context.Context, params IssueTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// multi-transfer set max bridge amount for token
@@ -873,7 +873,7 @@ func (handler *KcHandler) setMaxBridgeAmountOnMultitransfer(ctx context.Context,
 	log.Info("multi-transfer set max bridge amount for token tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KcHandler) getTokenNameFromResult(txResult data.TransactionOnNetwork) string {
+func (handler *KCHandler) getTokenNameFromResult(txResult data.TransactionOnNetwork) string {
 	for _, event := range txResult.Logs.Events {
 		if event.Identifier == issueFunction {
 			require.Greater(handler, len(event.Topics), 1)
@@ -887,7 +887,7 @@ func (handler *KcHandler) getTokenNameFromResult(txResult data.TransactionOnNetw
 }
 
 // SubmitAggregatorBatch will submit the aggregator batch
-func (handler *KcHandler) SubmitAggregatorBatch(ctx context.Context, params IssueTokenParams) {
+func (handler *KCHandler) SubmitAggregatorBatch(ctx context.Context, params IssueTokenParams) {
 	txHashes := make([]string, 0, len(handler.OraclesKeys))
 	for _, key := range handler.OraclesKeys {
 		hash := handler.submitAggregatorBatchForKey(ctx, key, params)
@@ -900,7 +900,7 @@ func (handler *KcHandler) SubmitAggregatorBatch(ctx context.Context, params Issu
 	}
 }
 
-func (handler *KcHandler) submitAggregatorBatchForKey(ctx context.Context, key KeysHolder, params IssueTokenParams) string {
+func (handler *KCHandler) submitAggregatorBatchForKey(ctx context.Context, key KeysHolder, params IssueTokenParams) string {
 	timestamp := handler.ChainSimulator.GetBlockchainTimeStamp(ctx)
 	require.Greater(handler, timestamp, uint64(0), "something went wrong and the chain simulator returned 0 for the current timestamp")
 
@@ -925,8 +925,8 @@ func (handler *KcHandler) submitAggregatorBatchForKey(ctx context.Context, key K
 	return hash
 }
 
-// SendDepositTransactionFromKc will send the deposit transaction from Kc
-func (handler *KcHandler) SendDepositTransactionFromKc(ctx context.Context, token *TokenData, params TestTokenParams, value *big.Int) {
+// SendDepositTransactionFromKC will send the deposit transaction from KC
+func (handler *KCHandler) SendDepositTransactionFromKC(ctx context.Context, token *TokenData, params TestTokenParams, value *big.Int) {
 	if params.HasChainSpecificToken {
 		handler.unwrapCreateTransaction(ctx, token, value)
 		return
@@ -935,7 +935,7 @@ func (handler *KcHandler) SendDepositTransactionFromKc(ctx context.Context, toke
 	handler.createTransactionWithoutUnwrap(ctx, token, value)
 }
 
-func (handler *KcHandler) createTransactionWithoutUnwrap(ctx context.Context, token *TokenData, value *big.Int) {
+func (handler *KCHandler) createTransactionWithoutUnwrap(ctx context.Context, token *TokenData, value *big.Int) {
 	// create transaction params
 	params := []string{
 		hex.EncodeToString([]byte(token.KlvUniversalToken)),
@@ -954,10 +954,10 @@ func (handler *KcHandler) createTransactionWithoutUnwrap(ctx context.Context, to
 		kdaTransferFunction,
 		params,
 	)
-	log.Info("Kc->Ethereum createTransaction sent", "hash", hash, "token", token.KlvUniversalToken, "status", txResult.Status)
+	log.Info("KC->Ethereum createTransaction sent", "hash", hash, "token", token.KlvUniversalToken, "status", txResult.Status)
 }
 
-func (handler *KcHandler) unwrapCreateTransaction(ctx context.Context, token *TokenData, value *big.Int) {
+func (handler *KCHandler) unwrapCreateTransaction(ctx context.Context, token *TokenData, value *big.Int) {
 	// create transaction params
 	params := []string{
 		hex.EncodeToString([]byte(token.KlvUniversalToken)),
@@ -978,11 +978,11 @@ func (handler *KcHandler) unwrapCreateTransaction(ctx context.Context, token *To
 		kdaTransferFunction,
 		params,
 	)
-	log.Info("Kc->Ethereum unwrapCreateTransaction sent", "hash", hash, "token", token.KlvUniversalToken, "status", txResult.Status)
+	log.Info("KC->Ethereum unwrapCreateTransaction sent", "hash", hash, "token", token.KlvUniversalToken, "status", txResult.Status)
 }
 
 // TestWithdrawFees will try to withdraw the fees for the provided token from the safe contract to the owner
-func (handler *KcHandler) TestWithdrawFees(
+func (handler *KCHandler) TestWithdrawFees(
 	ctx context.Context,
 	token string,
 	expectedDeltaForRefund *big.Int,
@@ -992,7 +992,7 @@ func (handler *KcHandler) TestWithdrawFees(
 	handler.withdrawFees(ctx, token, expectedDeltaForAccumulated, getTransactionFeesFunction, withdrawTransactionFeesFunction)
 }
 
-func (handler *KcHandler) withdrawFees(ctx context.Context,
+func (handler *KCHandler) withdrawFees(ctx context.Context,
 	token string,
 	expectedDelta *big.Int,
 	getFunction string,
@@ -1036,7 +1036,7 @@ func (handler *KcHandler) withdrawFees(ctx context.Context,
 }
 
 // TransferToken is able to create an KDA transfer
-func (handler *KcHandler) TransferToken(ctx context.Context, source KeysHolder, receiver KeysHolder, amount *big.Int, params TestTokenParams) {
+func (handler *KCHandler) TransferToken(ctx context.Context, source KeysHolder, receiver KeysHolder, amount *big.Int, params TestTokenParams) {
 	tkData := handler.TokensRegistry.GetTokenData(params.AbstractTokenIdentifier)
 
 	// transfer to the test key, so it will have funds to carry on with the deposits

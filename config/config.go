@@ -161,7 +161,7 @@ type ProxyConfig struct {
 	FinalityCheck           bool
 }
 
-// KcGasMapConfig represents the gas limits for Klever Blockchain operations
+// KCGasMapConfig represents the gas limits for Klever Blockchain operations
 type KleverGasMapConfig struct {
 	Sign                   uint64
 	ProposeTransferBase    uint64

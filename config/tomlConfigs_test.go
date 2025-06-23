@@ -153,11 +153,11 @@ func TestConfigs(t *testing.T) {
 					DefaultMaxMessagesPerSec: 300,
 					MaxMessages: []chainConfig.TopicMaxMessagesConfig{
 						{
-							Topic:             "EthereumToKc_join",
+							Topic:             "EthereumToKC_join",
 							NumMessagesPerSec: 100,
 						},
 						{
-							Topic:             "EthereumToKc_sign",
+							Topic:             "EthereumToKC_sign",
 							NumMessagesPerSec: 100,
 						},
 					},
@@ -166,11 +166,11 @@ func TestConfigs(t *testing.T) {
 			},
 		},
 		StateMachine: map[string]ConfigStateMachine{
-			"EthereumToKc": {
+			"EthereumToKC": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 120,
 			},
-			"KcToEthereum": {
+			"KCToEthereum": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 720,
 			},
@@ -341,8 +341,8 @@ func TestConfigs(t *testing.T) {
             Type = "LRU"
         [P2P.AntifloodConfig.Topic]
             DefaultMaxMessagesPerSec = 300 # default number of messages per interval for a topic
-            MaxMessages = [{ Topic = "EthereumToKc_join", NumMessagesPerSec = 100 },
-                           { Topic = "EthereumToKc_sign", NumMessagesPerSec = 100 }]
+            MaxMessages = [{ Topic = "EthereumToKC_join", NumMessagesPerSec = 100 },
+                           { Topic = "EthereumToKC_sign", NumMessagesPerSec = 100 }]
 
 [Relayer]
     [Relayer.Marshalizer]
@@ -363,11 +363,11 @@ func TestConfigs(t *testing.T) {
             MaxOpenFiles = 10
 
 [StateMachine]
-    [StateMachine.EthereumToKc]
+    [StateMachine.EthereumToKC]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 120 #2 minutes
 
-    [StateMachine.KcToEthereum]
+    [StateMachine.KCToEthereum]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 720 #12 minutes
 

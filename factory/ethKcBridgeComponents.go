@@ -10,11 +10,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/klever-io/klever-go/tools"
-	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKc"
-	"github.com/klever-io/klv-bridge-eth-go/bridges/ethKc/disabled"
-	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKc/steps/ethToKc"
-	kctoeth "github.com/klever-io/klv-bridge-eth-go/bridges/ethKc/steps/kcToEth"
-	"github.com/klever-io/klv-bridge-eth-go/bridges/ethKc/topology"
+	ethklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKC"
+	"github.com/klever-io/klv-bridge-eth-go/bridges/ethKC/disabled"
+	ethtoklever "github.com/klever-io/klv-bridge-eth-go/bridges/ethKC/steps/ethToKC"
+	kctoeth "github.com/klever-io/klv-bridge-eth-go/bridges/ethKC/steps/kcToEth"
+	"github.com/klever-io/klv-bridge-eth-go/bridges/ethKC/topology"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	balanceValidatorManagement "github.com/klever-io/klv-bridge-eth-go/clients/balanceValidator"
 	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
@@ -74,7 +74,7 @@ type ethKleverBridgeComponents struct {
 	baseLogger                    logger.Logger
 	messenger                     p2p.NetMessenger
 	statusStorer                  core.Storer
-	kcClient                      ethklever.KcClient
+	kcClient                      ethklever.KCClient
 	ethClient                     ethklever.EthereumClient
 	evmCompatibleChain            chain.Chain
 	kleverMultisigContractAddress address.Address
@@ -159,7 +159,7 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 		return nil, err
 	}
 
-	err = components.createKcClient(args)
+	err = components.createKCClient(args)
 	if err != nil {
 		return nil, err
 	}
@@ -184,12 +184,12 @@ func NewEthKleverBridgeComponents(args ArgsEthereumToKleverBridge) (*ethKleverBr
 		return nil, err
 	}
 
-	err = components.createKcToEthereumBridge(args)
+	err = components.createKCToEthereumBridge(args)
 	if err != nil {
 		return nil, err
 	}
 
-	err = components.createKcToEthereumStateMachine()
+	err = components.createKCToEthereumStateMachine()
 	if err != nil {
 		return nil, err
 	}
@@ -287,9 +287,9 @@ func (components *ethKleverBridgeComponents) createDataGetter() error {
 	return err
 }
 
-func (components *ethKleverBridgeComponents) createKcClient(args ArgsEthereumToKleverBridge) error {
+func (components *ethKleverBridgeComponents) createKCClient(args ArgsEthereumToKleverBridge) error {
 	chainConfigs := args.Configs.GeneralConfig.Klever
-	tokensMapper, err := mappers.NewKcToErc20Mapper(components.klvDataGetter)
+	tokensMapper, err := mappers.NewKCToErc20Mapper(components.klvDataGetter)
 	if err != nil {
 		return err
 	}
@@ -356,7 +356,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 	argsBroadcaster := p2p.ArgsBroadcaster{
 		Messenger:           args.Messenger,
 		Log:                 core.NewLoggerWithIdentifier(logger.GetOrCreate(broadcasterLogId), broadcasterLogId),
-		KcRoleProvider:      components.kleverRoleProvider,
+		KCRoleProvider:      components.kleverRoleProvider,
 		SignatureProcessor:  components.ethereumRoleProvider,
 		KeyGen:              keyGen,
 		SingleSigner:        singleSigner,
@@ -377,7 +377,7 @@ func (components *ethKleverBridgeComponents) createEthereumClient(args ArgsEther
 
 	components.ethereumRelayerAddress = cryptoHandler.GetAddress()
 
-	tokensMapper, err := mappers.NewErc20ToKcMapper(components.klvDataGetter)
+	tokensMapper, err := mappers.NewErc20ToKCMapper(components.klvDataGetter)
 	if err != nil {
 		return err
 	}
@@ -529,14 +529,14 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBri
 	argsBridgeExecutor := ethklever.ArgsBridgeExecutor{
 		Log:                        log,
 		TopologyProvider:           topologyHandler,
-		KcClient:                   components.kcClient,
+		KCClient:                   components.kcClient,
 		EthereumClient:             components.ethClient,
 		StatusHandler:              components.ethtoKleverStatusHandler,
 		TimeForWaitOnEthereum:      timeForTransferExecution,
 		SignaturesHolder:           disabled.NewDisabledSignaturesHolder(),
 		BalanceValidator:           balanceValidator,
 		MaxQuorumRetriesOnEthereum: args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
-		MaxQuorumRetriesOnKc:       args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
+		MaxQuorumRetriesOnKC:       args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
 		MaxRetriesOnWasProposed:    args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
@@ -553,7 +553,7 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBri
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createKcToEthereumBridge(args ArgsEthereumToKleverBridge) error {
+func (components *ethKleverBridgeComponents) createKCToEthereumBridge(args ArgsEthereumToKleverBridge) error {
 	kcToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(kcToEthName), kcToEthName)
 
@@ -597,14 +597,14 @@ func (components *ethKleverBridgeComponents) createKcToEthereumBridge(args ArgsE
 	argsBridgeExecutor := ethklever.ArgsBridgeExecutor{
 		Log:                        log,
 		TopologyProvider:           topologyHandler,
-		KcClient:                   components.kcClient,
+		KCClient:                   components.kcClient,
 		EthereumClient:             components.ethClient,
 		StatusHandler:              components.kcToEthStatusHandler,
 		TimeForWaitOnEthereum:      timeForWaitOnEthereum,
 		SignaturesHolder:           components.ethtoKleverSignaturesHolder,
 		BalanceValidator:           balanceValidator,
 		MaxQuorumRetriesOnEthereum: args.Configs.GeneralConfig.Eth.MaxRetriesOnQuorumReached,
-		MaxQuorumRetriesOnKc:       args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
+		MaxQuorumRetriesOnKC:       args.Configs.GeneralConfig.Klever.MaxRetriesOnQuorumReached,
 		MaxRetriesOnWasProposed:    args.Configs.GeneralConfig.Klever.MaxRetriesOnWasTransferProposed,
 	}
 
@@ -664,7 +664,7 @@ func (components *ethKleverBridgeComponents) Start() error {
 func (components *ethKleverBridgeComponents) createBalanceValidator() (ethklever.BalanceValidator, error) {
 	argsBalanceValidator := balanceValidatorManagement.ArgsBalanceValidator{
 		Log:            components.baseLogger,
-		KcClient:       components.kcClient,
+		KCClient:       components.kcClient,
 		EthereumClient: components.ethClient,
 	}
 
@@ -708,14 +708,14 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainSta
 	return nil
 }
 
-func (components *ethKleverBridgeComponents) createKcToEthereumStateMachine() error {
+func (components *ethKleverBridgeComponents) createKCToEthereumStateMachine() error {
 	kcToEthName := components.evmCompatibleChain.KleverBlockchainToEvmCompatibleChainName()
 	log := core.NewLoggerWithIdentifier(logger.GetOrCreate(kcToEthName), kcToEthName)
 
 	argsStateMachine := stateMachine.ArgsStateMachine{
 		StateMachineName:     kcToEthName,
 		Steps:                components.kcToEthMachineStates,
-		StartStateIdentifier: kctoeth.GettingPendingBatchFromKc,
+		StartStateIdentifier: kctoeth.GettingPendingBatchFromKC,
 		Log:                  log,
 		StatusHandler:        components.kcToEthStatusHandler,
 	}

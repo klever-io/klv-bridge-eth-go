@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/config"
-	"github.com/klever-io/klv-bridge-eth-go/executors/kc/module"
+	"github.com/klever-io/klv-bridge-eth-go/executors/kleverBlockchain/module"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	chainFactory "github.com/multiversx/mx-chain-go/cmd/node/factory"

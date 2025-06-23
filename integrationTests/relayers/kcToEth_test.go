@@ -31,7 +31,7 @@ func asyncCancelCall(cancelHandler func(), delay time.Duration) {
 	}()
 }
 
-func TestRelayersShouldExecuteSimpleTransfersFromKcToEth(t *testing.T) {
+func TestRelayersShouldExecuteSimpleTransfersFromKCToEth(t *testing.T) {
 	if testing.Short() {
 		t.Skip("this is not a short test")
 	}
@@ -119,20 +119,20 @@ func callIsFromBalanceValidator() bool {
 	return strings.Contains(callStack, "(*balanceValidator).getTotalTransferAmountInPendingKlvBatches")
 }
 
-func TestRelayersShouldExecuteTransfersFromKcToEthIfTransactionsAppearInBatch(t *testing.T) {
+func TestRelayersShouldExecuteTransfersFromKCToEthIfTransactionsAppearInBatch(t *testing.T) {
 	if testing.Short() {
 		t.Skip("this is not a short test")
 	}
 
 	t.Run("simple tokens transfers", func(t *testing.T) {
-		testRelayersShouldExecuteTransfersFromKcToEthIfTransactionsAppearInBatch(t, false)
+		testRelayersShouldExecuteTransfersFromKCToEthIfTransactionsAppearInBatch(t, false)
 	})
 	t.Run("native tokens transfers", func(t *testing.T) {
-		testRelayersShouldExecuteTransfersFromKcToEthIfTransactionsAppearInBatch(t, true)
+		testRelayersShouldExecuteTransfersFromKCToEthIfTransactionsAppearInBatch(t, true)
 	})
 }
 
-func testRelayersShouldExecuteTransfersFromKcToEthIfTransactionsAppearInBatch(t *testing.T, withNativeTokens bool) {
+func testRelayersShouldExecuteTransfersFromKCToEthIfTransactionsAppearInBatch(t *testing.T, withNativeTokens bool) {
 	numTransactions := 2
 	deposits, tokensAddresses, erc20Map := createTransactions(numTransactions)
 
@@ -250,7 +250,7 @@ func createTransaction(index int) (mock.KleverBlockchainDeposit, common.Address)
 	tokenAddress := testsCommon.CreateRandomEthereumAddress()
 
 	return mock.KleverBlockchainDeposit{
-		From:   testsCommon.CreateRandomKcAddress(),
+		From:   testsCommon.CreateRandomKCAddress(),
 		To:     testsCommon.CreateRandomEthereumAddress(),
 		Ticker: fmt.Sprintf("tck-00000%d", index+1),
 		Amount: big.NewInt(int64(index*1000) + 500), // 0 as amount is not relevant

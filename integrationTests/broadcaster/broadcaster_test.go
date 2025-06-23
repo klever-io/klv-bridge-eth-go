@@ -205,7 +205,7 @@ func createBroadcaster(
 	args := p2p.ArgsBroadcaster{
 		Messenger:           messenger,
 		Log:                 integrationTests.Log,
-		KcRoleProvider:      roleProvider,
+		KCRoleProvider:      roleProvider,
 		KeyGen:              integrationTests.TestKeyGenerator,
 		SingleSigner:        integrationTests.TestSingleSigner,
 		PrivateKey:          privateKey,

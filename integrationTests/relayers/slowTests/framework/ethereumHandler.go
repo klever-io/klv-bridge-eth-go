@@ -463,8 +463,8 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 	}
 }
 
-// SendFromEthereumToKc will create the deposit transactions on the Ethereum side
-func (handler *EthereumHandler) SendFromEthereumToKc(
+// SendFromEthereumToKC will create the deposit transactions on the Ethereum side
+func (handler *EthereumHandler) SendFromEthereumToKC(
 	ctx context.Context,
 	klvTestCallerAddress address.Address,
 	tokensParams ...TestTokenParams,

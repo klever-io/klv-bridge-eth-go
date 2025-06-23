@@ -13,8 +13,8 @@ import (
 const lenEthAddress = 20
 const lenKlvAddress = 32
 
-// KcCodec defines the codec operations to be used for Klever Blockchain contracts
-type KcCodec struct {
+// KCCodec defines the codec operations to be used for Klever Blockchain contracts
+type KCCodec struct {
 }
 
 func partiallyDecodeCallData(buff []byte, marker byte) (CallData, error) {
@@ -110,7 +110,7 @@ func ExtractUint32(buff []byte) ([]byte, int, error) {
 }
 
 // DecodeProxySCCompleteCallData will try to decode the provided bytes into a ProxySCCompleteCallData struct
-func (codec *KcCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxySCCompleteCallData, error) {
+func (codec *KCCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxySCCompleteCallData, error) {
 	result := ProxySCCompleteCallData{}
 
 	if len(buff) < lenEthAddress {
@@ -156,7 +156,7 @@ func (codec *KcCodec) DecodeProxySCCompleteCallData(buff []byte) (ProxySCComplet
 }
 
 // ExtractGasLimitFromRawCallData will try to extract the gas limit from the provided buffer
-func (codec *KcCodec) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
+func (codec *KCCodec) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error) {
 	if len(buff) == 0 {
 		return 0, errBufferTooShortForMarker
 	}
@@ -177,6 +177,6 @@ func (codec *KcCodec) ExtractGasLimitFromRawCallData(buff []byte) (uint64, error
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
-func (codec *KcCodec) IsInterfaceNil() bool {
+func (codec *KCCodec) IsInterfaceNil() bool {
 	return codec == nil
 }

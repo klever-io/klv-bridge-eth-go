@@ -28,7 +28,7 @@ const (
 type ArgsBroadcaster struct {
 	Messenger           NetMessenger
 	Log                 logger.Logger
-	KcRoleProvider      KcRoleProvider
+	KCRoleProvider      KCRoleProvider
 	SignatureProcessor  SignatureProcessor
 	KeyGen              crypto.KeyGenerator
 	SingleSigner        crypto.SingleSigner
@@ -42,7 +42,7 @@ type broadcaster struct {
 	*noncesOfPublicKeys
 	messenger          NetMessenger
 	log                logger.Logger
-	kleverRoleProvider KcRoleProvider
+	kleverRoleProvider KCRoleProvider
 	signatureProcessor SignatureProcessor
 	name               string
 	mutClients         sync.RWMutex
@@ -63,7 +63,7 @@ func NewBroadcaster(args ArgsBroadcaster) (*broadcaster, error) {
 		messenger:          args.Messenger,
 		noncesOfPublicKeys: newNoncesOfPublicKeys(),
 		log:                args.Log,
-		kleverRoleProvider: args.KcRoleProvider,
+		kleverRoleProvider: args.KCRoleProvider,
 		signatureProcessor: args.SignatureProcessor,
 		relayerMessageHandler: &relayerMessageHandler{
 			marshalizer:         &marshal.JsonMarshalizer{},
@@ -102,8 +102,8 @@ func checkArgs(args ArgsBroadcaster) error {
 	if check.IfNil(args.SingleSigner) {
 		return ErrNilSingleSigner
 	}
-	if check.IfNil(args.KcRoleProvider) {
-		return ErrNilKcRoleProvider
+	if check.IfNil(args.KCRoleProvider) {
+		return ErrNilKCRoleProvider
 	}
 	if check.IfNil(args.Messenger) {
 		return ErrNilMessenger

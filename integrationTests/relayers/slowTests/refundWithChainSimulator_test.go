@@ -256,12 +256,12 @@ func testRelayersWithChainSimulatorAndTokensAndRefund(tb testing.TB, manualStopC
 		startsFromEthFlow.setup = setup
 
 		setup.IssueAndConfigureTokens(tokens...)
-		setup.KcHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
+		setup.KCHandler.CheckForZeroBalanceOnReceivers(setup.Ctx, tokens...)
 		if len(startsFromEthFlow.tokens) > 0 {
-			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KcHandler.TestCallerAddress, startsFromEthFlow.tokens...)
+			setup.EthereumHandler.CreateBatchOnEthereum(setup.Ctx, setup.KCHandler.TestCallerAddress, startsFromEthFlow.tokens...)
 		}
 		if len(startsFromKlvFlow.tokens) > 0 {
-			setup.CreateBatchOnKc(startsFromKlvFlow.tokens...)
+			setup.CreateBatchOnKC(startsFromKlvFlow.tokens...)
 		}
 	}
 

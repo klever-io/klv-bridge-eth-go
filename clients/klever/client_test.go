@@ -1044,8 +1044,8 @@ func TestClient_CheckClientAvailability(t *testing.T) {
 		incrementor = 0
 
 		// place a random message as to test it is reset
-		statusHandler.SetStringMetric(bridgeCore.MetricKcClientStatus, bridgeCore.ClientStatus(3).String())
-		statusHandler.SetStringMetric(bridgeCore.MetricLastKcClientError, "random")
+		statusHandler.SetStringMetric(bridgeCore.MetricKCClientStatus, bridgeCore.ClientStatus(3).String())
+		statusHandler.SetStringMetric(bridgeCore.MetricLastKCClientError, "random")
 
 		// this will just increment the retry counter
 		for i := 0; i < int(args.ClientAvailabilityAllowDelta); i++ {
@@ -1108,12 +1108,12 @@ func resetClient(c *client) {
 	c.mut.Lock()
 	c.retriesAvailabilityCheck = 0
 	c.mut.Unlock()
-	c.statusHandler.SetStringMetric(bridgeCore.MetricKcClientStatus, "")
-	c.statusHandler.SetStringMetric(bridgeCore.MetricLastKcClientError, "")
+	c.statusHandler.SetStringMetric(bridgeCore.MetricKCClientStatus, "")
+	c.statusHandler.SetStringMetric(bridgeCore.MetricLastKCClientError, "")
 	c.statusHandler.SetIntMetric(bridgeCore.MetricLastBlockNonce, 0)
 }
 
 func checkStatusHandler(t *testing.T, statusHandler *testsCommon.StatusHandlerMock, status bridgeCore.ClientStatus, message string) {
-	assert.Equal(t, status.String(), statusHandler.GetStringMetric(bridgeCore.MetricKcClientStatus))
-	assert.Equal(t, message, statusHandler.GetStringMetric(bridgeCore.MetricLastKcClientError))
+	assert.Equal(t, status.String(), statusHandler.GetStringMetric(bridgeCore.MetricKCClientStatus))
+	assert.Equal(t, message, statusHandler.GetStringMetric(bridgeCore.MetricLastKCClientError))
 }
