@@ -12,8 +12,8 @@ import (
 type startsFromEthereumFlow struct {
 	testing.TB
 	setup        *framework.TestSetup
-	ethToMvxDone bool
-	mvxToEthDone bool
+	ethToKlvDone bool
+	kdaToEthDone bool
 	tokens       []framework.TestTokenParams
 }
 
@@ -21,26 +21,26 @@ func (flow *startsFromEthereumFlow) process() (finished bool) {
 	if len(flow.tokens) == 0 {
 		return true
 	}
-	if flow.mvxToEthDone && flow.ethToMvxDone {
+	if flow.kdaToEthDone && flow.ethToKlvDone {
 		return true
 	}
 
 	isTransferDoneFromEthereum := flow.setup.IsTransferDoneFromEthereum(flow.tokens...)
-	if !flow.ethToMvxDone && isTransferDoneFromEthereum {
-		flow.ethToMvxDone = true
-		log.Info(fmt.Sprintf(framework.LogStepMarker, "Ethereum->MultiversX transfer finished, now sending back to Ethereum..."))
+	if !flow.ethToKlvDone && isTransferDoneFromEthereum {
+		flow.ethToKlvDone = true
+		log.Info(fmt.Sprintf(framework.LogStepMarker, "Ethereum->Klever Blockchain transfer finished, now sending back to Ethereum..."))
 
-		flow.setup.SendFromMultiversxToEthereum(flow.tokens...)
+		flow.setup.SendFromKCToEthereum(flow.tokens...)
 	}
-	if !flow.ethToMvxDone {
+	if !flow.ethToKlvDone {
 		// return here, no reason to check downwards
 		return false
 	}
 
-	isTransferDoneFromMultiversX := flow.setup.IsTransferDoneFromMultiversX(flow.tokens...)
-	if !flow.mvxToEthDone && isTransferDoneFromMultiversX {
-		flow.mvxToEthDone = true
-		log.Info(fmt.Sprintf(framework.LogStepMarker, "MultiversX<->Ethereum from Ethereum transfers done"))
+	isTransferDoneFromKC := flow.setup.IsTransferDoneFromKC(flow.tokens...)
+	if !flow.kdaToEthDone && isTransferDoneFromKC {
+		flow.kdaToEthDone = true
+		log.Info(fmt.Sprintf(framework.LogStepMarker, "Klever Blockchain<->Ethereum from Ethereum transfers done"))
 		return true
 	}
 

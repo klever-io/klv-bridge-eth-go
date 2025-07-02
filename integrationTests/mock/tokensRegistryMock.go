@@ -10,13 +10,13 @@ import (
 
 // tokensRegistryMock is not concurrent safe
 type tokensRegistryMock struct {
-	ethToMultiversX map[common.Address]string
-	multiversXToEth map[string]common.Address
-	mintBurnTokens  map[string]bool
-	nativeTokens    map[string]bool
-	totalBalances   map[string]*big.Int
-	mintBalances    map[string]*big.Int
-	burnBalances    map[string]*big.Int
+	ethToKC        map[common.Address]string
+	kcToEth        map[string]common.Address
+	mintBurnTokens map[string]bool
+	nativeTokens   map[string]bool
+	totalBalances  map[string]*big.Int
+	mintBalances   map[string]*big.Int
+	burnBalances   map[string]*big.Int
 }
 
 func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticker string, isNativeToken, isMintBurnToken bool, totalBalance, mintBalances, burnBalances *big.Int) {
@@ -24,10 +24,10 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 		"erc20 address", erc20Address.String(), "is native token", isNativeToken, "is mint burn token", isMintBurnToken,
 		"total balance", totalBalance, "mint balances", mintBalances, "burn balances", burnBalances)
 
-	mock.ethToMultiversX[erc20Address] = ticker
+	mock.ethToKC[erc20Address] = ticker
 
 	hexedTicker := hex.EncodeToString([]byte(ticker))
-	mock.multiversXToEth[hexedTicker] = erc20Address
+	mock.kcToEth[hexedTicker] = erc20Address
 
 	if isNativeToken {
 		mock.nativeTokens[hexedTicker] = true
@@ -42,8 +42,8 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 }
 
 func (mock *tokensRegistryMock) clearTokens() {
-	mock.ethToMultiversX = make(map[common.Address]string)
-	mock.multiversXToEth = make(map[string]common.Address)
+	mock.ethToKC = make(map[common.Address]string)
+	mock.kcToEth = make(map[string]common.Address)
 	mock.mintBurnTokens = make(map[string]bool)
 	mock.nativeTokens = make(map[string]bool)
 	mock.totalBalances = make(map[string]*big.Int)
@@ -52,7 +52,7 @@ func (mock *tokensRegistryMock) clearTokens() {
 }
 
 func (mock *tokensRegistryMock) getTicker(erc20Address common.Address) string {
-	ticker, found := mock.ethToMultiversX[erc20Address]
+	ticker, found := mock.ethToKC[erc20Address]
 	if !found {
 		panic("tiker for erc20 address " + erc20Address.String() + " not found")
 	}
@@ -61,7 +61,7 @@ func (mock *tokensRegistryMock) getTicker(erc20Address common.Address) string {
 }
 
 func (mock *tokensRegistryMock) getErc20Address(ticker string) common.Address {
-	addr, found := mock.multiversXToEth[ticker]
+	addr, found := mock.kcToEth[ticker]
 	if !found {
 		panic("erc20 address for ticker " + ticker + " not found")
 	}

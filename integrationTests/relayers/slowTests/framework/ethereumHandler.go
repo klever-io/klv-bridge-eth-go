@@ -424,11 +424,11 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 
 	allowanceValue := big.NewInt(0)
 	for _, operation := range params.TestOperations {
-		if operation.ValueToTransferToMvx == nil {
+		if operation.ValueToTransferToKlv == nil {
 			continue
 		}
 
-		allowanceValue.Add(allowanceValue, operation.ValueToTransferToMvx)
+		allowanceValue.Add(allowanceValue, operation.ValueToTransferToKlv)
 	}
 
 	if allowanceValue.Cmp(zeroValueBigInt) > 0 {
@@ -440,21 +440,21 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 
 	var err error
 	for _, operation := range params.TestOperations {
-		if operation.ValueToTransferToMvx == nil {
+		if operation.ValueToTransferToKlv == nil {
 			continue
 		}
 
 		var tx *types.Transaction
-		if len(operation.MvxSCCallData) > 0 || operation.MvxForceSCCall {
+		if len(operation.KlvSCCallData) > 0 || operation.KlvForceSCCall {
 			tx, err = handler.SafeContract.DepositWithSCExecution(
 				auth,
 				token.EthErc20Address,
-				operation.ValueToTransferToMvx,
+				operation.ValueToTransferToKlv,
 				klvTestCallerAddress.AddressSlice(),
-				operation.MvxSCCallData,
+				operation.KlvSCCallData,
 			)
 		} else {
-			tx, err = handler.SafeContract.Deposit(auth, token.EthErc20Address, operation.ValueToTransferToMvx, handler.TestKeys.MvxAddress.AddressSlice())
+			tx, err = handler.SafeContract.Deposit(auth, token.EthErc20Address, operation.ValueToTransferToKlv, handler.TestKeys.KlvAddress.AddressSlice())
 		}
 
 		require.NoError(handler, err)
@@ -463,8 +463,8 @@ func (handler *EthereumHandler) createDepositsOnEthereumForToken(
 	}
 }
 
-// SendFromEthereumToMultiversX will create the deposit transactions on the Ethereum side
-func (handler *EthereumHandler) SendFromEthereumToMultiversX(
+// SendFromEthereumToKC will create the deposit transactions on the Ethereum side
+func (handler *EthereumHandler) SendFromEthereumToKC(
 	ctx context.Context,
 	klvTestCallerAddress address.Address,
 	tokensParams ...TestTokenParams,

@@ -66,7 +66,7 @@ type kleverBlockchainContractStateMock struct {
 	lastExecutedEthBatchId           uint64
 	lastExecutedEthTxId              uint64
 
-	ProposeMultiTransferEsdtBatchCalled func()
+	ProposeMultiTransferKdaBatchCalled func()
 }
 
 func newKleverBlockchainContractStateMock() *kleverBlockchainContractStateMock {
@@ -92,12 +92,12 @@ func (mock *kleverBlockchainContractStateMock) processTransaction(tx *transactio
 	dataSplit := strings.Split(string(tx.GetRawData().GetData()[0]), "@")
 	funcName := dataSplit[0]
 	switch funcName {
-	case "proposeEsdtSafeSetCurrentTransactionBatchStatus":
-		mock.proposeEsdtSafeSetCurrentTransactionBatchStatus(dataSplit, tx)
+	case "proposeKdaSafeSetCurrentTransactionBatchStatus":
+		mock.proposeKdaSafeSetCurrentTransactionBatchStatus(dataSplit, tx)
 
 		return
-	case "proposeMultiTransferEsdtBatch":
-		mock.proposeMultiTransferEsdtBatch(dataSplit, tx)
+	case "proposeMultiTransferKdaBatch":
+		mock.proposeMultiTransferKdaBatch(dataSplit, tx)
 		return
 	case "sign":
 		mock.sign(dataSplit, tx)
@@ -114,19 +114,19 @@ func (mock *kleverBlockchainContractStateMock) processTransaction(tx *transactio
 	panic("can not execute transaction that calls function: " + funcName)
 }
 
-func (mock *kleverBlockchainContractStateMock) proposeEsdtSafeSetCurrentTransactionBatchStatus(dataSplit []string, _ *transaction.Transaction) {
+func (mock *kleverBlockchainContractStateMock) proposeKdaSafeSetCurrentTransactionBatchStatus(dataSplit []string, _ *transaction.Transaction) {
 	status, hash := mock.createProposedStatus(dataSplit)
 
 	mock.proposedStatus[hash] = status
 }
 
-func (mock *kleverBlockchainContractStateMock) proposeMultiTransferEsdtBatch(dataSplit []string, _ *transaction.Transaction) {
+func (mock *kleverBlockchainContractStateMock) proposeMultiTransferKdaBatch(dataSplit []string, _ *transaction.Transaction) {
 	transfer, hash := mock.createProposedTransfer(dataSplit)
 
 	mock.proposedTransfers[hash] = transfer
 
-	if mock.ProposeMultiTransferEsdtBatchCalled != nil {
-		mock.ProposeMultiTransferEsdtBatchCalled()
+	if mock.ProposeMultiTransferKdaBatchCalled != nil {
+		mock.ProposeMultiTransferKdaBatchCalled()
 	}
 }
 

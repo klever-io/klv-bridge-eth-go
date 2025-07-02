@@ -20,44 +20,44 @@ type BridgeExecutorStub struct {
 	mutExecutor           sync.RWMutex
 	fullPath              string
 
-	PrintInfoCalled                                            func(logLevel logger.LogLevel, message string, extras ...interface{})
-	MyTurnAsLeaderCalled                                       func() bool
-	GetBatchFromMultiversXCalled                               func(ctx context.Context) (*bridgeCore.TransferBatch, error)
-	StoreBatchFromMultiversXCalled                             func(batch *bridgeCore.TransferBatch) error
-	GetStoredBatchCalled                                       func() *bridgeCore.TransferBatch
-	GetLastExecutedEthBatchIDFromMultiversXCalled              func(ctx context.Context) (uint64, error)
-	VerifyLastDepositNonceExecutedOnEthereumBatchCalled        func(ctx context.Context) error
-	GetAndStoreActionIDForProposeTransferOnMultiversXCalled    func(ctx context.Context) (uint64, error)
-	GetAndStoreActionIDForProposeSetStatusFromMultiversXCalled func(ctx context.Context) (uint64, error)
-	GetStoredActionIDCalled                                    func() uint64
-	WasTransferProposedOnMultiversXCalled                      func(ctx context.Context) (bool, error)
-	ProposeTransferOnMultiversXCalled                          func(ctx context.Context) error
-	ProcessMaxRetriesOnWasTransferProposedOnMultiversXCalled   func() bool
-	ResetRetriesOnWasTransferProposedOnMultiversXCalled        func()
-	WasSetStatusProposedOnMultiversXCalled                     func(ctx context.Context) (bool, error)
-	ProposeSetStatusOnMultiversXCalled                         func(ctx context.Context) error
-	WasActionSignedOnMultiversXCalled                          func(ctx context.Context) (bool, error)
-	SignActionOnMultiversXCalled                               func(ctx context.Context) error
-	ProcessQuorumReachedOnMultiversXCalled                     func(ctx context.Context) (bool, error)
-	WasActionPerformedOnMultiversXCalled                       func(ctx context.Context) (bool, error)
-	PerformActionOnMultiversXCalled                            func(ctx context.Context) error
-	ResolveNewDepositsStatusesCalled                           func(numDeposits uint64)
-	ProcessMaxQuorumRetriesOnMultiversXCalled                  func() bool
-	ResetRetriesCountOnMultiversXCalled                        func()
-	GetAndStoreBatchFromEthereumCalled                         func(ctx context.Context, nonce uint64) error
-	WasTransferPerformedOnEthereumCalled                       func(ctx context.Context) (bool, error)
-	SignTransferOnEthereumCalled                               func() error
-	PerformTransferOnEthereumCalled                            func(ctx context.Context) error
-	ProcessQuorumReachedOnEthereumCalled                       func(ctx context.Context) (bool, error)
-	WaitForTransferConfirmationCalled                          func(ctx context.Context)
-	WaitAndReturnFinalBatchStatusesCalled                      func(ctx context.Context) []byte
-	GetBatchStatusesFromEthereumCalled                         func(ctx context.Context) ([]byte, error)
-	ProcessMaxQuorumRetriesOnEthereumCalled                    func() bool
-	ResetRetriesCountOnEthereumCalled                          func()
-	ClearStoredP2PSignaturesForEthereumCalled                  func()
-	CheckMultiversXClientAvailabilityCalled                    func(ctx context.Context) error
-	CheckEthereumClientAvailabilityCalled                      func(ctx context.Context) error
-	CheckAvailableTokensCalled                                 func(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error
+	PrintInfoCalled                                     func(logLevel logger.LogLevel, message string, extras ...interface{})
+	MyTurnAsLeaderCalled                                func() bool
+	GetBatchFromKCCalled                                func(ctx context.Context) (*bridgeCore.TransferBatch, error)
+	StoreBatchFromKCCalled                              func(batch *bridgeCore.TransferBatch) error
+	GetStoredBatchCalled                                func() *bridgeCore.TransferBatch
+	GetLastExecutedEthBatchIDFromKCCalled               func(ctx context.Context) (uint64, error)
+	VerifyLastDepositNonceExecutedOnEthereumBatchCalled func(ctx context.Context) error
+	GetAndStoreActionIDForProposeTransferOnKCCalled     func(ctx context.Context) (uint64, error)
+	GetAndStoreActionIDForProposeSetStatusFromKCCalled  func(ctx context.Context) (uint64, error)
+	GetStoredActionIDCalled                             func() uint64
+	WasTransferProposedOnKCCalled                       func(ctx context.Context) (bool, error)
+	ProposeTransferOnKCCalled                           func(ctx context.Context) error
+	ProcessMaxRetriesOnWasTransferProposedOnKCCalled    func() bool
+	ResetRetriesOnWasTransferProposedOnKCCalled         func()
+	WasSetStatusProposedOnKCCalled                      func(ctx context.Context) (bool, error)
+	ProposeSetStatusOnKCCalled                          func(ctx context.Context) error
+	WasActionSignedOnKCCalled                           func(ctx context.Context) (bool, error)
+	SignActionOnKCCalled                                func(ctx context.Context) error
+	ProcessQuorumReachedOnKCCalled                      func(ctx context.Context) (bool, error)
+	WasActionPerformedOnKCCalled                        func(ctx context.Context) (bool, error)
+	PerformActionOnKCCalled                             func(ctx context.Context) error
+	ResolveNewDepositsStatusesCalled                    func(numDeposits uint64)
+	ProcessMaxQuorumRetriesOnKCCalled                   func() bool
+	ResetRetriesCountOnKCCalled                         func()
+	GetAndStoreBatchFromEthereumCalled                  func(ctx context.Context, nonce uint64) error
+	WasTransferPerformedOnEthereumCalled                func(ctx context.Context) (bool, error)
+	SignTransferOnEthereumCalled                        func() error
+	PerformTransferOnEthereumCalled                     func(ctx context.Context) error
+	ProcessQuorumReachedOnEthereumCalled                func(ctx context.Context) (bool, error)
+	WaitForTransferConfirmationCalled                   func(ctx context.Context)
+	WaitAndReturnFinalBatchStatusesCalled               func(ctx context.Context) []byte
+	GetBatchStatusesFromEthereumCalled                  func(ctx context.Context) ([]byte, error)
+	ProcessMaxQuorumRetriesOnEthereumCalled             func() bool
+	ResetRetriesCountOnEthereumCalled                   func()
+	ClearStoredP2PSignaturesForEthereumCalled           func()
+	CheckKCClientAvailabilityCalled                     func(ctx context.Context) error
+	CheckEthereumClientAvailabilityCalled               func(ctx context.Context) error
+	CheckAvailableTokensCalled                          func(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error
 }
 
 // NewBridgeExecutorStub creates a new BridgeExecutorStub instance
@@ -85,20 +85,20 @@ func (stub *BridgeExecutorStub) MyTurnAsLeader() bool {
 	return false
 }
 
-// GetBatchFromMultiversX -
-func (stub *BridgeExecutorStub) GetBatchFromMultiversX(ctx context.Context) (*bridgeCore.TransferBatch, error) {
+// GetBatchFromKC -
+func (stub *BridgeExecutorStub) GetBatchFromKC(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 	stub.incrementFunctionCounter()
-	if stub.GetBatchFromMultiversXCalled != nil {
-		return stub.GetBatchFromMultiversXCalled(ctx)
+	if stub.GetBatchFromKCCalled != nil {
+		return stub.GetBatchFromKCCalled(ctx)
 	}
 	return nil, notImplemented
 }
 
-// StoreBatchFromMultiversX -
-func (stub *BridgeExecutorStub) StoreBatchFromMultiversX(batch *bridgeCore.TransferBatch) error {
+// StoreBatchFromKC -
+func (stub *BridgeExecutorStub) StoreBatchFromKC(batch *bridgeCore.TransferBatch) error {
 	stub.incrementFunctionCounter()
-	if stub.StoreBatchFromMultiversXCalled != nil {
-		return stub.StoreBatchFromMultiversXCalled(batch)
+	if stub.StoreBatchFromKCCalled != nil {
+		return stub.StoreBatchFromKCCalled(batch)
 	}
 	return notImplemented
 }
@@ -112,11 +112,11 @@ func (stub *BridgeExecutorStub) GetStoredBatch() *bridgeCore.TransferBatch {
 	return nil
 }
 
-// GetLastExecutedEthBatchIDFromMultiversX -
-func (stub *BridgeExecutorStub) GetLastExecutedEthBatchIDFromMultiversX(ctx context.Context) (uint64, error) {
+// GetLastExecutedEthBatchIDFromKC -
+func (stub *BridgeExecutorStub) GetLastExecutedEthBatchIDFromKC(ctx context.Context) (uint64, error) {
 	stub.incrementFunctionCounter()
-	if stub.GetLastExecutedEthBatchIDFromMultiversXCalled != nil {
-		return stub.GetLastExecutedEthBatchIDFromMultiversXCalled(ctx)
+	if stub.GetLastExecutedEthBatchIDFromKCCalled != nil {
+		return stub.GetLastExecutedEthBatchIDFromKCCalled(ctx)
 	}
 	return 0, notImplemented
 }
@@ -130,20 +130,20 @@ func (stub *BridgeExecutorStub) VerifyLastDepositNonceExecutedOnEthereumBatch(ct
 	return notImplemented
 }
 
-// GetAndStoreActionIDForProposeTransferOnMultiversX -
-func (stub *BridgeExecutorStub) GetAndStoreActionIDForProposeTransferOnMultiversX(ctx context.Context) (uint64, error) {
+// GetAndStoreActionIDForProposeTransferOnKC -
+func (stub *BridgeExecutorStub) GetAndStoreActionIDForProposeTransferOnKC(ctx context.Context) (uint64, error) {
 	stub.incrementFunctionCounter()
-	if stub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled != nil {
-		return stub.GetAndStoreActionIDForProposeTransferOnMultiversXCalled(ctx)
+	if stub.GetAndStoreActionIDForProposeTransferOnKCCalled != nil {
+		return stub.GetAndStoreActionIDForProposeTransferOnKCCalled(ctx)
 	}
 	return 0, notImplemented
 }
 
-// GetAndStoreActionIDForProposeSetStatusFromMultiversX -
-func (stub *BridgeExecutorStub) GetAndStoreActionIDForProposeSetStatusFromMultiversX(ctx context.Context) (uint64, error) {
+// GetAndStoreActionIDForProposeSetStatusFromKC -
+func (stub *BridgeExecutorStub) GetAndStoreActionIDForProposeSetStatusFromKC(ctx context.Context) (uint64, error) {
 	stub.incrementFunctionCounter()
-	if stub.GetAndStoreActionIDForProposeSetStatusFromMultiversXCalled != nil {
-		return stub.GetAndStoreActionIDForProposeSetStatusFromMultiversXCalled(ctx)
+	if stub.GetAndStoreActionIDForProposeSetStatusFromKCCalled != nil {
+		return stub.GetAndStoreActionIDForProposeSetStatusFromKCCalled(ctx)
 	}
 	return 0, notImplemented
 }
@@ -157,100 +157,100 @@ func (stub *BridgeExecutorStub) GetStoredActionID() uint64 {
 	return 0
 }
 
-// WasTransferProposedOnMultiversX -
-func (stub *BridgeExecutorStub) WasTransferProposedOnMultiversX(ctx context.Context) (bool, error) {
+// WasTransferProposedOnKC -
+func (stub *BridgeExecutorStub) WasTransferProposedOnKC(ctx context.Context) (bool, error) {
 	stub.incrementFunctionCounter()
-	if stub.WasTransferProposedOnMultiversXCalled != nil {
-		return stub.WasTransferProposedOnMultiversXCalled(ctx)
+	if stub.WasTransferProposedOnKCCalled != nil {
+		return stub.WasTransferProposedOnKCCalled(ctx)
 	}
 	return false, notImplemented
 }
 
-// ProposeTransferOnMultiversX -
-func (stub *BridgeExecutorStub) ProposeTransferOnMultiversX(ctx context.Context) error {
+// ProposeTransferOnKC -
+func (stub *BridgeExecutorStub) ProposeTransferOnKC(ctx context.Context) error {
 	stub.incrementFunctionCounter()
-	if stub.ProposeTransferOnMultiversXCalled != nil {
-		return stub.ProposeTransferOnMultiversXCalled(ctx)
+	if stub.ProposeTransferOnKCCalled != nil {
+		return stub.ProposeTransferOnKCCalled(ctx)
 	}
 	return notImplemented
 }
 
-// ProcessMaxRetriesOnWasTransferProposedOnMultiversX -
-func (stub *BridgeExecutorStub) ProcessMaxRetriesOnWasTransferProposedOnMultiversX() bool {
+// ProcessMaxRetriesOnWasTransferProposedOnKC -
+func (stub *BridgeExecutorStub) ProcessMaxRetriesOnWasTransferProposedOnKC() bool {
 	stub.incrementFunctionCounter()
-	if stub.ProcessMaxRetriesOnWasTransferProposedOnMultiversXCalled != nil {
-		return stub.ProcessMaxRetriesOnWasTransferProposedOnMultiversXCalled()
+	if stub.ProcessMaxRetriesOnWasTransferProposedOnKCCalled != nil {
+		return stub.ProcessMaxRetriesOnWasTransferProposedOnKCCalled()
 	}
 	return false
 }
 
-// ResetRetriesOnWasTransferProposedOnMultiversX -
-func (stub *BridgeExecutorStub) ResetRetriesOnWasTransferProposedOnMultiversX() {
+// ResetRetriesOnWasTransferProposedOnKC -
+func (stub *BridgeExecutorStub) ResetRetriesOnWasTransferProposedOnKC() {
 	stub.incrementFunctionCounter()
-	if stub.ResetRetriesOnWasTransferProposedOnMultiversXCalled != nil {
-		stub.ResetRetriesOnWasTransferProposedOnMultiversXCalled()
+	if stub.ResetRetriesOnWasTransferProposedOnKCCalled != nil {
+		stub.ResetRetriesOnWasTransferProposedOnKCCalled()
 	}
 }
 
-// WasSetStatusProposedOnMultiversX -
-func (stub *BridgeExecutorStub) WasSetStatusProposedOnMultiversX(ctx context.Context) (bool, error) {
+// WasSetStatusProposedOnKC -
+func (stub *BridgeExecutorStub) WasSetStatusProposedOnKC(ctx context.Context) (bool, error) {
 	stub.incrementFunctionCounter()
-	if stub.WasSetStatusProposedOnMultiversXCalled != nil {
-		return stub.WasSetStatusProposedOnMultiversXCalled(ctx)
+	if stub.WasSetStatusProposedOnKCCalled != nil {
+		return stub.WasSetStatusProposedOnKCCalled(ctx)
 	}
 	return false, notImplemented
 }
 
-// ProposeSetStatusOnMultiversX -
-func (stub *BridgeExecutorStub) ProposeSetStatusOnMultiversX(ctx context.Context) error {
+// ProposeSetStatusOnKC -
+func (stub *BridgeExecutorStub) ProposeSetStatusOnKC(ctx context.Context) error {
 	stub.incrementFunctionCounter()
-	if stub.ProposeSetStatusOnMultiversXCalled != nil {
-		return stub.ProposeSetStatusOnMultiversXCalled(ctx)
+	if stub.ProposeSetStatusOnKCCalled != nil {
+		return stub.ProposeSetStatusOnKCCalled(ctx)
 	}
 	return notImplemented
 }
 
-// WasActionSignedOnMultiversX -
-func (stub *BridgeExecutorStub) WasActionSignedOnMultiversX(ctx context.Context) (bool, error) {
+// WasActionSignedOnKC -
+func (stub *BridgeExecutorStub) WasActionSignedOnKC(ctx context.Context) (bool, error) {
 	stub.incrementFunctionCounter()
-	if stub.WasActionSignedOnMultiversXCalled != nil {
-		return stub.WasActionSignedOnMultiversXCalled(ctx)
+	if stub.WasActionSignedOnKCCalled != nil {
+		return stub.WasActionSignedOnKCCalled(ctx)
 	}
 	return false, notImplemented
 }
 
-// SignActionOnMultiversX -
-func (stub *BridgeExecutorStub) SignActionOnMultiversX(ctx context.Context) error {
+// SignActionOnKC -
+func (stub *BridgeExecutorStub) SignActionOnKC(ctx context.Context) error {
 	stub.incrementFunctionCounter()
-	if stub.SignActionOnMultiversXCalled != nil {
-		return stub.SignActionOnMultiversXCalled(ctx)
+	if stub.SignActionOnKCCalled != nil {
+		return stub.SignActionOnKCCalled(ctx)
 	}
 	return notImplemented
 }
 
-// ProcessQuorumReachedOnMultiversX -
-func (stub *BridgeExecutorStub) ProcessQuorumReachedOnMultiversX(ctx context.Context) (bool, error) {
+// ProcessQuorumReachedOnKC -
+func (stub *BridgeExecutorStub) ProcessQuorumReachedOnKC(ctx context.Context) (bool, error) {
 	stub.incrementFunctionCounter()
-	if stub.ProcessQuorumReachedOnMultiversXCalled != nil {
-		return stub.ProcessQuorumReachedOnMultiversXCalled(ctx)
+	if stub.ProcessQuorumReachedOnKCCalled != nil {
+		return stub.ProcessQuorumReachedOnKCCalled(ctx)
 	}
 	return false, notImplemented
 }
 
-// WasActionPerformedOnMultiversX -
-func (stub *BridgeExecutorStub) WasActionPerformedOnMultiversX(ctx context.Context) (bool, error) {
+// WasActionPerformedOnKC -
+func (stub *BridgeExecutorStub) WasActionPerformedOnKC(ctx context.Context) (bool, error) {
 	stub.incrementFunctionCounter()
-	if stub.WasActionPerformedOnMultiversXCalled != nil {
-		return stub.WasActionPerformedOnMultiversXCalled(ctx)
+	if stub.WasActionPerformedOnKCCalled != nil {
+		return stub.WasActionPerformedOnKCCalled(ctx)
 	}
 	return false, notImplemented
 }
 
-// PerformActionOnMultiversX -
-func (stub *BridgeExecutorStub) PerformActionOnMultiversX(ctx context.Context) error {
+// PerformActionOnKC -
+func (stub *BridgeExecutorStub) PerformActionOnKC(ctx context.Context) error {
 	stub.incrementFunctionCounter()
-	if stub.PerformActionOnMultiversXCalled != nil {
-		return stub.PerformActionOnMultiversXCalled(ctx)
+	if stub.PerformActionOnKCCalled != nil {
+		return stub.PerformActionOnKCCalled(ctx)
 	}
 	return notImplemented
 }
@@ -263,20 +263,20 @@ func (stub *BridgeExecutorStub) ResolveNewDepositsStatuses(numDeposits uint64) {
 	}
 }
 
-// ProcessMaxQuorumRetriesOnMultiversX -
-func (stub *BridgeExecutorStub) ProcessMaxQuorumRetriesOnMultiversX() bool {
+// ProcessMaxQuorumRetriesOnKC -
+func (stub *BridgeExecutorStub) ProcessMaxQuorumRetriesOnKC() bool {
 	stub.incrementFunctionCounter()
-	if stub.ProcessMaxQuorumRetriesOnMultiversXCalled != nil {
-		return stub.ProcessMaxQuorumRetriesOnMultiversXCalled()
+	if stub.ProcessMaxQuorumRetriesOnKCCalled != nil {
+		return stub.ProcessMaxQuorumRetriesOnKCCalled()
 	}
 	return false
 }
 
-// ResetRetriesCountOnMultiversX -
-func (stub *BridgeExecutorStub) ResetRetriesCountOnMultiversX() {
+// ResetRetriesCountOnKC -
+func (stub *BridgeExecutorStub) ResetRetriesCountOnKC() {
 	stub.incrementFunctionCounter()
-	if stub.ResetRetriesCountOnMultiversXCalled != nil {
-		stub.ResetRetriesCountOnMultiversXCalled()
+	if stub.ResetRetriesCountOnKCCalled != nil {
+		stub.ResetRetriesCountOnKCCalled()
 	}
 }
 
@@ -376,10 +376,10 @@ func (stub *BridgeExecutorStub) ClearStoredP2PSignaturesForEthereum() {
 	}
 }
 
-// CheckMultiversXClientAvailability -
-func (stub *BridgeExecutorStub) CheckMultiversXClientAvailability(ctx context.Context) error {
-	if stub.CheckMultiversXClientAvailabilityCalled != nil {
-		return stub.CheckMultiversXClientAvailabilityCalled(ctx)
+// CheckKCClientAvailability -
+func (stub *BridgeExecutorStub) CheckKCClientAvailability(ctx context.Context) error {
+	if stub.CheckKCClientAvailabilityCalled != nil {
+		return stub.CheckKCClientAvailabilityCalled(ctx)
 	}
 	return notImplemented
 }
@@ -418,9 +418,9 @@ func (stub *BridgeExecutorStub) GetFunctionCounter(function string) int {
 }
 
 // CheckAvailableTokens -
-func (stub *BridgeExecutorStub) CheckAvailableTokens(ctx context.Context, ethTokens []common.Address, mvxTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
+func (stub *BridgeExecutorStub) CheckAvailableTokens(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
 	if stub.CheckAvailableTokensCalled != nil {
-		return stub.CheckAvailableTokensCalled(ctx, ethTokens, mvxTokens, amounts, direction)
+		return stub.CheckAvailableTokensCalled(ctx, ethTokens, kdaTokens, amounts, direction)
 	}
 
 	return nil

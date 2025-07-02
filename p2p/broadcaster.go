@@ -26,29 +26,29 @@ const (
 
 // ArgsBroadcaster is the DTO used in the broadcaster constructor
 type ArgsBroadcaster struct {
-	Messenger              NetMessenger
-	Log                    logger.Logger
-	MultiversXRoleProvider KleverChainRoleProvider
-	SignatureProcessor     SignatureProcessor
-	KeyGen                 crypto.KeyGenerator
-	SingleSigner           crypto.SingleSigner
-	PrivateKey             crypto.PrivateKey
-	Name                   string
-	AntifloodComponents    *factory.AntiFloodComponents
+	Messenger           NetMessenger
+	Log                 logger.Logger
+	KCRoleProvider      KCRoleProvider
+	SignatureProcessor  SignatureProcessor
+	KeyGen              crypto.KeyGenerator
+	SingleSigner        crypto.SingleSigner
+	PrivateKey          crypto.PrivateKey
+	Name                string
+	AntifloodComponents *factory.AntiFloodComponents
 }
 
 type broadcaster struct {
 	*relayerMessageHandler
 	*noncesOfPublicKeys
-	messenger             NetMessenger
-	log                   logger.Logger
-	multiversRoleProvider KleverChainRoleProvider
-	signatureProcessor    SignatureProcessor
-	name                  string
-	mutClients            sync.RWMutex
-	clients               []core.BroadcastClient
-	joinTopicName         string
-	signTopicName         string
+	messenger          NetMessenger
+	log                logger.Logger
+	kleverRoleProvider KCRoleProvider
+	signatureProcessor SignatureProcessor
+	name               string
+	mutClients         sync.RWMutex
+	clients            []core.BroadcastClient
+	joinTopicName      string
+	signTopicName      string
 }
 
 // NewBroadcaster will create a new broadcaster able to pass messages and signatures
@@ -59,12 +59,12 @@ func NewBroadcaster(args ArgsBroadcaster) (*broadcaster, error) {
 	}
 
 	b := &broadcaster{
-		name:                  args.Name,
-		messenger:             args.Messenger,
-		noncesOfPublicKeys:    newNoncesOfPublicKeys(),
-		log:                   args.Log,
-		multiversRoleProvider: args.MultiversXRoleProvider,
-		signatureProcessor:    args.SignatureProcessor,
+		name:               args.Name,
+		messenger:          args.Messenger,
+		noncesOfPublicKeys: newNoncesOfPublicKeys(),
+		log:                args.Log,
+		kleverRoleProvider: args.KCRoleProvider,
+		signatureProcessor: args.SignatureProcessor,
 		relayerMessageHandler: &relayerMessageHandler{
 			marshalizer:         &marshal.JsonMarshalizer{},
 			keyGen:              args.KeyGen,
@@ -102,8 +102,8 @@ func checkArgs(args ArgsBroadcaster) error {
 	if check.IfNil(args.SingleSigner) {
 		return ErrNilSingleSigner
 	}
-	if check.IfNil(args.MultiversXRoleProvider) {
-		return ErrNilMultiversXRoleProvider
+	if check.IfNil(args.KCRoleProvider) {
+		return ErrNilKCRoleProvider
 	}
 	if check.IfNil(args.Messenger) {
 		return ErrNilMessenger
@@ -153,7 +153,7 @@ func (b *broadcaster) ProcessReceivedMessage(message p2p.MessageP2P, fromConnect
 	}
 
 	hexPkBytes := hex.EncodeToString(msg.PublicKeyBytes)
-	if !b.multiversRoleProvider.IsWhitelisted(addr) {
+	if !b.kleverRoleProvider.IsWhitelisted(addr) {
 		return fmt.Errorf("%w for peer: %s", ErrPeerNotWhitelisted, hexPkBytes)
 	}
 

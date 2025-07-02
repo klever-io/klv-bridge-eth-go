@@ -310,7 +310,7 @@ func (c *client) createCommonTxDataBuilder(funcName string, id int64) builders.T
 	return builders.NewTxDataBuilder().Function(funcName).ArgInt64(id)
 }
 
-// ProposeSetStatus will trigger the proposal of the ESDT safe set current transaction batch status operation
+// ProposeSetStatus will trigger the proposal of the KDA safe set current transaction batch status operation
 func (c *client) ProposeSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
 	if batch == nil {
 		return "", clients.ErrNilBatch
@@ -477,23 +477,23 @@ func (c *client) CheckRequiredBalance(ctx context.Context, token []byte, value *
 	}
 	safeAddress := c.safeContractAddress.Bech32()
 
-	esdt, err := c.proxy.GetKDATokenData(ctx, c.safeContractAddress, string(token))
+	kda, err := c.proxy.GetKDATokenData(ctx, c.safeContractAddress, string(token))
 	if err != nil {
-		return fmt.Errorf("%w for address %s for ESDT token %s", err, safeAddress, string(token))
+		return fmt.Errorf("%w for address %s for KDA token %s", err, safeAddress, string(token))
 	}
 
-	existingBalance, ok := big.NewInt(0).SetString(esdt.Balance, 10)
+	existingBalance, ok := big.NewInt(0).SetString(kda.Balance, 10)
 	if !ok {
-		return fmt.Errorf("%w for ESDT token %s and address %s", errInvalidBalance, string(token), safeAddress)
+		return fmt.Errorf("%w for KDA token %s and address %s", errInvalidBalance, string(token), safeAddress)
 	}
 
 	if value.Cmp(existingBalance) > 0 {
 		return fmt.Errorf("%w, existing: %s, required: %s for ERC20 token %s and address %s",
-			errInsufficientESDTBalance, existingBalance.String(), value.String(), string(token), safeAddress)
+			errInsufficientKDABalance, existingBalance.String(), value.String(), string(token), safeAddress)
 	}
 
 	c.log.Debug("checked ERC20 balance",
-		"ESDT token", string(token),
+		"KDA token", string(token),
 		"address", safeAddress,
 		"existing balance", existingBalance.String(),
 		"needed", value.String())
@@ -538,8 +538,8 @@ func (c *client) incrementRetriesAvailabilityCheck() {
 }
 
 func (c *client) setStatusForAvailabilityCheck(status bridgeCore.ClientStatus, message string, nonce uint64) {
-	c.statusHandler.SetStringMetric(bridgeCore.MetricMultiversXClientStatus, status.String())
-	c.statusHandler.SetStringMetric(bridgeCore.MetricLastMultiversXClientError, message)
+	c.statusHandler.SetStringMetric(bridgeCore.MetricKCClientStatus, status.String())
+	c.statusHandler.SetStringMetric(bridgeCore.MetricLastKCClientError, message)
 	c.statusHandler.SetIntMetric(bridgeCore.MetricLastBlockNonce, int(nonce))
 }
 

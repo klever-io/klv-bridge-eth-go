@@ -203,15 +203,15 @@ func createBroadcaster(
 	require.Nil(t, err)
 
 	args := p2p.ArgsBroadcaster{
-		Messenger:              messenger,
-		Log:                    integrationTests.Log,
-		MultiversXRoleProvider: roleProvider,
-		KeyGen:                 integrationTests.TestKeyGenerator,
-		SingleSigner:           integrationTests.TestSingleSigner,
-		PrivateKey:             privateKey,
-		SignatureProcessor:     &testsCommon.SignatureProcessorStub{},
-		Name:                   "test",
-		AntifloodComponents:    ac,
+		Messenger:           messenger,
+		Log:                 integrationTests.Log,
+		KCRoleProvider:      roleProvider,
+		KeyGen:              integrationTests.TestKeyGenerator,
+		SingleSigner:        integrationTests.TestSingleSigner,
+		PrivateKey:          privateKey,
+		SignatureProcessor:  &testsCommon.SignatureProcessorStub{},
+		Name:                "test",
+		AntifloodComponents: ac,
 	}
 
 	b, err := p2p.NewBroadcaster(args)

@@ -5,8 +5,8 @@ import "errors"
 // ErrNilLogger signals that a nil logger has been provided
 var ErrNilLogger = errors.New("nil logger")
 
-// ErrNilMultiversXClient signals that a nil MultiversX client has been provided
-var ErrNilMultiversXClient = errors.New("nil MultiversX client")
+// ErrNilKCClient signals that a nil Klever Blockchain client has been provided
+var ErrNilKCClient = errors.New("nil Klever Blockchain client")
 
 // ErrNilEthereumClient signals that a nil Ethereum client has been provided
 var ErrNilEthereumClient = errors.New("nil Ethereum client")

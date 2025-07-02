@@ -153,7 +153,7 @@ type KleverConfig struct {
 	Proxy                           ProxyConfig
 }
 
-// ProxyConfig represents the configuration for the MultiversX proxy
+// ProxyConfig represents the configuration for the Klever Blockchain proxy
 type ProxyConfig struct {
 	CacherExpirationSeconds uint64
 	RestAPIEntityType       string
@@ -161,7 +161,7 @@ type ProxyConfig struct {
 	FinalityCheck           bool
 }
 
-// MultiversXGasMapConfig represents the gas limits for MultiversX operations
+// KCGasMapConfig represents the gas limits for Klever Blockchain operations
 type KleverGasMapConfig struct {
 	Sign                   uint64
 	ProposeTransferBase    uint64
@@ -184,8 +184,8 @@ type PeersRatingConfig struct {
 type PendingOperationsFilterConfig struct {
 	DeniedEthAddresses  []string
 	AllowedEthAddresses []string
-	DeniedMvxAddresses  []string
-	AllowedMvxAddresses []string
+	DeniedKlvAddresses  []string
+	AllowedKlvAddresses []string
 	DeniedTokens        []string
 	AllowedTokens       []string
 }

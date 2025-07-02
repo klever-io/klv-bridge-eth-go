@@ -8,7 +8,7 @@ const (
 	nodeVmQuery = "vm/query"
 )
 
-// nodeEndpointProvider is suitable to work with a MultiversX node (observer)
+// nodeEndpointProvider is suitable to work with a Klever Blockchain node (observer)
 type nodeEndpointProvider struct {
 	*baseEndpointProvider
 }

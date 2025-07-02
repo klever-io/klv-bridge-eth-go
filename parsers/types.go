@@ -38,7 +38,7 @@ func (callData ProxySCCompleteCallData) String() string {
 		amountString = callData.Amount.String()
 	}
 
-	return fmt.Sprintf("Eth address: %s, MvX address: %s, token: %s, amount: %s, nonce: %d, raw call data: %x",
+	return fmt.Sprintf("Eth address: %s, Klv address: %s, token: %s, amount: %s, nonce: %d, raw call data: %x",
 		callData.From.String(),
 		toString,
 		callData.Token,

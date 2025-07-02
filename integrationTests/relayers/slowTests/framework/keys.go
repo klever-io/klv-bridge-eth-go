@@ -28,8 +28,8 @@ const (
 
 // KeysHolder holds a 2 pk-sk pairs for both chains
 type KeysHolder struct {
-	MvxAddress *MvxAddress
-	MvxSk      []byte
+	KlvAddress *KlvAddress
+	KlvSk      []byte
 	EthSK      *ecdsa.PrivateKey
 	EthAddress common.Address
 }
@@ -71,13 +71,13 @@ func NewKeysStore(
 	keysStore.SCExecutorKeys = keysStore.generateKey("", projectedShardForBridgeSetup)
 	keysStore.OwnerKeys = keysStore.generateKey(ethOwnerSK, projectedShardForBridgeSetup)
 	log.Info("generated owner",
-		"MvX address", keysStore.OwnerKeys.MvxAddress.Bech32(),
+		"Klv address", keysStore.OwnerKeys.KlvAddress.Bech32(),
 		"Eth address", keysStore.OwnerKeys.EthAddress.String())
 	keysStore.DepositorKeys = keysStore.generateKey(ethDepositorSK, projectedShardForDepositor)
 	keysStore.TestKeys = keysStore.generateKey(ethTestSk, projectedShardForTestKeys)
 
 	filename := path.Join(keysStore.workingDir, SCCallerFilename)
-	SaveMvxKey(keysStore, filename, keysStore.SCExecutorKeys)
+	SaveKlvKey(keysStore, filename, keysStore.SCExecutorKeys)
 
 	return keysStore
 }
@@ -89,14 +89,14 @@ func (keyStore *KeysStore) generateRelayersKeys(numKeys int) {
 
 		relayerKeys := keyStore.generateKey(string(relayerETHSKBytes), projectedShardForBridgeSetup)
 		log.Info("generated relayer", "index", i,
-			"MvX address", relayerKeys.MvxAddress.Bech32(),
+			"Klv address", relayerKeys.KlvAddress.Bech32(),
 			"Eth address", relayerKeys.EthAddress.String())
 
 		keyStore.RelayersKeys = append(keyStore.RelayersKeys, relayerKeys)
 
 		filename := path.Join(keyStore.workingDir, fmt.Sprintf(relayerPemPathFormat, i))
 
-		SaveMvxKey(keyStore, filename, relayerKeys)
+		SaveKlvKey(keyStore, filename, relayerKeys)
 	}
 }
 
@@ -109,7 +109,7 @@ func (keyStore *KeysStore) generateKeys(numKeys int, message string, projectedSh
 
 		key := keyStore.generateKey(hex.EncodeToString(ethPrivateKeyBytes), projectedShard)
 		log.Info(message, "index", i,
-			"MvX address", key.MvxAddress.Bech32(),
+			"Klv address", key.KlvAddress.Bech32(),
 			"Eth address", key.EthAddress.String())
 
 		keys = append(keys, key)
@@ -121,7 +121,7 @@ func (keyStore *KeysStore) generateKeys(numKeys int, message string, projectedSh
 func (keyStore *KeysStore) generateKey(ethSkHex string, projectedShard byte) KeysHolder {
 	var err error
 
-	keys := GenerateMvxPrivatePublicKey(keyStore, projectedShard)
+	keys := GenerateKlvPrivatePublicKey(keyStore, projectedShard)
 	if len(ethSkHex) == 0 {
 		// eth keys not required
 		return keys
@@ -150,7 +150,7 @@ func (keyStore *KeysStore) WalletsToFundOnEthereum() []common.Address {
 	walletsToFund := make([]common.Address, 0, len(allKeys))
 
 	for _, key := range allKeys {
-		if len(key.MvxSk) == 0 {
+		if len(key.KlvSk) == 0 {
 			continue
 		}
 
@@ -160,28 +160,28 @@ func (keyStore *KeysStore) WalletsToFundOnEthereum() []common.Address {
 	return walletsToFund
 }
 
-// WalletsToFundOnMultiversX will return the wallets to fund on MultiversX
-func (keyStore *KeysStore) WalletsToFundOnMultiversX() []string {
+// WalletsToFundOnKC will return the wallets to fund on KC
+func (keyStore *KeysStore) WalletsToFundOnKC() []string {
 	allKeys := keyStore.getAllKeys()
 	walletsToFund := make([]string, 0, len(allKeys))
 
 	for _, key := range allKeys {
-		walletsToFund = append(walletsToFund, key.MvxAddress.Bech32())
+		walletsToFund = append(walletsToFund, key.KlvAddress.Bech32())
 	}
 
 	return walletsToFund
 }
 
-// GenerateMvxPrivatePublicKey will generate a new keys holder instance that will hold only the MultiversX generated keys
-func GenerateMvxPrivatePublicKey(tb testing.TB, projectedShard byte) KeysHolder {
+// GenerateKlvPrivatePublicKey will generate a new keys holder instance that will hold only the KC generated keys
+func GenerateKlvPrivatePublicKey(tb testing.TB, projectedShard byte) KeysHolder {
 	sk, pkBytes := generateSkPkInShard(tb, projectedShard)
 
 	skBytes, err := sk.ToByteArray()
 	require.Nil(tb, err)
 
 	return KeysHolder{
-		MvxSk:      skBytes,
-		MvxAddress: NewMvxAddressFromBytes(tb, pkBytes),
+		KlvSk:      skBytes,
+		KlvAddress: NewKlvAddressFromBytes(tb, pkBytes),
 	}
 }
 
@@ -201,11 +201,11 @@ func generateSkPkInShard(tb testing.TB, projectedShard byte) (klvCrypto.PrivateK
 	}
 }
 
-// SaveMvxKey will save the MultiversX key
-func SaveMvxKey(tb testing.TB, filename string, key KeysHolder) {
+// SaveKlvKey will save the Klever Blockchain key
+func SaveKlvKey(tb testing.TB, filename string, key KeysHolder) {
 	blk := pem.Block{
-		Type:  "PRIVATE KEY for " + key.MvxAddress.Bech32(),
-		Bytes: []byte(hex.EncodeToString(key.MvxSk)),
+		Type:  "PRIVATE KEY for " + key.KlvAddress.Bech32(),
+		Bytes: []byte(hex.EncodeToString(key.KlvSk)),
 	}
 
 	buff := bytes.NewBuffer(make([]byte, 0))

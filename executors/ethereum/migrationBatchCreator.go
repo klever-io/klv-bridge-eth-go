@@ -20,7 +20,7 @@ const timeBetweenBatchIDChecks = time.Millisecond * 100
 
 // ArgsMigrationBatchCreator is the argument for the NewMigrationBatchCreator constructor
 type ArgsMigrationBatchCreator struct {
-	MvxDataGetter        MvxDataGetter
+	KlvDataGetter        KlvDataGetter
 	Erc20ContractsHolder Erc20ContractsHolder
 	SafeContractAddress  common.Address
 	EthereumChainWrapper EthereumChainWrapper
@@ -28,7 +28,7 @@ type ArgsMigrationBatchCreator struct {
 }
 
 type migrationBatchCreator struct {
-	mvxDataGetter        MvxDataGetter
+	kdaDataGetter        KlvDataGetter
 	erc20ContractsHolder Erc20ContractsHolder
 	safeContractAddress  common.Address
 	ethereumChainWrapper EthereumChainWrapper
@@ -37,8 +37,8 @@ type migrationBatchCreator struct {
 
 // NewMigrationBatchCreator creates a new instance of type migrationBatchCreator that is able to generate the migration batch output file
 func NewMigrationBatchCreator(args ArgsMigrationBatchCreator) (*migrationBatchCreator, error) {
-	if check.IfNil(args.MvxDataGetter) {
-		return nil, errNilMvxDataGetter
+	if check.IfNil(args.KlvDataGetter) {
+		return nil, errNilKlvDataGetter
 	}
 	if check.IfNil(args.Erc20ContractsHolder) {
 		return nil, errNilErc20ContractsHolder
@@ -51,7 +51,7 @@ func NewMigrationBatchCreator(args ArgsMigrationBatchCreator) (*migrationBatchCr
 	}
 
 	return &migrationBatchCreator{
-		mvxDataGetter:        args.MvxDataGetter,
+		kdaDataGetter:        args.KlvDataGetter,
 		erc20ContractsHolder: args.Erc20ContractsHolder,
 		safeContractAddress:  args.SafeContractAddress,
 		logger:               args.Logger,
@@ -176,7 +176,7 @@ func (creator *migrationBatchCreator) checkAvailableBatch(
 }
 
 func (creator *migrationBatchCreator) getTokensList(ctx context.Context, partialMigration map[string]*big.Float) ([]string, error) {
-	tokens, err := creator.mvxDataGetter.GetAllKnownTokens(ctx)
+	tokens, err := creator.kdaDataGetter.GetAllKnownTokens(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (creator *migrationBatchCreator) getTokensList(ctx context.Context, partial
 func (creator *migrationBatchCreator) fetchERC20ContractsAddresses(ctx context.Context, tokensList []string, lastDepositNonce uint64) ([]*DepositInfo, error) {
 	deposits := make([]*DepositInfo, 0, len(tokensList))
 	for idx, token := range tokensList {
-		response, err := creator.mvxDataGetter.GetERC20AddressForTokenId(ctx, []byte(token))
+		response, err := creator.kdaDataGetter.GetERC20AddressForTokenId(ctx, []byte(token))
 		if err != nil {
 			return nil, err
 		}

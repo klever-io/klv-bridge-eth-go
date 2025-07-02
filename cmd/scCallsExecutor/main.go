@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/config"
-	"github.com/klever-io/klv-bridge-eth-go/executors/kleverchain/module"
+	"github.com/klever-io/klv-bridge-eth-go/executors/kleverBlockchain/module"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	chainFactory "github.com/multiversx/mx-chain-go/cmd/node/factory"
@@ -48,8 +48,8 @@ func main() {
 	app.Version = fmt.Sprintf("%s/%s/%s-%s/%s", appVersion, runtime.Version(), runtime.GOOS, runtime.GOARCH, machineID)
 	app.Authors = []cli.Author{
 		{
-			Name:  "The MultiversX Team",
-			Email: "contact@multiversx.com",
+			Name:  "The Klever Blockchain Team",
+			Email: "contact@klever.io",
 		},
 	}
 

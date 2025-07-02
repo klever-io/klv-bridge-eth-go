@@ -164,7 +164,7 @@ func TestNewKLVClientDataGetter(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
+func TestKlvClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -262,7 +262,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBytes(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
+func TestKlvClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -330,7 +330,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBool(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
+func TestKlvClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -398,7 +398,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningUint64(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_ExecuteQueryReturningBigInt(t *testing.T) {
+func TestKlvClientDataGetter_ExecuteQueryReturningBigInt(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -452,7 +452,7 @@ func TestMXClientDataGetter_ExecuteQueryReturningBigInt(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_GetCurrentBatchAsDataBytes(t *testing.T) {
+func TestKlvClientDataGetter_GetCurrentBatchAsDataBytes(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -502,13 +502,13 @@ func TestExecuteQueryFromBuilderReturnErr(t *testing.T) {
 	assert.Equal(t, expectedError, err)
 }
 
-func TestMXClientDataGetter_GetTokenIdForErc20Address(t *testing.T) {
+func TestKlvClientDataGetter_GetTokenIdForErc20Address(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
-	erdAddress := "erdAddress"
+	klvAddress := "klvAddress"
 	erc20Address := "erc20Address"
-	returningBytes := [][]byte{[]byte(erdAddress)}
+	returningBytes := [][]byte{[]byte(klvAddress)}
 	args.Proxy = &interactors.ProxyStub{
 		ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
@@ -533,11 +533,11 @@ func TestMXClientDataGetter_GetTokenIdForErc20Address(t *testing.T) {
 	assert.Equal(t, returningBytes, result)
 }
 
-func TestMXClientDataGetter_GetERC20AddressForTokenId(t *testing.T) {
+func TestKlvClientDataGetter_GetERC20AddressForTokenId(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
-	erdAddress := "erdAddress"
+	klvAddress := "klvAddress"
 	erc20Address := "erc20Address"
 	returningBytes := [][]byte{[]byte(erc20Address)}
 	args.Proxy = &interactors.ProxyStub{
@@ -545,7 +545,7 @@ func TestMXClientDataGetter_GetERC20AddressForTokenId(t *testing.T) {
 			assert.Equal(t, getBech32Address(args.MultisigContractAddress), vmRequest.Address)
 			assert.Equal(t, getBech32Address(args.RelayerAddress), vmRequest.CallerAddr)
 			assert.Equal(t, 0, len(vmRequest.CallValue))
-			assert.Equal(t, []string{hex.EncodeToString([]byte(erdAddress))}, vmRequest.Args)
+			assert.Equal(t, []string{hex.EncodeToString([]byte(klvAddress))}, vmRequest.Args)
 			assert.Equal(t, getErc20AddressForTokenIdFuncName, vmRequest.FuncName)
 
 			return &models.VmValuesResponseData{
@@ -558,13 +558,13 @@ func TestMXClientDataGetter_GetERC20AddressForTokenId(t *testing.T) {
 	}
 	dg, _ := NewKLVClientDataGetter(args)
 
-	result, err := dg.GetERC20AddressForTokenId(context.Background(), []byte(erdAddress))
+	result, err := dg.GetERC20AddressForTokenId(context.Background(), []byte(klvAddress))
 
 	assert.Nil(t, err)
 	assert.Equal(t, returningBytes, result)
 }
 
-func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
+func TestKlvClientDataGetter_WasProposedTransfer(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil batch", func(t *testing.T) {
@@ -682,7 +682,7 @@ func TestMXClientDataGetter_WasProposedTransfer(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_WasExecuted(t *testing.T) {
+func TestKlvClientDataGetter_WasExecuted(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -715,7 +715,7 @@ func TestMXClientDataGetter_WasExecuted(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestMXClientDataGetter_executeQueryWithErroredBuilder(t *testing.T) {
+func TestKlvClientDataGetter_executeQueryWithErroredBuilder(t *testing.T) {
 	t.Parallel()
 
 	builder := builders.NewVMQueryBuilder().ArgBytes(nil)
@@ -739,7 +739,7 @@ func TestMXClientDataGetter_executeQueryWithErroredBuilder(t *testing.T) {
 	assert.True(t, strings.Contains(err.Error(), "builder.ArgBytes"))
 }
 
-func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
+func TestKlvClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil batch", func(t *testing.T) {
@@ -855,7 +855,7 @@ func TestMXClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_WasProposedSetStatus(t *testing.T) {
+func TestKlvClientDataGetter_WasProposedSetStatus(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil batch", func(t *testing.T) {
@@ -909,7 +909,7 @@ func TestMXClientDataGetter_WasProposedSetStatus(t *testing.T) {
 	})
 }
 
-func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
+func TestKlvClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 	t.Parallel()
 
 	batchID := uint64(112233)
@@ -1033,7 +1033,7 @@ func TestMXClientDataGetter_GetTransactionsStatuses(t *testing.T) {
 
 }
 
-func TestMXClientDataGetter_GetActionIDForSetStatusOnPendingTransfer(t *testing.T) {
+func TestKlvClientDataGetter_GetActionIDForSetStatusOnPendingTransfer(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil batch", func(t *testing.T) {
@@ -1087,7 +1087,7 @@ func TestMXClientDataGetter_GetActionIDForSetStatusOnPendingTransfer(t *testing.
 	})
 }
 
-func TestMXClientDataGetter_QuorumReached(t *testing.T) {
+func TestKlvClientDataGetter_QuorumReached(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1121,7 +1121,7 @@ func TestMXClientDataGetter_QuorumReached(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestMXClientDataGetter_GetLastExecutedEthBatchID(t *testing.T) {
+func TestKlvClientDataGetter_GetLastExecutedEthBatchID(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1153,7 +1153,7 @@ func TestMXClientDataGetter_GetLastExecutedEthBatchID(t *testing.T) {
 	assert.Equal(t, val.Uint64(), result)
 }
 
-func TestMXClientDataGetter_GetLastExecutedEthTxID(t *testing.T) {
+func TestKlvClientDataGetter_GetLastExecutedEthTxID(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1185,7 +1185,7 @@ func TestMXClientDataGetter_GetLastExecutedEthTxID(t *testing.T) {
 	assert.Equal(t, val.Uint64(), result)
 }
 
-func TestMXClientDataGetter_WasSigned(t *testing.T) {
+func TestKlvClientDataGetter_WasSigned(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1222,7 +1222,7 @@ func TestMXClientDataGetter_WasSigned(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestMXClientDataGetter_GetAllStakedRelayers(t *testing.T) {
+func TestKlvClientDataGetter_GetAllStakedRelayers(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1252,7 +1252,7 @@ func TestMXClientDataGetter_GetAllStakedRelayers(t *testing.T) {
 	assert.Equal(t, providedRelayers, result)
 }
 
-func TestMXClientDataGetter_GetAllKnownTokens(t *testing.T) {
+func TestKlvClientDataGetter_GetAllKnownTokens(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1281,7 +1281,7 @@ func TestMXClientDataGetter_GetAllKnownTokens(t *testing.T) {
 	assert.Equal(t, providedTokens, result)
 }
 
-func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
+func TestKCClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 	t.Parallel()
 
 	expectedErr := errors.New("expected error")
@@ -1344,7 +1344,7 @@ func TestMultiversXClientDataGetter_GetShardCurrentNonce(t *testing.T) {
 	})
 }
 
-func TestMultiversXClientDataGetter_IsPaused(t *testing.T) {
+func TestKCClientDataGetter_IsPaused(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1377,7 +1377,7 @@ func TestMultiversXClientDataGetter_IsPaused(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestMultiversXClientDataGetter_isMintBurnToken(t *testing.T) {
+func TestKCClientDataGetter_isMintBurnToken(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1410,7 +1410,7 @@ func TestMultiversXClientDataGetter_isMintBurnToken(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestMultiversXClientDataGetter_isNativeToken(t *testing.T) {
+func TestKCClientDataGetter_isNativeToken(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1443,7 +1443,7 @@ func TestMultiversXClientDataGetter_isNativeToken(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestMultiversXClientDataGetter_getTotalBalances(t *testing.T) {
+func TestKCClientDataGetter_getTotalBalances(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1475,7 +1475,7 @@ func TestMultiversXClientDataGetter_getTotalBalances(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestMultiversXClientDataGetter_getMintBalances(t *testing.T) {
+func TestKCClientDataGetter_getMintBalances(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1507,7 +1507,7 @@ func TestMultiversXClientDataGetter_getMintBalances(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestMultiversXClientDataGetter_getBurnBalances(t *testing.T) {
+func TestKCClientDataGetter_getBurnBalances(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1539,7 +1539,7 @@ func TestMultiversXClientDataGetter_getBurnBalances(t *testing.T) {
 	assert.True(t, proxyCalled)
 }
 
-func TestMultiversXClientDataGetter_GetLastMvxBatchID(t *testing.T) {
+func TestKCClientDataGetter_GetLastKCBatchID(t *testing.T) {
 	t.Parallel()
 
 	args := createMockArgsKLVClientDataGetter()
@@ -1566,7 +1566,7 @@ func TestMultiversXClientDataGetter_GetLastMvxBatchID(t *testing.T) {
 
 	dg, _ := NewKLVClientDataGetter(args)
 
-	result, err := dg.GetLastMvxBatchID(context.Background())
+	result, err := dg.GetLastKCBatchID(context.Background())
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(3737), result)
 	assert.True(t, proxyCalled)

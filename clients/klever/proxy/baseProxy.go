@@ -15,7 +15,7 @@ import (
 	logger "github.com/multiversx/mx-chain-logger-go"
 )
 
-var log = logger.GetOrCreate("mx-sdk-go/blockchain")
+var log = logger.GetOrCreate("klever-go-sdk/blockchain")
 
 const (
 	minimumCachingInterval = time.Second
@@ -37,7 +37,7 @@ type baseProxy struct {
 	endpointProvider    factory.EndpointProvider
 }
 
-// newBaseProxy will create a base multiversx proxy with cache instance
+// newBaseProxy will create a base kc proxy with cache instance
 func newBaseProxy(args argsBaseProxy) (*baseProxy, error) {
 	err := checkArgsBaseProxy(args)
 	if err != nil {

@@ -43,7 +43,7 @@ func TestConfigs(t *testing.T) {
 			NetworkAddress:               "https://api.devnet.klever.finance",
 			MultisigContractAddress:      "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
 			SafeContractAddress:          "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
-			PrivateKeyFile:               "keys/multiversx.pem",
+			PrivateKeyFile:               "keys/walletKey.pem",
 			IntervalToResendTxsInSeconds: 60,
 			GasMap: KleverGasMapConfig{
 				Sign:                   8000000,
@@ -67,7 +67,7 @@ func TestConfigs(t *testing.T) {
 		P2P: ConfigP2P{
 			Port:            "10010",
 			InitialPeerList: make([]string, 0),
-			ProtocolID:      "/erd/relay/1.0.0",
+			ProtocolID:      "/klv/relay/1.0.0",
 			Transports: p2pConfig.P2PTransportConfig{
 				TCP: config.TCPProtocolConfig{
 					ListenAddress:    "/ip4/0.0.0.0/tcp/%d",
@@ -153,11 +153,11 @@ func TestConfigs(t *testing.T) {
 					DefaultMaxMessagesPerSec: 300,
 					MaxMessages: []chainConfig.TopicMaxMessagesConfig{
 						{
-							Topic:             "EthereumToMultiversX_join",
+							Topic:             "EthereumToKC_join",
 							NumMessagesPerSec: 100,
 						},
 						{
-							Topic:             "EthereumToMultiversX_sign",
+							Topic:             "EthereumToKC_sign",
 							NumMessagesPerSec: 100,
 						},
 					},
@@ -166,11 +166,11 @@ func TestConfigs(t *testing.T) {
 			},
 		},
 		StateMachine: map[string]ConfigStateMachine{
-			"EthereumToMultiversX": {
+			"EthereumToKC": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 120,
 			},
-			"MultiversXToEthereum": {
+			"KCToEthereum": {
 				StepDurationInMillis:       12000,
 				IntervalForLeaderInSeconds: 720,
 			},
@@ -244,9 +244,9 @@ func TestConfigs(t *testing.T) {
 
 [Klever]
     NetworkAddress = "https://api.devnet.klever.finance" # the network address
-    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
-    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
-    PrivateKeyFile = "keys/multiversx.pem" # the path to the pem file containing the relayer multiversx wallet
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the Klever Blockchain address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the Klever Blockchain address for the safe contract
+    PrivateKeyFile = "keys/walletKey.pem" # the path to the pem file containing the relayer Klever Blockchain wallet
     IntervalToResendTxsInSeconds = 60 # the time in seconds between nonce reads
     MaxRetriesOnQuorumReached = 3
     MaxRetriesOnWasTransferProposed = 3
@@ -271,7 +271,7 @@ func TestConfigs(t *testing.T) {
 [P2P]
     Port = "10010"
     InitialPeerList = []
-    ProtocolID = "/erd/relay/1.0.0"
+    ProtocolID = "/klv/relay/1.0.0"
     [P2P.Transports]
         QUICAddress = "" # optional QUIC address. If this transport should be activated, should be in this format: /ip4/0.0.0.0/udp/%d/quic-v1
         WebSocketAddress = "" # optional WebSocket address. If this transport should be activated, should be in this format: /ip4/0.0.0.0/tcp/%d/ws
@@ -341,8 +341,8 @@ func TestConfigs(t *testing.T) {
             Type = "LRU"
         [P2P.AntifloodConfig.Topic]
             DefaultMaxMessagesPerSec = 300 # default number of messages per interval for a topic
-            MaxMessages = [{ Topic = "EthereumToMultiversX_join", NumMessagesPerSec = 100 },
-                           { Topic = "EthereumToMultiversX_sign", NumMessagesPerSec = 100 }]
+            MaxMessages = [{ Topic = "EthereumToKC_join", NumMessagesPerSec = 100 },
+                           { Topic = "EthereumToKC_sign", NumMessagesPerSec = 100 }]
 
 [Relayer]
     [Relayer.Marshalizer]
@@ -363,11 +363,11 @@ func TestConfigs(t *testing.T) {
             MaxOpenFiles = 10
 
 [StateMachine]
-    [StateMachine.EthereumToMultiversX]
+    [StateMachine.EthereumToKC]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 120 #2 minutes
 
-    [StateMachine.MultiversXToEthereum]
+    [StateMachine.KCToEthereum]
         StepDurationInMillis = 12000 #12 seconds
         IntervalForLeaderInSeconds = 720 #12 minutes
 
@@ -405,7 +405,7 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 	t.Parallel()
 
 	expectedConfig := ScCallsModuleConfig{
-		ScProxyBech32Address:            "erd1qqqqqqqqqqqqqpgqnef5f5aq32d63kljld8w5vnvz4gk5sy9hrrq2ld08s",
+		ScProxyBech32Address:            "klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3",
 		ExtraGasToExecute:               50000000,
 		MaxGasLimitToUse:                249999999,
 		GasLimitForOutOfGasTransactions: 30000000,
@@ -415,11 +415,11 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 		ProxyCacherExpirationSeconds:    600,
 		ProxyRestAPIEntityType:          "observer",
 		IntervalToResendTxsInSeconds:    60,
-		PrivateKeyFile:                  "keys/multiversx.pem",
+		PrivateKeyFile:                  "keys/walletKey.pem",
 		PollingIntervalInMillis:         6000,
 		Filter: PendingOperationsFilterConfig{
 			AllowedEthAddresses: []string{"*"},
-			AllowedMvxAddresses: []string{"*"},
+			AllowedKlvAddresses: []string{"*"},
 			AllowedTokens:       []string{"MEME-a43fa1"},
 		},
 		Logs: LogsConfig{
@@ -436,7 +436,7 @@ func TestScCallsExecutorConfigs(t *testing.T) {
 	}
 
 	testString := `
-ScProxyBech32Address = "erd1qqqqqqqqqqqqqpgqnef5f5aq32d63kljld8w5vnvz4gk5sy9hrrq2ld08s"
+ScProxyBech32Address = "klv1qqqqqqqqqqqqqpgqu2jcktadaq8mmytwglc704yfv7rezv5usg8sgzuah3"
 ExtraGasToExecute = 50000000
 MaxGasLimitToUse = 249999999 # this is a safe max gas limit to use both intra-shard & cross-shard
 GasLimitForOutOfGasTransactions = 30000000 # this value will be used when a transaction specified a gas limit > 249999999 
@@ -446,12 +446,12 @@ ProxyFinalityCheck = true
 ProxyCacherExpirationSeconds = 600
 ProxyRestAPIEntityType = "observer"
 IntervalToResendTxsInSeconds = 60
-PrivateKeyFile = "keys/multiversx.pem"
+PrivateKeyFile = "keys/walletKey.pem"
 PollingIntervalInMillis = 6000
 
 [Filter]
 	AllowedEthAddresses = ["*"]		# execute SC calls from all ETH addresses
-	AllowedMvxAddresses = ["*"]     # execute SC calls to all MvX contracts
+	AllowedKlvAddresses = ["*"]     # execute SC calls to all Klv contracts
 	AllowedTokens = ["MEME-a43fa1"] # execute SC calls for this token only
 
 [Logs]
@@ -536,9 +536,9 @@ func TestMigrationToolConfig(t *testing.T) {
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
 
 [Klever]
-    NetworkAddress = "https://api.devnet.klever.finance/" # the network address
-    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the multiversx address for the bridge contract
-    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the multiversx address for the safe contract
+    NetworkAddress = "https://api.devnet.klever.finance" # the network address
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the kc address for the bridge contract
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc" # the kc address for the safe contract
     [Klever.Proxy]
         CacherExpirationSeconds = 600 # the caching time in seconds
 

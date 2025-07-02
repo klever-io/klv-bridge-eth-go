@@ -29,7 +29,7 @@ var (
 	MaximumBlocksDelta uint64 = 500
 )
 
-// ArgsProxy is the DTO used in the multiversx proxy constructor
+// ArgsProxy is the DTO used in the kc proxy constructor
 type ArgsProxy struct {
 	ProxyURL               string
 	Client                 sdkHttp.Client
@@ -42,7 +42,7 @@ type ArgsProxy struct {
 	FilterQueryBlockCacher BlockDataCache
 }
 
-// proxy implements basic functions for interacting with a multiversx Proxy
+// proxy implements basic functions for interacting with a kc Proxy
 type proxy struct {
 	*baseProxy
 	sameScState            bool
