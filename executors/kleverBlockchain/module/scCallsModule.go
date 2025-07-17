@@ -7,7 +7,8 @@ import (
 
 	"github.com/klever-io/klever-go/tools"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors/nonceHandlerV2"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	kc "github.com/klever-io/klv-bridge-eth-go/executors/kleverBlockchain"
 	"github.com/klever-io/klv-bridge-eth-go/executors/kleverBlockchain/filters"
@@ -36,8 +37,20 @@ func NewScCallsModule(cfg config.ScCallsModuleConfig, log logger.Logger, chClose
 		return nil, err
 	}
 
-	// TODO: change to real klever proxy when available
-	proxy := mock.CreateMockProxyKLV()
+	argsProxy := proxy.ArgsProxy{
+		ProxyURL:            cfg.NetworkAddress,
+		SameScState:         false,
+		ShouldBeSynced:      false,
+		FinalityCheck:       cfg.ProxyFinalityCheck,
+		AllowedDeltaToFinal: cfg.ProxyMaxNoncesDelta,
+		CacheExpirationTime: time.Second * time.Duration(cfg.ProxyCacherExpirationSeconds),
+		EntityType:          models.RestAPIEntityType(cfg.ProxyRestAPIEntityType),
+	}
+
+	proxy, err := proxy.NewProxy(argsProxy)
+	if err != nil {
+		return nil, err
+	}
 
 	module := &scCallsModule{}
 
