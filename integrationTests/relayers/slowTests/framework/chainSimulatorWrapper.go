@@ -16,16 +16,14 @@ import (
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klever-go/tools"
 	"github.com/klever-io/klever-go/tools/marshal/factory"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever/mock"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	"github.com/multiversx/mx-chain-go/integrationTests/vm/wasm"
 	"github.com/multiversx/mx-chain-go/node/chainSimulator/dtos"
 	sdkHttp "github.com/multiversx/mx-sdk-go/core/http"
-	"github.com/multiversx/mx-sdk-go/data"
 	"github.com/stretchr/testify/require"
 )
 
@@ -56,14 +54,23 @@ type ArgChainSimulatorWrapper struct {
 type chainSimulatorWrapper struct {
 	testing.TB
 	clientWrapper httpClientWrapper
-	proxyInstance klever.Proxy
+	proxyInstance proxy.Proxy
 	pkConv        core.PubkeyConverter
 }
 
 // CreateChainSimulatorWrapper creates a new instance of the chain simulator wrapper
 func CreateChainSimulatorWrapper(args ArgChainSimulatorWrapper) *chainSimulatorWrapper {
-	// TODO: change this to use the real klever proxy when available
-	proxyInstance := mock.NewKCMock()
+	argsProxy := proxy.ArgsProxy{
+		ProxyURL:            proxyURL,
+		SameScState:         false,
+		ShouldBeSynced:      false,
+		FinalityCheck:       false,
+		AllowedDeltaToFinal: args.ProxyMaxNoncesDelta,
+		CacheExpirationTime: time.Second * time.Duration(args.ProxyCacherExpirationSeconds),
+		EntityType:          models.Proxy,
+	}
+	proxyInstance, err := proxy.NewProxy(argsProxy)
+	require.Nil(args.TB, err)
 
 	pubKeyConverter, err := pubkeyConverter.NewBech32PubkeyConverter(32, "klv")
 	require.Nil(args.TB, err)
@@ -103,7 +110,7 @@ func (instance *chainSimulatorWrapper) probeURLWithRetries() {
 }
 
 // Proxy returns the managed proxy instance
-func (instance *chainSimulatorWrapper) Proxy() klever.Proxy {
+func (instance *chainSimulatorWrapper) Proxy() proxy.Proxy {
 	return instance.proxyInstance
 }
 
@@ -113,7 +120,7 @@ func (instance *chainSimulatorWrapper) GetNetworkAddress() string {
 }
 
 // DeploySC will deploy the provided smart contract and return its address
-func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePath string, ownerSK []byte, gasLimit uint64, parameters []string) (*KlvAddress, string, *data.TransactionOnNetwork) {
+func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePath string, ownerSK []byte, gasLimit uint64, parameters []string) (*KlvAddress, string, *models.TransactionData) {
 	networkConfig, err := instance.proxyInstance.GetNetworkConfig(ctx)
 	require.Nil(instance.TB, err)
 
@@ -140,20 +147,17 @@ func (instance *chainSimulatorWrapper) DeploySC(ctx context.Context, wasmFilePat
 }
 
 // GetTransactionResult tries to get a transaction result. It may wait a few blocks
-func (instance *chainSimulatorWrapper) GetTransactionResult(ctx context.Context, hash string) *data.TransactionOnNetwork {
+func (instance *chainSimulatorWrapper) GetTransactionResult(ctx context.Context, hash string) *models.TransactionData {
 	instance.GenerateBlocksUntilTxProcessed(ctx, hash)
 
 	txResult, err := instance.proxyInstance.GetTransactionInfoWithResults(ctx, hash)
 	require.Nil(instance, err)
 
-	txStatus, err := instance.proxyInstance.ProcessTransactionStatus(ctx, hash)
+	jsonData, err := json.MarshalIndent(txResult.Status, "", "  ")
 	require.Nil(instance, err)
+	require.Equal(instance, transaction.Transaction_SUCCESS, txResult.Status, fmt.Sprintf("tx hash: %s,\n tx: %s", hash, string(jsonData)))
 
-	jsonData, err := json.MarshalIndent(txResult.Data.Transaction, "", "  ")
-	require.Nil(instance, err)
-	require.Equal(instance, transaction.Transaction_SUCCESS, txStatus, fmt.Sprintf("tx hash: %s,\n tx: %s", hash, string(jsonData)))
-
-	return &txResult.Data.Transaction
+	return txResult
 }
 
 // GenerateBlocks calls the chain simulator generate block endpoint
@@ -188,7 +192,7 @@ func (instance *chainSimulatorWrapper) GenerateBlocksUntilTxProcessed(ctx contex
 }
 
 // ScCall will make the provided sc call
-func (instance *chainSimulatorWrapper) ScCall(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) (string, *data.TransactionOnNetwork) {
+func (instance *chainSimulatorWrapper) ScCall(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) (string, *models.TransactionData) {
 	return instance.SendTx(ctx, senderSK, contract, value, gasLimit, createTxData(function, parameters))
 }
 
@@ -206,7 +210,7 @@ func createTxData(function string, parameters []string) []byte {
 }
 
 // SendTx will build and send a transaction
-func (instance *chainSimulatorWrapper) SendTx(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) (string, *data.TransactionOnNetwork) {
+func (instance *chainSimulatorWrapper) SendTx(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) (string, *models.TransactionData) {
 	hash := instance.SendTxWithoutGenerateBlocks(ctx, senderSK, receiver, value, gasLimit, dataField)
 	instance.GenerateBlocks(ctx, 1)
 	txResult := instance.GetTransactionResult(ctx, hash)

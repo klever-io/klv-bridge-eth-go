@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -478,7 +478,7 @@ func (handler *KCHandler) GetKDAChainSpecificTokenBalance(
 	return balance
 }
 
-func (handler *KCHandler) callContractNoParams(ctx context.Context, contract *KlvAddress, endpoint string) (string, *data.TransactionOnNetwork) {
+func (handler *KCHandler) callContractNoParams(ctx context.Context, contract *KlvAddress, endpoint string) (string, *models.TransactionData) {
 	return handler.ChainSimulator.ScCall(
 		ctx,
 		handler.OwnerKeys.KlvSk,
@@ -873,7 +873,7 @@ func (handler *KCHandler) setMaxBridgeAmountOnMultitransfer(ctx context.Context,
 	log.Info("multi-transfer set max bridge amount for token tx executed", "hash", hash, "status", txResult.Status)
 }
 
-func (handler *KCHandler) getTokenNameFromResult(txResult data.TransactionOnNetwork) string {
+func (handler *KCHandler) getTokenNameFromResult(txResult models.TransactionData) string {
 	for _, event := range txResult.Logs.Events {
 		if event.Identifier == issueFunction {
 			require.Greater(handler, len(event.Topics), 1)
