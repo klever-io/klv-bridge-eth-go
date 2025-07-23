@@ -359,9 +359,13 @@ func TestRelayerMessageHandler_createMessage(t *testing.T) {
 }
 
 func createSignedMessageAndMarshaledBytes(index int) (*core.SignedMessage, []byte) {
+	// Create PBK with a fixed size of 32 bytes
+	pbkBytes := make([]byte, 32)
+	copy(pbkBytes, fmt.Sprintf("pk %d", index))
+
 	msg := &core.SignedMessage{
 		Payload:        []byte(fmt.Sprintf("payload %d", index)),
-		PublicKeyBytes: []byte(fmt.Sprintf("pk %d", index)),
+		PublicKeyBytes: pbkBytes,
 		Signature:      []byte(fmt.Sprintf("sig %d", index)),
 		Nonce:          34,
 	}
@@ -378,9 +382,13 @@ func createSignedMessageForEthSig(index int) (*core.SignedMessage, []byte) {
 	}
 	payload, _ := marshalizer.Marshal(e)
 
+	// Create PBK with a fixed size of 32 bytes
+	pbkBytes := make([]byte, 32)
+	copy(pbkBytes, fmt.Sprintf("pk %d", index))
+
 	msg := &core.SignedMessage{
 		Payload:        payload,
-		PublicKeyBytes: []byte(fmt.Sprintf("pk %d", index)),
+		PublicKeyBytes: pbkBytes,
 		Signature:      []byte(fmt.Sprintf("sig %d", index)),
 		Nonce:          34,
 	}
