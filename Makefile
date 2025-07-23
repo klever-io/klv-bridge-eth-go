@@ -15,7 +15,7 @@ test: clean-test
 
 test-coverage:
 	@echo "Running unit tests"
-	CURRENT_DIRECTORY=$(CURRENT_DIRECTORY) go test -cover -coverprofile=coverage.txt -covermode=atomic -v ${TESTS_TO_RUN}
+	CURRENT_DIRECTORY=$(CURRENT_DIRECTORY) go test -cover -coverprofile=coverage.out -covermode=atomic -v ${TESTS_TO_RUN} -json > test-output.json
 
 slow-tests: clean-test
 	@docker compose -f docker/docker-compose.yml build
