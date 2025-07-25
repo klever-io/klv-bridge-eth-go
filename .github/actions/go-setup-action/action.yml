@@ -61,7 +61,7 @@ runs:
       if: ${{ steps.cache_vendor.outputs.cache-hit != 'true' }}
       shell: bash
       run: |
-        go install github.com/goware/modvendor@v1.8.3
+        go install github.com/goware/modvendor@v0.5.0
         go mod vendor
         modvendor -copy="**/*.c **/*.h **/*.proto **/*.a"
 
