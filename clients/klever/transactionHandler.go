@@ -2,6 +2,7 @@ package klever
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/klever-io/klever-go/crypto/hashing"
 	"github.com/klever-io/klever-go/data/transaction"
@@ -55,7 +56,10 @@ func (txHandler *transactionHandler) signTransaction(ctx context.Context, builde
 
 	// building transaction to be signed, and send using proxy interface, but noncehandler as intermediare to help with nonce logic
 	tx := transaction.NewBaseTransaction(senderByteAddress, 0, [][]byte{scCallData}, 0, 0)
-	tx.SetChainID([]byte(networkConfig.ChainID))
+	err = tx.SetChainID([]byte(networkConfig.ChainID))
+	if err != nil {
+		return nil, err
+	}
 
 	addr, err := address.NewAddress(txHandler.multisigAddressAsBech32)
 	if err != nil {
@@ -67,7 +71,10 @@ func (txHandler *transactionHandler) signTransaction(ctx context.Context, builde
 		Address: addr.Bytes(),
 	}
 
-	tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
+	err = tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add contract to transaction: %w", err)
+	}
 
 	// uses addressNonceHandler to fetch gas price using proxy endpoint GetNetworkConfig, in case of klever should
 	// use node simulate transaction probably

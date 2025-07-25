@@ -295,7 +295,7 @@ func createMockTransactions(addr address.Address, numTxs int, startNonce uint64)
 		tx.GasLimit = 50000
 		tx.GasMultiplier = 100000
 		tx.AddSignature([]byte("sig"))
-		tx.SetChainID([]byte{3})
+		_ = tx.SetChainID([]byte{3})
 
 		txs = append(txs, tx)
 		startNonce++
@@ -384,9 +384,10 @@ func TestNonceTransactionsHandlerV2_SendDuplicateTransactions(t *testing.T) {
 
 	tx := transaction.NewBaseTransaction(testAddress.Bytes(), 0, nil, 0, 0)
 	tx.AddSignature([]byte("sig"))
-	tx.SetChainID([]byte{3})
+	err := tx.SetChainID([]byte{3})
+	require.Nil(t, err)
 
-	err := nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
+	err = nth.ApplyNonceAndGasPrice(context.Background(), testAddress, tx)
 	require.Nil(t, err)
 
 	_, err = nth.SendTransaction(context.Background(), tx)
@@ -420,7 +421,8 @@ func createMockTransactionsWithGetNonce(
 		require.Nil(tb, err)
 
 		tx.AddSignature([]byte("sig"))
-		tx.SetChainID([]byte{3})
+		err = tx.SetChainID([]byte{3})
+		require.Nil(tb, err)
 
 		txs = append(txs, tx)
 	}
