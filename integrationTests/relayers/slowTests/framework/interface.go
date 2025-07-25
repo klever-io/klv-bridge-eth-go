@@ -8,9 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/klever-io/klv-bridge-eth-go/clients/klever"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
-	"github.com/multiversx/mx-sdk-go/data"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy"
+	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 )
 
 type httpClientWrapper interface {
@@ -29,19 +29,19 @@ type Relayer interface {
 
 // ChainSimulatorWrapper defines the wrapper over the chain simulator
 type ChainSimulatorWrapper interface {
-	Proxy() klever.Proxy
+	Proxy() proxy.Proxy
 	GetNetworkAddress() string
-	DeploySC(ctx context.Context, path string, ownerSK []byte, gasLimit uint64, extraParams []string) (*KlvAddress, string, *data.TransactionOnNetwork)
-	ScCall(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) (string, *data.TransactionOnNetwork)
+	DeploySC(ctx context.Context, path string, ownerSK []byte, gasLimit uint64, extraParams []string) (*KlvAddress, string, *models.TransactionData)
+	ScCall(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) (string, *models.TransactionData)
 	ScCallWithoutGenerateBlocks(ctx context.Context, senderSK []byte, contract *KlvAddress, value string, gasLimit uint64, function string, parameters []string) string
-	SendTx(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) (string, *data.TransactionOnNetwork)
+	SendTx(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) (string, *models.TransactionData)
 	SendTxWithoutGenerateBlocks(ctx context.Context, senderSK []byte, receiver *KlvAddress, value string, gasLimit uint64, dataField []byte) string
 	FundWallets(ctx context.Context, wallets []string)
 	GenerateBlocksUntilEpochReached(ctx context.Context, epoch uint32)
 	GenerateBlocks(ctx context.Context, numBlocks int)
 	GetKDABalance(ctx context.Context, address *KlvAddress, token string) string
 	GetBlockchainTimeStamp(ctx context.Context) uint64
-	GetTransactionResult(ctx context.Context, hash string) *data.TransactionOnNetwork
+	GetTransactionResult(ctx context.Context, hash string) *models.TransactionData
 	ExecuteVMQuery(ctx context.Context, scAddress *KlvAddress, function string, hexParams []string) [][]byte
 }
 

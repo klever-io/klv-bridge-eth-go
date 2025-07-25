@@ -412,7 +412,7 @@ func (executor *scCallExecutor) checkResultsUntilDone(ctx context.Context, hash 
 }
 
 func (executor *scCallExecutor) checkResults(ctx context.Context, hash string) (error, bool) {
-	txStatus, err := executor.proxy.ProcessTransactionStatus(ctx, hash)
+	txResult, err := executor.proxy.GetTransactionInfoWithResults(ctx, hash)
 	if err != nil {
 		if err.Error() == transactionNotFoundErrString {
 			return nil, false
@@ -421,7 +421,7 @@ func (executor *scCallExecutor) checkResults(ctx context.Context, hash string) (
 		return err, true
 	}
 
-	if txStatus == transaction.Transaction_SUCCESS {
+	if txResult.Status == transaction.Transaction_SUCCESS.String() {
 		return nil, true
 	}
 
