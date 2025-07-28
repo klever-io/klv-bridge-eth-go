@@ -292,7 +292,10 @@ func (executor *scCallExecutor) executeOperation(
 		Address: receiverAddr.Bytes(),
 	}
 
-	tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
+	err = tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
+	if err != nil {
+		return err
+	}
 
 	err = executor.nonceTxHandler.ApplyNonceAndGasPrice(ctx, executor.senderAddress, tx)
 	if err != nil {
