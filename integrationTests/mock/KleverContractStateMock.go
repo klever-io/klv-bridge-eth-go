@@ -285,7 +285,7 @@ func (mock *kleverBlockchainContractStateMock) processVmRequests(vmRequest *mode
 		return mock.vmRequestGetLastBatchId(vmRequest), nil
 	}
 
-	panic("unimplemented function: " + vmRequest.FuncName)
+	return nil, fmt.Errorf("unimplemented function: %s", vmRequest.FuncName)
 }
 
 func (mock *kleverBlockchainContractStateMock) vmRequestWasSetCurrentTransactionBatchStatusActionProposed(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {

@@ -323,7 +323,8 @@ func TestSendTransaction_ShouldWork(t *testing.T) {
 	require.Nil(t, err)
 
 	tx := transaction.NewBaseTransaction(addr.Bytes(), 10, nil, 0, 0)
-	tx.SetChainID([]byte("420420"))
+	err = tx.SetChainID([]byte("420420"))
+	require.Nil(t, err)
 
 	responseHash, err := ep.SendTransaction(context.Background(), tx)
 	require.Nil(t, err)

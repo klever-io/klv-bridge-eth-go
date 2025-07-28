@@ -3,13 +3,11 @@ package nonceHandlerV2
 import (
 	"context"
 	"crypto/rand"
-	"encoding/json"
 	"errors"
 	"sync"
 	"testing"
 
 	"github.com/klever-io/klever-go/data/transaction"
-	chainModels "github.com/klever-io/klever-go/network/api/models"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/interactors"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
@@ -57,7 +55,7 @@ func TestAddressNonceHandler_ApplyNonceAndGasPrice(t *testing.T) {
 	t.Run("tx already sent; oldTx.BandwidthFee == txArgs.BandwidthFee", func(t *testing.T) {
 		t.Parallel()
 
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 
 		anh, err := NewAddressNonceHandlerWithPrivateAccess(&testsCommon.ProxyStub{}, testAddress)
 		require.Nil(t, err)
@@ -74,7 +72,7 @@ func TestAddressNonceHandler_ApplyNonceAndGasPrice(t *testing.T) {
 	t.Run("tx already sent; oldTx.BandwidthFee < txArgs.BandwidthFee", func(t *testing.T) {
 		t.Parallel()
 
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 
 		estimateTransactionFeesTimesCalled := 0
 		proxy := &testsCommon.ProxyStub{
@@ -109,8 +107,8 @@ func TestAddressNonceHandler_ApplyNonceAndGasPrice(t *testing.T) {
 	t.Run("same transaction but with different nonce should work", func(t *testing.T) {
 		t.Parallel()
 
-		tx1 := createDefaultTx()
-		tx2 := createDefaultTx()
+		tx1 := createDefaultTx(t)
+		tx2 := createDefaultTx(t)
 		tx2.RawData.Nonce++
 
 		anh, err := NewAddressNonceHandlerWithPrivateAccess(&testsCommon.ProxyStub{}, testAddress)
@@ -196,7 +194,7 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 			},
 		}
 		anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 
 		err := anh.ApplyNonceAndGasPrice(context.Background(), tx)
 		require.Equal(t, expectedErr, err)
@@ -216,7 +214,7 @@ func TestAddressNonceHandler_getNonceUpdatingCurrent(t *testing.T) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				tx := createDefaultTx()
+				tx := createDefaultTx(t)
 				err := anh.ApplyNonceAndGasPrice(context.Background(), tx)
 				assert.Nil(t, err)
 
@@ -266,7 +264,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 			},
 		}
 		anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 		tx.RawData.Nonce = blockchainNonce
 		_, err := anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
@@ -290,7 +288,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 			},
 		}
 		anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 		_, err := anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
 		require.Equal(t, 1, len(anh.transactions))
@@ -306,7 +304,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 		t.Parallel()
 
 		anh, _ := NewAddressNonceHandlerWithPrivateAccess(&testsCommon.ProxyStub{}, testAddress)
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 		_, err := anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
 		require.Equal(t, 1, len(anh.transactions))
@@ -330,7 +328,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 			},
 		}
 		anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 		tx.RawData.Nonce = blockchainNonce + 1
 		_, err := anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
@@ -358,7 +356,7 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 			},
 		}
 		anh, _ := NewAddressNonceHandlerWithPrivateAccess(proxy, testAddress)
-		tx := createDefaultTx()
+		tx := createDefaultTx(t)
 		tx.RawData.Nonce = blockchainNonce
 		_, err := anh.SendTransaction(context.Background(), tx)
 		require.Nil(t, err)
@@ -372,23 +370,16 @@ func TestAddressNonceHandler_ReSendTransactionsIfRequired(t *testing.T) {
 	})
 }
 
-func createDefaultTx() *transaction.Transaction {
+func createDefaultTx(t testing.TB) *transaction.Transaction {
 	tx := transaction.NewBaseTransaction(testAddress.Bytes(), 0, nil, 0, 0)
-	contractRequest := chainModels.TransferTXRequest{
-		Receiver: testAddressAsBech32String,
-		Amount:   10,
-		KDA:      "KLV",
+	contractRequest := &transaction.TransferContract{
+		ToAddress: testAddress.Bytes(),
+		AssetID:   []byte("KLV"),
+		Amount:    10,
 	}
 
-	contractBytes, _ := json.Marshal(contractRequest)
-
-	txArgs := transaction.TXArgs{
-		Type:     uint32(transaction.TXContract_TransferContractType),
-		Sender:   testAddress.Bytes(),
-		Contract: json.RawMessage(contractBytes),
-	}
-
-	tx.AddTransaction(txArgs)
+	err := tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
+	require.Nil(t, err)
 
 	return tx
 }
