@@ -21,7 +21,7 @@ func createTestProxySCCompleteCallData() ProxySCCompleteCallData {
 		Amount:      big.NewInt(20000),
 		Nonce:       1,
 	}
-	completeCallData.To, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0")
+	completeCallData.To, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqsudu3a3n9yu62k5qkgcpy4j9ywl2x2gl5smsl7s8wj")
 	completeCallData.From.SetBytes(ethUnhexed)
 
 	return completeCallData

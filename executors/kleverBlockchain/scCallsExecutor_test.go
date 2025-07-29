@@ -3,9 +3,7 @@ package kc
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"errors"
-	"fmt"
 	"math/big"
 	"sync/atomic"
 	"testing"
@@ -14,8 +12,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/klever-io/klever-go/data/transaction"
 	"github.com/klever-io/klever-go/data/vm"
+	"github.com/klever-io/klever-go/indexer/data"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
-	kleverAddress "github.com/klever-io/klv-bridge-eth-go/clients/klever/blockchain/address"
 	"github.com/klever-io/klv-bridge-eth-go/clients/klever/proxy/models"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/parsers"
@@ -70,7 +68,7 @@ func createTestProxySCCompleteCallData(token string) parsers.ProxySCCompleteCall
 		Amount: big.NewInt(37),
 		Nonce:  1,
 	}
-	callData.To, _ = kleverAddress.NewAddress("klv1qqqqqqqqqqqqqpgqswlgqde4tfwp4ucwkh42m6d8a0d49w92sg8shyj6q3")
+	callData.To, _ = address.NewAddress("klv1qqqqqqqqqqqqqpgqswlgqde4tfwp4ucwkh42m6d8a0d49w92sg8shyj6q3")
 
 	return callData
 }
@@ -259,7 +257,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 	argsForErrors := createMockArgsScCallExecutor()
 	argsForErrors.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-		ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
+		ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 			assert.Fail(t, "should have not called ApplyNonceAndGasPriceCalled")
 			return runError
 		},
@@ -348,7 +346,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
-				require.Error(t, err)
+				require.Nil(t, err)
 
 				return parsers.ProxySCCompleteCallData{
 					To: addr,
@@ -386,7 +384,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
-				require.Error(t, err)
+				require.Nil(t, err)
 
 				return parsers.ProxySCCompleteCallData{
 					To: addr,
@@ -404,7 +402,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := createMockArgsScCallExecutor()
 		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				return expectedError
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
@@ -433,7 +431,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
-				require.Error(t, err)
+				require.Nil(t, err)
 
 				return parsers.ProxySCCompleteCallData{
 					To: addr,
@@ -451,7 +449,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := createMockArgsScCallExecutor()
 		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				return nil
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
@@ -480,7 +478,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
-				require.Error(t, err)
+				require.Nil(t, err)
 
 				return parsers.ProxySCCompleteCallData{
 					To: addr,
@@ -503,7 +501,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 		args := createMockArgsScCallExecutor()
 		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				return nil
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
@@ -531,7 +529,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				assert.Equal(t, []byte{0x03, 0x04}, buff)
 
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
-				require.Error(t, err)
+				require.Nil(t, err)
 
 				return parsers.ProxySCCompleteCallData{
 					RawCallData: []byte("dummy"),
@@ -584,11 +582,15 @@ func TestScCallExecutor_Execute(t *testing.T) {
 					ChainID: "TEST",
 				}, nil
 			},
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, hexTxHash string) (*models.TransactionData, error) {
 				assert.Equal(t, txHash, hexTxHash)
 				processTransactionStatusCalled = true
 
-				return transaction.Transaction_SUCCESS, nil
+				return &models.TransactionData{
+					Transaction: &data.Transaction{
+						Status: transaction.Transaction_SUCCESS.String(),
+					},
+				}, nil
 			},
 		}
 		args.Codec = &testsCommon.KCCodecStub{
@@ -601,14 +603,11 @@ func TestScCallExecutor_Execute(t *testing.T) {
 				}
 
 				addr, err := address.NewAddressFromBytes(bytes.Repeat([]byte{1}, 32))
-				require.Error(t, err)
+				require.Nil(t, err)
 
 				return parsers.ProxySCCompleteCallData{
 					To: addr,
 				}, errors.New("wrong buffer")
-			},
-			ExtractGasLimitFromRawCallDataCalled: func(buff []byte) (uint64, error) {
-				return 5000000, nil
 			},
 		}
 		args.Filter = &testsCommon.ScCallsExecuteFilterStub{
@@ -617,15 +616,15 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			},
 		}
 		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
 				tx.RawData.Nonce = nonceCounter
+				tx.RawData.BandwidthFee = 5000000
 				nonceCounter++
 				return nil
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
-				assert.Equal(t, "TEST", tx.GetRawData().ChainID)
-				assert.Equal(t, uint32(111), tx.GetRawData().Version)
-				assert.Equal(t, args.ExtraGasToExecute+5000000, tx.GasLimit)
+				assert.Equal(t, []byte("TEST"), tx.GetRawData().ChainID)
+				assert.Equal(t, int64(5000000), tx.RawData.BandwidthFee)
 				assert.Equal(t, nonceCounter-1, tx.GetRawData().Nonce)
 				_, err := address.NewAddressFromBytes(tx.GetSender())
 				assert.Nil(t, err)
@@ -636,7 +635,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 				scAddr, err := address.NewAddressFromBytes(sc.Address)
 				require.Nil(t, err)
-				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr)
+				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr.Bech32())
 
 				// only the second pending operation gor through the filter
 				expectedData := scProxyCallFunction + "@02"
@@ -661,103 +660,6 @@ func TestScCallExecutor_Execute(t *testing.T) {
 		assert.True(t, sendWasCalled)
 		assert.Equal(t, uint32(1), executor.GetNumSentTransaction())
 		assert.True(t, processTransactionStatusCalled)
-	})
-	t.Run("should work even if the gas limit decode errors", func(t *testing.T) {
-		t.Parallel()
-
-		args := createMockArgsScCallExecutor()
-
-		nonceCounter := uint64(100)
-		sendWasCalled := false
-
-		args.Proxy = &interactors.ProxyStub{
-			ExecuteVMQueryCalled: func(ctx context.Context, vmRequest *models.VmValueRequest) (*models.VmValuesResponseData, error) {
-				assert.Equal(t, args.ScProxyBech32Address, vmRequest.Address)
-				assert.Equal(t, getPendingTransactionsFunction, vmRequest.FuncName)
-
-				return &models.VmValuesResponseData{
-					Data: &vm.VMOutputApi{
-						ReturnCode: okCodeAfterExecution,
-						ReturnData: [][]byte{
-							{0x01},
-							[]byte("ProxySCCompleteCallData 1"),
-							{0x02},
-							[]byte("ProxySCCompleteCallData 2"),
-						},
-					},
-				}, nil
-			},
-			GetNetworkConfigCalled: func(ctx context.Context) (*models.NetworkConfig, error) {
-				return &models.NetworkConfig{
-					ChainID: "TEST",
-				}, nil
-			},
-		}
-		args.Codec = &testsCommon.KCCodecStub{
-			DecodeProxySCCompleteCallDataCalled: func(buff []byte) (parsers.ProxySCCompleteCallData, error) {
-				if string(buff) == "ProxySCCompleteCallData 1" {
-					return createTestProxySCCompleteCallData("tkn1"), nil
-				}
-				if string(buff) == "ProxySCCompleteCallData 2" {
-					return createTestProxySCCompleteCallData("tkn2"), nil
-				}
-
-				return parsers.ProxySCCompleteCallData{}, errors.New("wrong buffer")
-			},
-			ExtractGasLimitFromRawCallDataCalled: func(buff []byte) (uint64, error) {
-				return 0, expectedError
-			},
-		}
-		args.Filter = &testsCommon.ScCallsExecuteFilterStub{
-			ShouldExecuteCalled: func(callData parsers.ProxySCCompleteCallData) bool {
-				return callData.Token == "tkn2"
-			},
-		}
-		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
-				tx.RawData.Nonce = nonceCounter
-				nonceCounter++
-				return nil
-			},
-			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
-				assert.Equal(t, "TEST", tx.GetRawData().ChainID)
-				assert.Equal(t, uint32(111), tx.GetRawData().Version)
-				assert.Equal(t, args.ExtraGasToExecute, tx.GasLimit) // no 5000000 added gas limit because it wasn't extracted
-				assert.Equal(t, nonceCounter-1, tx.GetRawData().Nonce)
-				assert.Equal(t, hex.EncodeToString([]byte("sig")), tx.Signature)
-				_, err := address.NewAddressFromBytes(tx.GetSender())
-				assert.Nil(t, err)
-
-				require.Len(t, tx.GetContracts(), 1)
-				sc, err := tx.GetContracts()[0].GetSmartContract()
-				require.Nil(t, err)
-
-				scAddr, err := address.NewAddressFromBytes(sc.Address)
-				require.Nil(t, err)
-				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr)
-
-				// only the second pending operation gor through the filter
-				expectedData := scProxyCallFunction + "@02"
-				require.Len(t, tx.GetData(), 1)
-				assert.Equal(t, expectedData, string(tx.GetData()[0]))
-
-				sendWasCalled = true
-
-				return "", nil
-			},
-		}
-		args.SingleSigner = &testCrypto.SingleSignerStub{
-			SignCalled: func(private crypto.PrivateKey, msg []byte) ([]byte, error) {
-				return []byte("sig"), nil
-			},
-		}
-
-		executor, _ := NewScCallExecutor(args)
-
-		err := executor.Execute(context.Background())
-		assert.Nil(t, err)
-		assert.True(t, sendWasCalled)
-		assert.Equal(t, uint32(1), executor.GetNumSentTransaction())
 	})
 	t.Run("should work if the gas limit is above the contract threshold", func(t *testing.T) {
 		t.Parallel()
@@ -811,15 +713,15 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			},
 		}
 		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
+				tx.RawData.BandwidthFee = contractMaxGasLimit + 1
 				tx.RawData.Nonce = nonceCounter
 				nonceCounter++
 				return nil
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
-				assert.Equal(t, "TEST", tx.GetRawData().ChainID)
-				assert.Equal(t, uint32(111), tx.GetRawData().Version)
-				assert.Equal(t, args.GasLimitForOutOfGasTransactions, tx.GasLimit) // the gas limit was replaced
+				assert.Equal(t, []byte("TEST"), tx.GetRawData().ChainID)
+				assert.Equal(t, args.GasLimitForOutOfGasTransactions, tx.RawData.BandwidthFee) // the gas limit was replaced
 				assert.Equal(t, nonceCounter-1, tx.GetRawData().Nonce)
 				_, err := address.NewAddressFromBytes(tx.GetSender())
 				assert.Nil(t, err)
@@ -830,7 +732,7 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 				scAddr, err := address.NewAddressFromBytes(sc.Address)
 				require.Nil(t, err)
-				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr)
+				assert.Equal(t, "klv1qqqqqqqqqqqqqpgqql06jh2h6z598kyulvdu7u2d2aelx5j5sg8ss2cvn3", scAddr.Bech32())
 
 				// only the second pending operation gor through the filter
 				expectedData := scProxyCallFunction + "@02"
@@ -894,9 +796,6 @@ func TestScCallExecutor_Execute(t *testing.T) {
 
 				return parsers.ProxySCCompleteCallData{}, errors.New("wrong buffer")
 			},
-			ExtractGasLimitFromRawCallDataCalled: func(buff []byte) (uint64, error) {
-				return args.MaxGasLimitToUse - args.ExtraGasToExecute + 1, nil
-			},
 		}
 		args.Filter = &testsCommon.ScCallsExecuteFilterStub{
 			ShouldExecuteCalled: func(callData parsers.ProxySCCompleteCallData) bool {
@@ -904,8 +803,8 @@ func TestScCallExecutor_Execute(t *testing.T) {
 			},
 		}
 		args.NonceTxHandler = &testsCommon.TxNonceHandlerV2Stub{
-			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address kleverAddress.Address, tx *transaction.Transaction) error {
-				assert.Fail(t, "should have not apply nonce")
+			ApplyNonceAndGasPriceCalled: func(ctx context.Context, address address.Address, tx *transaction.Transaction) error {
+				tx.RawData.BandwidthFee = args.MaxGasLimitToUse + 1
 				return nil
 			},
 			SendTransactionCalled: func(ctx context.Context, tx *transaction.Transaction) (string, error) {
@@ -954,10 +853,10 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 
 		args := createMockArgsScCallExecutor()
 		args.Proxy = &interactors.ProxyStub{
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, hexTxHash string) (*models.TransactionData, error) {
 				assert.Fail(t, "should have not called ProcessTransactionStatusCalled")
 
-				return transaction.Transaction_FAILED, nil
+				return &models.TransactionData{}, nil
 			},
 		}
 		args.TransactionChecks = createMockCheckConfigs()
@@ -977,46 +876,13 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 		args := createMockArgsScCallExecutor()
 		chDone := make(chan struct{}, 1)
 		args.Proxy = &interactors.ProxyStub{
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, hexTxHash string) (*models.TransactionData, error) {
 				atomic.AddUint64(&numRequests, 1)
 				if atomic.LoadUint64(&numRequests) > 3 {
 					chDone <- struct{}{}
 				}
 
-				return transaction.Transaction_FAILED, errors.New("transaction not found")
-			},
-		}
-		args.TransactionChecks = createMockCheckConfigs()
-		args.TransactionChecks.TimeInSecondsBetweenChecks = 1
-
-		executor, _ := NewScCallExecutor(args)
-
-		go func() {
-			err := executor.handleResults(context.Background(), testHash)
-			assert.ErrorIs(t, err, context.DeadlineExceeded) // this will be the actual error when the function finishes
-		}()
-
-		select {
-		case <-chDone:
-			return
-		case <-time.After(time.Second * 30):
-			assert.Fail(t, "timeout")
-		}
-	})
-	t.Run("transaction is still pending should continuously request the status", func(t *testing.T) {
-		t.Parallel()
-
-		numRequests := uint64(0)
-		args := createMockArgsScCallExecutor()
-		chDone := make(chan struct{}, 1)
-		args.Proxy = &interactors.ProxyStub{
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
-				atomic.AddUint64(&numRequests, 1)
-				if atomic.LoadUint64(&numRequests) > 3 {
-					chDone <- struct{}{}
-				}
-
-				return transaction.Transaction_FAILED, nil
+				return &models.TransactionData{}, errors.New("transaction not found")
 			},
 		}
 		args.TransactionChecks = createMockCheckConfigs()
@@ -1043,8 +909,12 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 		args := createMockArgsScCallExecutor()
 		args.CloseAppChan = make(chan struct{}, 1)
 		args.Proxy = &interactors.ProxyStub{
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
-				return transaction.Transaction_FAILED, expectedErr
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, hexTxHash string) (*models.TransactionData, error) {
+				return &models.TransactionData{
+					Transaction: &data.Transaction{
+						Status: transaction.Transaction_FAILED.String(),
+					},
+				}, expectedErr
 			},
 		}
 		args.TransactionChecks = createMockCheckConfigs()
@@ -1072,8 +942,8 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 		args := createMockArgsScCallExecutor()
 		args.CloseAppChan = make(chan struct{}, 1)
 		args.Proxy = &interactors.ProxyStub{
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
-				return transaction.Transaction_FAILED, expectedErr
+			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*models.TransactionData, error) {
+				return nil, expectedErr
 			},
 		}
 		args.TransactionChecks = createMockCheckConfigs()
@@ -1102,42 +972,11 @@ func TestScCallExecutor_handleResults(t *testing.T) {
 				return transaction.Transaction_FAILED, nil
 			},
 			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*models.TransactionData, error) {
-				return &models.TransactionData{}, nil
-			},
-		}
-		args.TransactionChecks = createMockCheckConfigs()
-		args.TransactionChecks.TimeInSecondsBetweenChecks = 1
-		args.TransactionChecks.ExtraDelayInSecondsOnError = 1
-
-		executor, _ := NewScCallExecutor(args)
-
-		err := executor.handleResults(context.Background(), testHash)
-		assert.ErrorIs(t, err, errTransactionFailed)
-
-		select {
-		case <-args.CloseAppChan:
-		default:
-			assert.Fail(t, "failed to write on the close app chan")
-		}
-	})
-	t.Run("transaction failed, get more info fails, should signal error and not panic", func(t *testing.T) {
-		t.Parallel()
-
-		defer func() {
-			r := recover()
-			if r != nil {
-				assert.Fail(t, fmt.Sprintf("should have not panicked %v", r))
-			}
-		}()
-
-		args := createMockArgsScCallExecutor()
-		args.CloseAppChan = make(chan struct{}, 1)
-		args.Proxy = &interactors.ProxyStub{
-			ProcessTransactionStatusCalled: func(ctx context.Context, hexTxHash string) (transaction.Transaction_TXResult, error) {
-				return transaction.Transaction_FAILED, nil
-			},
-			GetTransactionInfoWithResultsCalled: func(ctx context.Context, txHash string) (*models.TransactionData, error) {
-				return nil, fmt.Errorf("random error")
+				return &models.TransactionData{
+					Transaction: &data.Transaction{
+						Status: transaction.Transaction_FAILED.String(),
+					},
+				}, nil
 			},
 		}
 		args.TransactionChecks = createMockCheckConfigs()

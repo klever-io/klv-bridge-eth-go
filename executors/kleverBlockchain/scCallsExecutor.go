@@ -39,8 +39,8 @@ type ArgsScCallExecutor struct {
 	Filter                          ScCallsExecuteFilter
 	Log                             logger.Logger
 	ExtraGasToExecute               uint64
-	MaxGasLimitToUse                uint64
-	GasLimitForOutOfGasTransactions uint64
+	MaxGasLimitToUse                int64
+	GasLimitForOutOfGasTransactions int64
 	NonceTxHandler                  NonceTransactionsHandler
 	PrivateKey                      crypto.PrivateKey
 	SingleSigner                    crypto.SingleSigner
@@ -55,8 +55,8 @@ type scCallExecutor struct {
 	filter                          ScCallsExecuteFilter
 	log                             logger.Logger
 	extraGasToExecute               uint64
-	maxGasLimitToUse                uint64
-	gasLimitForOutOfGasTransactions uint64
+	maxGasLimitToUse                int64
+	gasLimitForOutOfGasTransactions int64
 	nonceTxHandler                  NonceTransactionsHandler
 	privateKey                      crypto.PrivateKey
 	singleSigner                    crypto.SingleSigner
@@ -281,30 +281,29 @@ func (executor *scCallExecutor) executeOperation(
 		return err
 	}
 
-	tx := transaction.NewBaseTransaction(executor.senderAddress.Bytes(), 0, nil, 0, 0)
+	tx := transaction.NewBaseTransaction(executor.senderAddress.Bytes(), 0, [][]byte{dataBytes}, 0, 0)
 	err = tx.SetChainID([]byte(networkConfig.ChainID))
 	if err != nil {
 		return err
 	}
 
-	contractRequest := transaction.SmartContract{
+	contractRequest := &transaction.SmartContract{
+		Type:    transaction.SmartContract_SCInvoke,
 		Address: receiverAddr.Bytes(),
 	}
 
-	txArgs := transaction.TXArgs{
-		Type:     uint32(transaction.SmartContract_SCInvoke),
-		Sender:   executor.senderAddress.Bytes(),
-		Contract: json.RawMessage(contractRequest.String()),
-		Data:     [][]byte{dataBytes},
+	err = tx.PushContract(transaction.TXContract_SmartContractType, contractRequest)
+	if err != nil {
+		return err
 	}
 
-	err = tx.AddTransaction(txArgs)
+	err = executor.nonceTxHandler.ApplyNonceAndGasPrice(ctx, executor.senderAddress, tx)
 	if err != nil {
 		return err
 	}
 
 	to := callData.To.Bech32()
-	if tx.GasLimit > contractMaxGasLimit {
+	if tx.GetBandwidthFee() > contractMaxGasLimit {
 		// the contract will refund this transaction, so we will use less gas to preserve funds
 		executor.log.Warn("setting a lower gas limit for this transaction because it will be refunded",
 			"computed gas limit", tx.GasLimit,
@@ -316,10 +315,10 @@ func (executor *scCallExecutor) executeOperation(
 			"amount", callData.Amount,
 			"nonce", callData.Nonce,
 		)
-		tx.GasLimit = executor.gasLimitForOutOfGasTransactions
+		tx.RawData.BandwidthFee = executor.gasLimitForOutOfGasTransactions
 	}
 
-	if tx.GasLimit > executor.maxGasLimitToUse {
+	if tx.GetBandwidthFee() > executor.maxGasLimitToUse {
 		executor.log.Warn("can not execute transaction because the provided gas limit on the SC call exceeds "+
 			"the maximum gas limit allowance for this executor, WILL SKIP the execution",
 			"computed gas limit", tx.GasLimit,
@@ -333,11 +332,6 @@ func (executor *scCallExecutor) executeOperation(
 		)
 
 		return nil
-	}
-
-	err = executor.nonceTxHandler.ApplyNonceAndGasPrice(ctx, executor.senderAddress, tx)
-	if err != nil {
-		return err
 	}
 
 	err = executor.signTransactionWithPrivateKey(tx)
@@ -425,7 +419,7 @@ func (executor *scCallExecutor) checkResults(ctx context.Context, hash string) (
 		return nil, true
 	}
 
-	executor.logFullTransaction(ctx, hash)
+	executor.logFullTransaction(ctx, txResult)
 	return fmt.Errorf("%w for tx hash %s", errTransactionFailed, hash), true
 }
 
@@ -447,20 +441,14 @@ func (executor *scCallExecutor) handleError(ctx context.Context, err error) {
 	}()
 }
 
-func (executor *scCallExecutor) logFullTransaction(ctx context.Context, hash string) {
-	txData, err := executor.proxy.GetTransactionInfoWithResults(ctx, hash)
-	if err != nil {
-		executor.log.Error("error getting the transaction for display", "error", err)
-		return
-	}
-
+func (executor *scCallExecutor) logFullTransaction(ctx context.Context, txData *models.TransactionData) {
 	txDataString, err := json.MarshalIndent(txData, "", "  ")
 	if err != nil {
 		executor.log.Error("error preparing transaction for display", "error", err)
 		return
 	}
 
-	executor.log.Error("transaction failed", "hash", hash, "full transaction details", string(txDataString))
+	executor.log.Error("transaction failed", "hash", txData.Hash, "full transaction details", string(txDataString))
 }
 
 func (executor *scCallExecutor) waitForExtraDelay(ctx context.Context, err error) {

@@ -353,7 +353,12 @@ func (mock *kleverBlockchainContractStateMock) sign(dataSplit []string, tx *tran
 		m = make(map[string]struct{})
 		mock.signedActionIDs[actionID.String()] = m
 	}
-	m[string(tx.GetRawData().GetSender())] = struct{}{}
+
+	address, err := address.NewAddressFromBytes(tx.GetRawData().GetSender())
+	if err != nil {
+		panic(err)
+	}
+	m[address.Bech32()] = struct{}{}
 }
 
 func (mock *kleverBlockchainContractStateMock) performAction(dataSplit []string, _ *transaction.Transaction) {
