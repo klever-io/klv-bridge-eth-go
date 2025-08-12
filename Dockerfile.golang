@@ -1,0 +1,48 @@
+# Note: This Dockerfile uses the vendor directory from the host machine.
+# Run 'go mod vendor' on the host machine before building this image.
+# Key files should be mounted at runtime to /app/keys using Docker secrets or volumes.
+
+# Build stage
+FROM golang:1.24.5-alpine3.22 AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git make build-base
+
+# Set working directory for the build
+WORKDIR /build
+
+# Copy the source code including the vendor directory from host
+COPY . .
+
+# Build the binary using the vendor directory from the host machine
+RUN go build -mod=vendor -o bridge ./cmd/bridge
+
+# Final stage
+FROM alpine:3.22
+
+# Install certificates and timezone data
+RUN apk add --no-cache ca-certificates tzdata
+
+# Key files should be injected at runtime using Docker secrets or mounted volumes for security.
+
+# Set working directory
+WORKDIR /app
+
+# Copy the binary from the builder stage
+COPY --from=builder /build/bridge /app/bridge
+RUN chmod +x /app/bridge
+
+# Create directories for data persistence
+RUN mkdir -p /app/logs /app/db /app/keys /app/config
+
+# Verify binary exists (will fail build if missing)
+RUN ls -la /app/bridge
+
+# Expose web server port
+EXPOSE 8080
+
+# Expose P2P port as specified in config
+EXPOSE 10010
+
+# Set the entrypoint
+ENTRYPOINT ["/app/bridge"]
