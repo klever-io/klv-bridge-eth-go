@@ -8,6 +8,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v5.0.0
+    
+    - name: Go Setup
+      uses: ./.github/actions/go-setup-action
+      with:
+        go-version: ${{ vars.GO_VERSION }}
+        go-private: ${{ vars.GO_PRIVATE_REPO }}
+        git-user: ${{ secrets.GIT_USER }}
+        git-pass: ${{ secrets.GIT_PASS }}
+
     - name: Docker Login
       uses: docker/login-action@v3.5.0
       with:
@@ -16,7 +25,8 @@ jobs:
     - name: Docker image build and push
       uses: docker/build-push-action@v6.18.0
       with:
-        file: ./Dockerfile.golang
+        context: .
+        file: Dockerfile.golang
         push: true
         tags: |
           kleverapp/klv-bridge:${{ github.sha }}
