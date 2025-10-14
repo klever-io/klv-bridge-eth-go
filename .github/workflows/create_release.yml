@@ -16,8 +16,7 @@ jobs:
     - name: Docker image build and push
       uses: docker/build-push-action@v6.18.0
       with:
-        context: ./app/src
-        file: ./app/src/Dockerfile
+        file: ./Dockerfile.golang
         push: true
         tags: |
           kleverapp/klv-bridge:${{ github.sha }}
@@ -37,7 +36,7 @@ jobs:
         service-key: ${{ secrets.TWINGATE_SERVICE_ACCOUNT }}
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
