@@ -1,6 +1,16 @@
 name: Create release
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+        inputs:
+          TARGET_HOST_POOL:
+            description: 'AWX host pool'
+            required: false
+            type: choice
+            default: 'testnet'
+            options:
+              - 'testnet'
+              - 'mainnet'
 
 jobs:
   CI:
@@ -61,4 +71,4 @@ jobs:
         export TOWER_USERNAME="${{ vars.AWX_USER }}"
         export TOWER_PASSWORD="${{ secrets.AWX_PASS }}"
         LOGIN_OUTPUT=$(awx login)
-        awx job_templates launch "${{ vars.AWX_TEMPLATE_NAME }}" --extra_vars '{"vm_name":"${{ vars.ENV_NETWORK }}","docker_image_tag":"kleverapp/klv-bridge:${{ github.sha }}"}' --job_tags update
+        awx job_templates launch "${{ vars.AWX_TEMPLATE_NAME }}" --extra_vars '{"vm_name":"${{ vars.ENV_NETWORK || inputs.TARGET_HOST_POOL }}","docker_image_tag":"kleverapp/klv-bridge:${{ github.sha }}"}' --job_tags update
