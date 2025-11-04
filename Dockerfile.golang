@@ -3,7 +3,7 @@
 # Key files should be mounted at runtime to /app/keys using Docker secrets or volumes.
 
 # Build stage
-FROM golang:1.24.5-alpine3.22 AS builder
+FROM golang:1.25.3-alpine3.22 AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git make build-base

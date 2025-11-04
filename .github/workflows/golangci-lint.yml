@@ -23,7 +23,7 @@ jobs:
           git-pass: ${{ secrets.GIT_PASS }}
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v8
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: ${{ vars.GOLANGCI_VERSION || 'v1.61.0' }}
@@ -32,7 +32,7 @@ jobs:
           # working-directory: somedir
 
           # Optional: golangci-lint command line arguments.
-          args: --timeout 10m0s --max-issues-per-linter 0 --max-same-issues 0 --print-issued-lines
+          args: --timeout 10m0s --max-issues-per-linter 0 --max-same-issues 0
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
