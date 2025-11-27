@@ -19,6 +19,7 @@ func TestDepositTransfer_Clone(t *testing.T) {
 		SourceTokenBytes:      []byte("source token"),
 		DisplayableToken:      "token",
 		Amount:                big.NewInt(7463),
+		ConvertedAmount:       big.NewInt(746300),
 		DestinationTokenBytes: []byte("destination token"),
 		Data:                  []byte("tx data"),
 	}
@@ -62,6 +63,7 @@ func TestTransferBatch_Clone(t *testing.T) {
 				SourceTokenBytes:      []byte("source token1"),
 				DisplayableToken:      "token1",
 				Amount:                big.NewInt(3344),
+				ConvertedAmount:       big.NewInt(334400),
 				DestinationTokenBytes: []byte("destination token1"),
 				Data:                  []byte("tx data"),
 			},
@@ -74,6 +76,7 @@ func TestTransferBatch_Clone(t *testing.T) {
 				SourceTokenBytes:      []byte("source token2"),
 				DisplayableToken:      "token2",
 				Amount:                big.NewInt(5566),
+				ConvertedAmount:       big.NewInt(556600),
 				DestinationTokenBytes: []byte("destination token2"),
 				Data:                  []byte("tx data"),
 			},

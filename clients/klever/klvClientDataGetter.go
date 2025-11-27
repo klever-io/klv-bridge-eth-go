@@ -43,6 +43,7 @@ const (
 	getBurnBalances                                           = "getBurnBalances"
 	getAllKnownTokens                                         = "getAllKnownTokens"
 	getLastBatchId                                            = "getLastBatchId"
+	convertEthToKdaAmountFuncName                             = "convertEthToKdaAmount"
 )
 
 // ArgsklvClientDataGetter is the arguments DTO used in the NewklvClientDataGetter constructor
@@ -487,6 +488,7 @@ func (dataGetter *klvClientDataGetter) addBatchInfo(builder builders.VMQueryBuil
 			ArgBytes(dt.ToBytes).
 			ArgBytes(dt.DestinationTokenBytes).
 			ArgBigInt(dt.Amount).
+			ArgBigInt(dt.ConvertedAmount).
 			ArgInt64(int64(dt.Nonce)).
 			ArgBytes(dt.Data)
 	}
@@ -514,6 +516,14 @@ func (dataGetter *klvClientDataGetter) GetLastKCBatchID(ctx context.Context) (ui
 	builder.Function(getLastBatchId)
 
 	return dataGetter.executeQueryUint64FromBuilder(ctx, builder)
+}
+
+// ConvertEthToKdaAmount converts an amount from Ethereum decimals to KDA decimals
+func (dataGetter *klvClientDataGetter) ConvertEthToKdaAmount(ctx context.Context, token []byte, amount *big.Int) (*big.Int, error) {
+	builder := dataGetter.createSafeDefaultVmQueryBuilder()
+	builder.Function(convertEthToKdaAmountFuncName).ArgBytes(token).ArgBigInt(amount)
+
+	return dataGetter.executeQueryBigIntFromBuilder(ctx, builder)
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

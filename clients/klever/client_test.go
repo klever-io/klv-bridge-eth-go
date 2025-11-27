@@ -85,7 +85,8 @@ func createMockPendingBatchBytes(numDeposits int) [][]byte {
 		generatorByte++
 		pendingBatchBytes = append(pendingBatchBytes, bytes.Repeat([]byte{generatorByte}, 32)) // token
 
-		pendingBatchBytes = append(pendingBatchBytes, big.NewInt(int64((i+1)*10000)).Bytes())
+		pendingBatchBytes = append(pendingBatchBytes, big.NewInt(int64((i+1)*10000)).Bytes()) // amount (ETH decimals)
+		pendingBatchBytes = append(pendingBatchBytes, big.NewInt(int64((i+1)*10000)).Bytes()) // converted_amount (KDA decimals)
 	}
 
 	return pendingBatchBytes
@@ -271,7 +272,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 
 		assert.Nil(t, batch)
 		assert.True(t, errors.Is(err, errInvalidNumberOfArguments))
-		assert.True(t, strings.Contains(err.Error(), "got 12 argument(s)"))
+		assert.True(t, strings.Contains(err.Error(), "got 14 argument(s)"))
 
 		args.Proxy = createMockProxy([][]byte{{1}})
 		c, _ = NewClient(args)
@@ -302,7 +303,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 
 		args := createMockClientArgs()
 		buff := createMockPendingBatchBytes(2)
-		buff[8] = bytes.Repeat([]byte{1}, 32)
+		buff[9] = bytes.Repeat([]byte{1}, 32)
 		args.Proxy = createMockProxy(buff)
 
 		c, _ := NewClient(args)
@@ -358,6 +359,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes1...),
 					DisplayableToken:      string(tokenBytes1),
 					Amount:                big.NewInt(10000),
+					ConvertedAmount:       big.NewInt(10000),
 				},
 				{
 					Nonce:                 5001,
@@ -369,6 +371,7 @@ func TestClient_GetPendingBatch(t *testing.T) {
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes2...),
 					DisplayableToken:      string(tokenBytes2),
 					Amount:                big.NewInt(20000),
+					ConvertedAmount:       big.NewInt(20000),
 				},
 			},
 			Statuses: make([]byte, 2),
@@ -428,7 +431,7 @@ func TestClient_GetBatch(t *testing.T) {
 
 		assert.Nil(t, batch)
 		assert.True(t, errors.Is(err, errInvalidNumberOfArguments))
-		assert.True(t, strings.Contains(err.Error(), "got 12 argument(s)"))
+		assert.True(t, strings.Contains(err.Error(), "got 14 argument(s)"))
 
 		args.Proxy = createMockProxy([][]byte{{1}})
 		c, _ = NewClient(args)
@@ -459,7 +462,7 @@ func TestClient_GetBatch(t *testing.T) {
 
 		args := createMockClientArgs()
 		buff := createMockPendingBatchBytes(2)
-		buff[8] = bytes.Repeat([]byte{1}, 32)
+		buff[9] = bytes.Repeat([]byte{1}, 32)
 		args.Proxy = createMockProxy(buff)
 
 		c, _ := NewClient(args)
@@ -515,6 +518,7 @@ func TestClient_GetBatch(t *testing.T) {
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes1...),
 					DisplayableToken:      string(tokenBytes1),
 					Amount:                big.NewInt(10000),
+					ConvertedAmount:       big.NewInt(10000),
 				},
 				{
 					Nonce:                 5001,
@@ -526,6 +530,7 @@ func TestClient_GetBatch(t *testing.T) {
 					DestinationTokenBytes: append([]byte("converted_"), tokenBytes2...),
 					DisplayableToken:      string(tokenBytes2),
 					Amount:                big.NewInt(20000),
+					ConvertedAmount:       big.NewInt(20000),
 				},
 			},
 			Statuses: make([]byte, 2),
@@ -776,6 +781,7 @@ func depositToString(dt *bridgeCore.DepositTransfer) string {
 	result = result + "@" + hex.EncodeToString(dt.ToBytes)
 	result = result + "@" + hex.EncodeToString(dt.DestinationTokenBytes)
 	result = result + "@" + hex.EncodeToString(dt.Amount.Bytes())
+	result = result + "@" + hex.EncodeToString(dt.ConvertedAmount.Bytes())
 	result = result + "@" + hex.EncodeToString(big.NewInt(0).SetUint64(dt.Nonce).Bytes())
 	result = result + "@" + hex.EncodeToString(dt.Data)
 

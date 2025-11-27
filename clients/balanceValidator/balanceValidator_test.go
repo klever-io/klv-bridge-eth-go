@@ -1553,6 +1553,7 @@ func applyDummyFromKlvDepositsToBatch(cfg testConfiguration, batch *bridgeCore.T
 				batch.Deposits = append(batch.Deposits, &bridgeCore.DepositTransfer{
 					Nonce:            depositCounter,
 					Amount:           big.NewInt(0).Set(deposit),
+					ConvertedAmount:  big.NewInt(0).Set(deposit),
 					SourceTokenBytes: kdaToken,
 				})
 			}
@@ -1570,6 +1571,7 @@ func applyDummyFromEthDepositsToBatch(cfg testConfiguration, batch *bridgeCore.T
 				batch.Deposits = append(batch.Deposits, &bridgeCore.DepositTransfer{
 					Nonce:            depositCounter,
 					Amount:           big.NewInt(0).Set(deposit),
+					ConvertedAmount:  big.NewInt(0).Set(deposit),
 					SourceTokenBytes: ethToken.Bytes(),
 				})
 			}

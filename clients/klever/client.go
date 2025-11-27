@@ -247,7 +247,7 @@ func emptyResponse(response [][]byte) bool {
 }
 
 func (c *client) createPendingBatchFromResponse(ctx context.Context, responseData [][]byte) (*bridgeCore.TransferBatch, error) {
-	numFieldsForTransaction := 6
+	numFieldsForTransaction := 7
 	dataLen := len(responseData)
 	haveCorrectNumberOfArgs := (dataLen-1)%numFieldsForTransaction == 0 && dataLen > 1
 	if !haveCorrectNumberOfArgs {
@@ -266,13 +266,21 @@ func (c *client) createPendingBatchFromResponse(ctx context.Context, responseDat
 	cachedTokens := make(map[string][]byte)
 	transferIndex := 0
 	for i := 1; i < dataLen; i += numFieldsForTransaction {
-		// blockNonce is the i-th element, let's ignore it for now
+		// Transaction struct fields order:
+		// i+0: block_nonce (ignored for now)
+		// i+1: nonce
+		// i+2: from
+		// i+3: to
+		// i+4: token_identifier
+		// i+5: amount (ETH decimals)
+		// i+6: converted_amount (KDA decimals)
 		depositNonce, errParse := parseUInt64FromByteSlice(responseData[i+1])
 		if errParse != nil {
 			return nil, fmt.Errorf("%w while parsing the deposit nonce, transfer index %d", errParse, transferIndex)
 		}
 
 		amount := big.NewInt(0).SetBytes(responseData[i+5])
+		convertedAmount := big.NewInt(0).SetBytes(responseData[i+6])
 		deposit := &bridgeCore.DepositTransfer{
 			Nonce:            depositNonce,
 			FromBytes:        responseData[i+2],
@@ -282,6 +290,7 @@ func (c *client) createPendingBatchFromResponse(ctx context.Context, responseDat
 			SourceTokenBytes: responseData[i+4],
 			DisplayableToken: string(responseData[i+4]),
 			Amount:           amount,
+			ConvertedAmount:  convertedAmount,
 		}
 
 		storedConvertedTokenBytes, exists := cachedTokens[deposit.DisplayableToken]
@@ -353,6 +362,7 @@ func (c *client) ProposeTransfer(ctx context.Context, batch *bridgeCore.Transfer
 			ArgBytes(dt.ToBytes).
 			ArgBytes(dt.DestinationTokenBytes).
 			ArgBigInt(dt.Amount).
+			ArgBigInt(dt.ConvertedAmount).
 			ArgInt64(int64(dt.Nonce)).
 			ArgBytes(dt.Data)
 	}
@@ -463,6 +473,11 @@ func (c *client) MintBalances(ctx context.Context, token []byte) (*big.Int, erro
 // BurnBalances returns the burned tokens
 func (c *client) BurnBalances(ctx context.Context, token []byte) (*big.Int, error) {
 	return c.getBurnBalances(ctx, token)
+}
+
+// ConvertEthToKdaAmount converts an amount from Ethereum decimals to KDA decimals
+func (c *client) ConvertEthToKdaAmount(ctx context.Context, token []byte, amount *big.Int) (*big.Int, error) {
+	return c.klvClientDataGetter.ConvertEthToKdaAmount(ctx, token, amount)
 }
 
 // CheckRequiredBalance will check the required balance for the provided token
