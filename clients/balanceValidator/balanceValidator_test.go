@@ -54,6 +54,12 @@ type testConfiguration struct {
 	pendingKlvBatchId          uint64
 	amountsOnKlvPendingBatches map[uint64][]*big.Int
 	amountsOnEthPendingBatches map[uint64][]*big.Int
+
+	// conversionMultiplier is used to simulate decimal conversion.
+	// If nil, conversion returns the same value (same decimals).
+	// If set, the converted value = amount * conversionMultiplier / conversionDivisor
+	conversionMultiplier *big.Int
+	conversionDivisor    *big.Int
 }
 
 func (cfg *testConfiguration) deepClone() testConfiguration {
@@ -91,6 +97,12 @@ func (cfg *testConfiguration) deepClone() testConfiguration {
 	}
 	if cfg.amount != nil {
 		result.amount = big.NewInt(0).Set(cfg.amount)
+	}
+	if cfg.conversionMultiplier != nil {
+		result.conversionMultiplier = big.NewInt(0).Set(cfg.conversionMultiplier)
+	}
+	if cfg.conversionDivisor != nil {
+		result.conversionDivisor = big.NewInt(0).Set(cfg.conversionDivisor)
 	}
 
 	for key, err := range cfg.errorsOnCalls {
@@ -1358,6 +1370,395 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			})
 		})
 	})
+	t.Run("decimal conversion", func(t *testing.T) {
+		t.Parallel()
+
+		t.Run("same decimals (6 ETH, 6 KDA) - no conversion needed", func(t *testing.T) {
+			t.Parallel()
+
+			// Both chains use 6 decimals (realistic since KDA max is 8)
+			// In this case, no conversion is needed
+			ethBalance := big.NewInt(1e6) // 1 token in ETH decimals
+			kdaBalance := big.NewInt(1e6) // 1 token in KDA decimals
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.ToKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e6), ethBalance), // initial + current
+				mintBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e6), big.NewInt(1e6)),
+				totalBalancesOnKlv: kdaBalance,
+				amount:             big.NewInt(1e6),
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e6)},
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// No conversion = multiplier and divisor are 1
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1),
+			}
+
+			result := validatorTester(cfg)
+			assert.Nil(t, result.error)
+		})
+
+		t.Run("different decimals (18 ETH -> 6 KDA) - conversion by smart contract", func(t *testing.T) {
+			t.Parallel()
+
+			// Token has 18 decimals on ETH and 6 decimals on KDA
+			// ETH amount: 1000000000000000000 (1 token with 18 decimals)
+			// KDA amount: 1000000 (1 token with 6 decimals)
+			// Conversion: ETH / 10^12 = KDA
+			ethBalance := big.NewInt(0).Mul(big.NewInt(1), big.NewInt(1e18)) // 1 token in ETH (18 decimals)
+			kdaBalance := big.NewInt(1e6)                                    // 1 token in KDA (6 decimals)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.ToKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), ethBalance),
+				mintBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), big.NewInt(1e18)),
+				totalBalancesOnKlv: kdaBalance,
+				amount:             big.NewInt(1e18),
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)},
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// Conversion: divide by 10^12 (from 18 decimals to 6 decimals)
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e12),
+			}
+
+			result := validatorTester(cfg)
+			assert.Nil(t, result.error)
+		})
+
+		t.Run("different decimals (18 ETH -> 8 KDA) - conversion by smart contract", func(t *testing.T) {
+			t.Parallel()
+
+			// Token has 18 decimals on ETH and 8 decimals on KDA (max KDA decimals)
+			// ETH amount: 1e18 (1 token with 18 decimals)
+			// KDA amount: 1e8 (1 token with 8 decimals)
+			// Conversion: ETH / 10^10 = KDA
+			ethBalance := big.NewInt(1e18) // 1 token in ETH (18 decimals)
+			kdaBalance := big.NewInt(1e8)  // 1 token in KDA (8 decimals)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.ToKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), ethBalance),
+				mintBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), big.NewInt(1e18)),
+				totalBalancesOnKlv: kdaBalance,
+				amount:             big.NewInt(1e18),
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)},
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// Conversion: divide by 10^10 (from 18 decimals to 8 decimals)
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e10),
+			}
+
+			result := validatorTester(cfg)
+			assert.Nil(t, result.error)
+		})
+
+		t.Run("different decimals with mismatch should error", func(t *testing.T) {
+			t.Parallel()
+
+			// 18 ETH decimals -> 6 KDA decimals with wrong KDA balance
+			ethBalance := big.NewInt(1e18)
+			kdaBalance := big.NewInt(1e6)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.ToKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), ethBalance),
+				mintBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), big.NewInt(1e18)),
+				totalBalancesOnKlv: big.NewInt(0).Add(kdaBalance, big.NewInt(1)), // Off by 1
+				amount:             big.NewInt(1e18),
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)},
+				},
+				kdaToken:             kdaToken,
+				ethToken:             ethToken,
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e12),
+			}
+
+			result := validatorTester(cfg)
+			assert.ErrorIs(t, result.error, ErrBalanceMismatch)
+		})
+
+		t.Run("conversion error should propagate", func(t *testing.T) {
+			t.Parallel()
+
+			expectedError := errors.New("conversion error")
+			cfg := testConfiguration{
+				direction:          batchProcessor.ToKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(1e18),
+				mintBalancesOnEth:  big.NewInt(1e18),
+				totalBalancesOnKlv: big.NewInt(1e8), // 8 KDA decimals
+				amount:             big.NewInt(1e18),
+				kdaToken:           kdaToken,
+				ethToken:           ethToken,
+				errorsOnCalls: map[string]error{
+					"ConvertEthToKdaAmount": expectedError,
+				},
+			}
+
+			result := validatorTester(cfg)
+			assert.Equal(t, expectedError, result.error)
+		})
+
+		t.Run("bad conversion from smart contract should cause mismatch", func(t *testing.T) {
+			t.Parallel()
+
+			// Simulate a bug in the smart contract where conversion returns wrong value
+			// Token has 18 decimals on ETH and 6 decimals on KDA
+			// Correct conversion: ETH / 10^12 = KDA
+			// Bad conversion: returns wrong multiplier/divisor
+			ethBalance := big.NewInt(1e18) // 1 token in ETH (18 decimals)
+			kdaBalance := big.NewInt(1e6)  // 1 token in KDA (6 decimals)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.ToKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), ethBalance),
+				mintBalancesOnEth:  big.NewInt(0).Add(big.NewInt(1e18), big.NewInt(1e18)),
+				totalBalancesOnKlv: kdaBalance,
+				amount:             big.NewInt(1e18),
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)},
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// BAD conversion: uses wrong divisor (10^10 instead of 10^12)
+				// This simulates a misconfigured smart contract
+				// Expected: 1e18 / 1e12 = 1e6, but returns: 1e18 / 1e10 = 1e8
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e10), // Wrong! Should be 1e12
+			}
+
+			result := validatorTester(cfg)
+			assert.ErrorIs(t, result.error, ErrBalanceMismatch)
+		})
+
+		// FromKC direction tests
+		t.Run("FromKC: same decimals (6 ETH, 6 KDA) - no conversion needed", func(t *testing.T) {
+			t.Parallel()
+
+			// Both chains use 6 decimals (realistic since KDA max is 8)
+			// For FromKC with native on KDA: totalBalancesOnKlv is used
+			// For FromKC with mint-burn on ETH: mint - burn on ETH should equal totalBalancesOnKlv (after pending adjustments)
+			existingNativeBalanceKlv := big.NewInt(10e6) // 10 tokens in KDA (6 decimals)
+			existingBurnEth := big.NewInt(1e6)           // 1 token burned on ETH
+			existingMintEth := big.NewInt(11e6)          // 11 tokens minted on ETH
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.FromKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(existingBurnEth, big.NewInt(1e6)), // + pending ETH transfer
+				mintBalancesOnEth:  existingMintEth,
+				totalBalancesOnKlv: big.NewInt(0).Add(existingNativeBalanceKlv, big.NewInt(1e6)), // + pending KLV transfer
+				amount:             big.NewInt(1e6),
+				pendingKlvBatchId:  1,
+				amountsOnKlvPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e6)},
+				},
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e6)},
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// No conversion = same decimals
+			}
+
+			result := validatorTester(cfg)
+			assert.Nil(t, result.error)
+		})
+
+		t.Run("FromKC: different decimals (18 ETH, 6 KDA) - conversion by smart contract", func(t *testing.T) {
+			t.Parallel()
+
+			// Token has 18 decimals on ETH and 6 decimals on KDA
+			// Native balance on KDA: 10e6 (10 tokens in 6 decimals)
+			// Pending transfers from KDA: 1e6 (1 token in 6 decimals)
+			// ETH values need to be in 18 decimals
+			// After conversion (ETH / 10^12 = KDA), ETH mint - burn should equal KDA totalBalances
+			existingNativeBalanceKlv := big.NewInt(10e6)                           // 10 tokens in KDA (6 decimals)
+			existingBurnEth := big.NewInt(1e18)                                    // 1 token burned on ETH (18 decimals)
+			existingMintEth := big.NewInt(0).Mul(big.NewInt(11), big.NewInt(1e18)) // 11 tokens minted on ETH (18 decimals)
+			pendingEthTransfer := big.NewInt(1e18)                                 // 1 token pending (ETH decimals)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.FromKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(existingBurnEth, pendingEthTransfer), // + 1 token pending (ETH decimals)
+				mintBalancesOnEth:  existingMintEth,
+				totalBalancesOnKlv: big.NewInt(0).Add(existingNativeBalanceKlv, big.NewInt(1e6)), // + 1 token pending (KDA decimals)
+				amount:             big.NewInt(1e6),                                              // amount in KDA decimals
+				pendingKlvBatchId:  1,
+				amountsOnKlvPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e6)}, // ConvertedAmount in KDA decimals
+				},
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)}, // Amount in ETH decimals
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// Conversion: divide by 10^12 (from 18 ETH decimals to 6 KDA decimals)
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e12),
+			}
+
+			result := validatorTester(cfg)
+			assert.Nil(t, result.error)
+		})
+
+		t.Run("FromKC: different decimals (18 ETH, 8 KDA) - conversion by smart contract", func(t *testing.T) {
+			t.Parallel()
+
+			// Token has 18 decimals on ETH and 8 decimals on KDA (max KDA decimals)
+			// Conversion: ETH / 10^10 = KDA
+			existingNativeBalanceKlv := big.NewInt(10e8)                           // 10 tokens in KDA (8 decimals)
+			existingBurnEth := big.NewInt(1e18)                                    // 1 token burned on ETH (18 decimals)
+			existingMintEth := big.NewInt(0).Mul(big.NewInt(11), big.NewInt(1e18)) // 11 tokens minted on ETH (18 decimals)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.FromKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(existingBurnEth, big.NewInt(1e18)), // + 1 token pending (ETH decimals)
+				mintBalancesOnEth:  existingMintEth,
+				totalBalancesOnKlv: big.NewInt(0).Add(existingNativeBalanceKlv, big.NewInt(1e8)), // + 1 token pending (KDA decimals)
+				amount:             big.NewInt(1e8),
+				pendingKlvBatchId:  1,
+				amountsOnKlvPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e8)}, // ConvertedAmount in KDA decimals
+				},
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)}, // Amount in ETH decimals
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// Conversion: divide by 10^10 (from 18 ETH decimals to 8 KDA decimals)
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e10),
+			}
+
+			result := validatorTester(cfg)
+			assert.Nil(t, result.error)
+		})
+
+		t.Run("FromKC: different decimals (18 ETH -> 8 KDA) with mismatch should error", func(t *testing.T) {
+			t.Parallel()
+
+			existingNativeBalanceKlv := big.NewInt(10e8) // 10 tokens in KDA decimals (8)
+			// existingBurnEth: 1 token in ETH decimals (18)
+			existingBurnEth := big.NewInt(1e18)
+			// existingMintEth: 11 tokens in ETH decimals (18)
+			existingMintEth := big.NewInt(0).Mul(big.NewInt(11), big.NewInt(1e18))
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.FromKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(existingBurnEth, big.NewInt(1e18)), // + 1 token pending
+				mintBalancesOnEth:  existingMintEth,
+				totalBalancesOnKlv: big.NewInt(0).Add(existingNativeBalanceKlv, big.NewInt(1e8+1)), // Off by 1 in KDA decimals
+				amount:             big.NewInt(1e8),                                                // 1 token in KDA decimals
+				pendingKlvBatchId:  1,
+				amountsOnKlvPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e8)}, // ConvertedAmount in KDA decimals
+				},
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)}, // Amount in ETH decimals
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// Conversion: divide by 10^10 (from 18 ETH decimals to 8 KDA decimals)
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e10),
+			}
+
+			result := validatorTester(cfg)
+			assert.ErrorIs(t, result.error, ErrBalanceMismatch)
+		})
+
+		t.Run("FromKC: conversion error should propagate", func(t *testing.T) {
+			t.Parallel()
+
+			expectedError := errors.New("conversion error")
+			cfg := testConfiguration{
+				direction:          batchProcessor.FromKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(1e8),
+				mintBalancesOnEth:  big.NewInt(10e8),
+				totalBalancesOnKlv: big.NewInt(10e6),
+				amount:             big.NewInt(1e6),
+				kdaToken:           kdaToken,
+				ethToken:           ethToken,
+				errorsOnCalls: map[string]error{
+					"ConvertEthToKdaAmount": expectedError,
+				},
+			}
+
+			result := validatorTester(cfg)
+			assert.Equal(t, expectedError, result.error)
+		})
+
+		t.Run("FromKC: bad conversion from smart contract should cause mismatch", func(t *testing.T) {
+			t.Parallel()
+
+			// Simulate a bug in the smart contract where conversion returns wrong value
+			// Token has 18 decimals on ETH and 6 decimals on KDA
+			// Correct conversion: ETH / 10^12 = KDA
+			// Bad conversion: returns wrong multiplier/divisor
+			existingNativeBalanceKlv := big.NewInt(10e6)                           // 10 tokens in KDA (6 decimals)
+			existingBurnEth := big.NewInt(1e18)                                    // 1 token burned on ETH (18 decimals)
+			existingMintEth := big.NewInt(0).Mul(big.NewInt(11), big.NewInt(1e18)) // 11 tokens minted on ETH (18 decimals)
+			pendingEthTransfer := big.NewInt(1e18)                                 // 1 token pending (ETH decimals)
+
+			cfg := testConfiguration{
+				direction:          batchProcessor.FromKC,
+				isMintBurnOnEth:    true,
+				isNativeOnKlv:      true,
+				burnBalancesOnEth:  big.NewInt(0).Add(existingBurnEth, pendingEthTransfer), // + 1 token pending (ETH decimals)
+				mintBalancesOnEth:  existingMintEth,
+				totalBalancesOnKlv: big.NewInt(0).Add(existingNativeBalanceKlv, big.NewInt(1e6)), // + 1 token pending (KDA decimals)
+				amount:             big.NewInt(1e6),                                              // amount in KDA decimals
+				pendingKlvBatchId:  1,
+				amountsOnKlvPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e6)}, // ConvertedAmount in KDA decimals
+				},
+				amountsOnEthPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(1e18)}, // Amount in ETH decimals
+				},
+				kdaToken: kdaToken,
+				ethToken: ethToken,
+				// BAD conversion: uses wrong divisor (10^10 instead of 10^12)
+				// This simulates a misconfigured smart contract
+				// Expected: 1e18 / 1e12 = 1e6, but returns: 1e18 / 1e10 = 1e8
+				conversionMultiplier: big.NewInt(1),
+				conversionDivisor:    big.NewInt(1e10), // Wrong! Should be 1e12
+			}
+
+			result := validatorTester(cfg)
+			assert.ErrorIs(t, result.error, ErrBalanceMismatch)
+		})
+	})
 }
 
 func validatorTester(cfg testConfiguration) testResult {
@@ -1461,6 +1862,22 @@ func validatorTester(cfg testConfiguration) testResult {
 			}
 
 			return lastKlvBatchID, nil
+		},
+		ConvertEthToKdaAmountCalled: func(ctx context.Context, token []byte, amount *big.Int) (*big.Int, error) {
+			err := cfg.errorsOnCalls["ConvertEthToKdaAmount"]
+			if err != nil {
+				return nil, err
+			}
+
+			// If no conversion ratio is set, return the same value (same decimals)
+			if cfg.conversionMultiplier == nil || cfg.conversionDivisor == nil {
+				return big.NewInt(0).Set(amount), nil
+			}
+
+			// Apply conversion: result = amount * multiplier / divisor
+			result := big.NewInt(0).Mul(amount, cfg.conversionMultiplier)
+			result.Div(result, cfg.conversionDivisor)
+			return result, nil
 		},
 	}
 	args.EthereumClient = &bridge.EthereumClientStub{
