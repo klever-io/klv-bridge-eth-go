@@ -117,7 +117,7 @@ func (proxy *baseProxy) cacheConfigs(ctx context.Context) (*models.NetworkConfig
 func (proxy *baseProxy) getNetworkConfigFromSource(ctx context.Context) (*models.NetworkConfig, error) {
 	buff, code, err := proxy.GetHTTP(ctx, proxy.endpointProvider.GetNetworkConfig())
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.NetworkConfigResponse{}
@@ -138,7 +138,7 @@ func (proxy *baseProxy) GetNetworkStatus(ctx context.Context) (*models.NodeOverv
 	endpoint := proxy.endpointProvider.GetNodeStatus()
 	buff, code, err := proxy.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.NodeOverviewApiResponse{}

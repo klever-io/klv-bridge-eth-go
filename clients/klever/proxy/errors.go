@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -45,6 +46,13 @@ var ErrNilProxy = errors.New("nil proxy")
 // ErrNotUint64Bytes signals that the provided bytes do not represent a valid uint64 number
 var ErrNotUint64Bytes = errors.New("provided bytes do not represent a valid uint64 number")
 
+// GenericAPIResponse represents the generic response structure from the Klever node/proxy
+type GenericAPIResponse struct {
+	Data  interface{} `json:"data"`
+	Error string      `json:"error"`
+	Code  string      `json:"code"`
+}
+
 func createHTTPStatusError(httpStatusCode int, err error) error {
 	if err == nil {
 		err = ErrHTTPStatusCodeIsNotOK
@@ -52,4 +60,32 @@ func createHTTPStatusError(httpStatusCode int, err error) error {
 
 	return fmt.Errorf("%w, returned http status: %d, %s",
 		err, httpStatusCode, http.StatusText(httpStatusCode))
+}
+
+func createHTTPStatusErrorWithBody(httpStatusCode int, err error, responseBody []byte) error {
+	if err == nil {
+		err = ErrHTTPStatusCodeIsNotOK
+	}
+
+	apiError := extractAPIError(responseBody)
+	if apiError != "" {
+		return fmt.Errorf("%w, returned http status: %d, %s, api error: %s",
+			err, httpStatusCode, http.StatusText(httpStatusCode), apiError)
+	}
+
+	return fmt.Errorf("%w, returned http status: %d, %s",
+		err, httpStatusCode, http.StatusText(httpStatusCode))
+}
+
+func extractAPIError(responseBody []byte) string {
+	if len(responseBody) == 0 {
+		return ""
+	}
+
+	var response GenericAPIResponse
+	if jsonErr := json.Unmarshal(responseBody, &response); jsonErr != nil {
+		return ""
+	}
+
+	return response.Error
 }

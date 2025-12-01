@@ -124,7 +124,7 @@ func (ep *proxy) ExecuteVMQuery(ctx context.Context, vmRequest *models.VmValueRe
 
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetVmQuery(), jsonVMRequest)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	endpointProviderType := ep.endpointProvider.GetRestAPIEntityType()
@@ -193,7 +193,7 @@ func (ep *proxy) getAccountNode(ctx context.Context, address address.Address) (*
 
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.AccountNodeResponse{}
@@ -214,7 +214,7 @@ func (ep *proxy) getAccountProxy(ctx context.Context, address address.Address) (
 
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.AccountApiResponse{}
@@ -247,7 +247,7 @@ func (ep *proxy) SendTransaction(ctx context.Context, tx *transaction.Transactio
 
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetSendTransaction(), jsonTx)
 	if err != nil || code != http.StatusOK {
-		return "", createHTTPStatusError(code, err)
+		return "", createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.SendTransactionResponse{}
@@ -275,7 +275,7 @@ func (ep *proxy) SendTransactions(ctx context.Context, txs []*transaction.Transa
 
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetSendMultipleTransactions(), jsonTx)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.SendBulkTransactionsResponse{}
@@ -295,7 +295,7 @@ func (ep *proxy) GetTransactionStatus(ctx context.Context, hash string) (string,
 	endpoint := ep.endpointProvider.GetTransactionStatus(hash)
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
-		return "", createHTTPStatusError(code, err)
+		return "", createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.TransactionStatus{}
@@ -328,7 +328,7 @@ func (ep *proxy) getTransactionInfo(ctx context.Context, hash string, withResult
 
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.GetTransactionResponse{}
@@ -351,7 +351,7 @@ func (ep *proxy) EstimateTransactionFees(ctx context.Context, tx *transaction.Tr
 	}
 	buff, code, err := ep.PostHTTP(ctx, ep.endpointProvider.GetEstimateTransactionFees(), jsonTx)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.EstimateTransactionFeesResponse{}
@@ -382,7 +382,7 @@ func (ep *proxy) GetKDATokenData(
 	endpoint := ep.endpointProvider.GetKDATokenData(address.Bech32(), tokenIdentifier)
 	buff, code, err := ep.GetHTTP(ctx, endpoint)
 	if err != nil || code != http.StatusOK {
-		return nil, createHTTPStatusError(code, err)
+		return nil, createHTTPStatusErrorWithBody(code, err, buff)
 	}
 
 	response := &models.KDAFungibleResponse{}
