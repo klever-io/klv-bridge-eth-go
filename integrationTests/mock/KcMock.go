@@ -161,6 +161,16 @@ func (mock *KleverBlockchainMock) AddTokensPair(erc20 common.Address, ticker str
 	mock.addTokensPair(erc20, ticker, isNativeToken, isMintBurnToken, totalBalance, mintBalances, burnBalances)
 }
 
+// SetDecimalConversion sets the decimal conversion configuration for a token
+// The conversion is calculated as: convertedAmount = (amount * multiplier) / divisor
+// For example, ETH 18 decimals to KDA 6 decimals: multiplier=1, divisor=10^12
+func (mock *KleverBlockchainMock) SetDecimalConversion(ticker string, multiplier, divisor *big.Int) {
+	mock.mutState.Lock()
+	defer mock.mutState.Unlock()
+
+	mock.setDecimalConversion(ticker, multiplier, divisor)
+}
+
 // SetLastExecutedEthBatchID -
 func (mock *KleverBlockchainMock) SetLastExecutedEthBatchID(lastExecutedEthBatchId uint64) {
 	mock.mutState.Lock()

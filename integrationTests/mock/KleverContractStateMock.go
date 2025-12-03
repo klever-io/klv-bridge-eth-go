@@ -28,12 +28,13 @@ type kleverBlockchainProposedTransfer struct {
 
 // Transfer -
 type Transfer struct {
-	From   []byte
-	To     []byte
-	Token  string
-	Amount *big.Int
-	Nonce  *big.Int
-	Data   []byte
+	From            []byte
+	To              []byte
+	Token           string
+	Amount          *big.Int
+	ConvertedAmount *big.Int
+	Nonce           *big.Int
+	Data            []byte
 }
 
 // KleverBlockchainPendingBatch -
@@ -44,11 +45,12 @@ type KleverBlockchainPendingBatch struct {
 
 // KleverBlockchainDeposit -
 type KleverBlockchainDeposit struct {
-	From         address.Address
-	To           common.Address
-	Ticker       string
-	Amount       *big.Int
-	DepositNonce uint64
+	From            address.Address
+	To              common.Address
+	Ticker          string
+	Amount          *big.Int
+	ConvertedAmount *big.Int
+	DepositNonce    uint64
 }
 
 // kleverBlockchainContractStateMock is not concurrent safe
@@ -193,26 +195,32 @@ func (mock *kleverBlockchainContractStateMock) createProposedTransfer(dataSplit 
 			panic(errDecode)
 		}
 
-		nonceBytes, errDecode := hex.DecodeString(dataSplit[currentIndex+4])
+		convertedAmountBytes, errDecode := hex.DecodeString(dataSplit[currentIndex+4])
 		if errDecode != nil {
 			panic(errDecode)
 		}
 
-		dataBytes, errDecode := hex.DecodeString(dataSplit[currentIndex+5])
+		nonceBytes, errDecode := hex.DecodeString(dataSplit[currentIndex+5])
+		if errDecode != nil {
+			panic(errDecode)
+		}
+
+		dataBytes, errDecode := hex.DecodeString(dataSplit[currentIndex+6])
 		if errDecode != nil {
 			panic(errDecode)
 		}
 
 		t := Transfer{
-			From:   from,
-			To:     to,
-			Token:  dataSplit[currentIndex+2],
-			Amount: big.NewInt(0).SetBytes(amountBytes),
-			Nonce:  big.NewInt(0).SetBytes(nonceBytes),
-			Data:   dataBytes,
+			From:            from,
+			To:              to,
+			Token:           dataSplit[currentIndex+2],
+			Amount:          big.NewInt(0).SetBytes(amountBytes),
+			ConvertedAmount: big.NewInt(0).SetBytes(convertedAmountBytes),
+			Nonce:           big.NewInt(0).SetBytes(nonceBytes),
+			Data:            dataBytes,
 		}
 
-		indexIncrementValue := 6
+		indexIncrementValue := 7
 		transfer.Transfers = append(transfer.Transfers, t)
 		currentIndex += indexIncrementValue
 	}
@@ -283,6 +291,8 @@ func (mock *kleverBlockchainContractStateMock) processVmRequests(vmRequest *mode
 		return mock.vmRequestGetBurnBalances(vmRequest), nil
 	case "getLastBatchId":
 		return mock.vmRequestGetLastBatchId(vmRequest), nil
+	case "convertEthToKdaAmount":
+		return mock.vmRequestConvertEthToKdaAmount(vmRequest), nil
 	}
 
 	return nil, fmt.Errorf("unimplemented function: %s", vmRequest.FuncName)
@@ -464,6 +474,11 @@ func (mock *kleverBlockchainContractStateMock) responseWithPendingBatch() *model
 		args = append(args, deposit.To.Bytes())
 		args = append(args, []byte(deposit.Ticker))
 		args = append(args, deposit.Amount.Bytes())
+		convertedAmount := deposit.ConvertedAmount
+		if convertedAmount == nil {
+			convertedAmount = deposit.Amount // default to same as Amount if not set
+		}
+		args = append(args, convertedAmount.Bytes())
 	}
 	return createOkVmResponse(args)
 }
@@ -551,6 +566,23 @@ func (mock *kleverBlockchainContractStateMock) vmRequestGetLastBatchId(_ *models
 		return createOkVmResponse([][]byte{big.NewInt(0).Bytes()})
 	}
 	return createOkVmResponse([][]byte{mock.pendingBatch.Nonce.Bytes()})
+}
+
+func (mock *kleverBlockchainContractStateMock) vmRequestConvertEthToKdaAmount(vmRequest *models.VmValueRequest) *models.VmValuesResponseData {
+	// Parse the token from the first argument
+	hexedToken := vmRequest.Args[0]
+
+	// Parse the amount from the second argument
+	amountBytes, err := hex.DecodeString(vmRequest.Args[1])
+	if err != nil {
+		return createNokVmResponse(err)
+	}
+	amount := big.NewInt(0).SetBytes(amountBytes)
+
+	// Use the decimal conversion configuration from the token registry
+	convertedAmount := mock.getConvertedAmount(hexedToken, amount)
+
+	return createOkVmResponse([][]byte{convertedAmount.Bytes()})
 }
 
 func getBigIntFromString(data string) *big.Int {

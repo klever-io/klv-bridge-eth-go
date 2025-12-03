@@ -248,12 +248,14 @@ func createTransactions(n int) ([]mock.KleverBlockchainDeposit, []common.Address
 
 func createTransaction(index int) (mock.KleverBlockchainDeposit, common.Address) {
 	tokenAddress := testsCommon.CreateRandomEthereumAddress()
+	amount := big.NewInt(int64(index*1000) + 500) // 0 as amount is not relevant
 
 	return mock.KleverBlockchainDeposit{
-		From:   testsCommon.CreateRandomKCAddress(),
-		To:     testsCommon.CreateRandomEthereumAddress(),
-		Ticker: fmt.Sprintf("tck-00000%d", index+1),
-		Amount: big.NewInt(int64(index*1000) + 500), // 0 as amount is not relevant
+		From:            testsCommon.CreateRandomKCAddress(),
+		To:              testsCommon.CreateRandomEthereumAddress(),
+		Ticker:          fmt.Sprintf("tck-00000%d", index+1),
+		Amount:          amount,
+		ConvertedAmount: amount, // default to same as Amount for now
 	}, tokenAddress
 }
 
