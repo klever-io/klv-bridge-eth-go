@@ -60,22 +60,26 @@ type testConfiguration struct {
 	// If set, the converted value = amount * conversionMultiplier / conversionDivisor
 	conversionMultiplier *big.Int
 	conversionDivisor    *big.Int
+
+	// nilConvertedAmountOnKlvBatch simulates a batch where ConvertedAmount is nil
+	nilConvertedAmountOnKlvBatch bool
 }
 
 func (cfg *testConfiguration) deepClone() testConfiguration {
 	result := testConfiguration{
-		isNativeOnEth:              cfg.isNativeOnEth,
-		isMintBurnOnEth:            cfg.isMintBurnOnEth,
-		isNativeOnKlv:              cfg.isNativeOnKlv,
-		isMintBurnOnKlv:            cfg.isMintBurnOnKlv,
-		errorsOnCalls:              make(map[string]error),
-		ethToken:                   common.HexToAddress(cfg.ethToken.Hex()),
-		kdaToken:                   make([]byte, len(cfg.kdaToken)),
-		direction:                  cfg.direction,
-		lastExecutedEthBatch:       cfg.lastExecutedEthBatch,
-		pendingKlvBatchId:          cfg.pendingKlvBatchId,
-		amountsOnKlvPendingBatches: make(map[uint64][]*big.Int),
-		amountsOnEthPendingBatches: make(map[uint64][]*big.Int),
+		isNativeOnEth:                cfg.isNativeOnEth,
+		isMintBurnOnEth:              cfg.isMintBurnOnEth,
+		isNativeOnKlv:                cfg.isNativeOnKlv,
+		isMintBurnOnKlv:              cfg.isMintBurnOnKlv,
+		errorsOnCalls:                make(map[string]error),
+		ethToken:                     common.HexToAddress(cfg.ethToken.Hex()),
+		kdaToken:                     make([]byte, len(cfg.kdaToken)),
+		direction:                    cfg.direction,
+		lastExecutedEthBatch:         cfg.lastExecutedEthBatch,
+		pendingKlvBatchId:            cfg.pendingKlvBatchId,
+		amountsOnKlvPendingBatches:   make(map[uint64][]*big.Int),
+		amountsOnEthPendingBatches:   make(map[uint64][]*big.Int),
+		nilConvertedAmountOnKlvBatch: cfg.nilConvertedAmountOnKlvBatch,
 	}
 	if cfg.totalBalancesOnEth != nil {
 		result.totalBalancesOnEth = big.NewInt(0).Set(cfg.totalBalancesOnEth)
@@ -398,6 +402,29 @@ func TestBridgeExecutor_CheckToken(t *testing.T) {
 			assert.Equal(t, expectedError, result.error)
 			assert.False(t, result.checkRequiredBalanceOnEthCalled)
 			assert.True(t, result.checkRequiredBalanceOnKlvCalled)
+		})
+		t.Run("on computeKlvAmount, nil ConvertedAmount in batch should error", func(t *testing.T) {
+			t.Parallel()
+
+			cfg := testConfiguration{
+				direction:         batchProcessor.ToKC,
+				isMintBurnOnKlv:   true,
+				isNativeOnEth:     true,
+				burnBalancesOnKlv: big.NewInt(100),
+				mintBalancesOnKlv: big.NewInt(0),
+				burnBalancesOnEth: big.NewInt(0),
+				mintBalancesOnEth: big.NewInt(100),
+				pendingKlvBatchId: 1,
+				amountsOnKlvPendingBatches: map[uint64][]*big.Int{
+					1: {big.NewInt(50)}, // Pending batch with amount but no ConvertedAmount
+				},
+				nilConvertedAmountOnKlvBatch: true,
+				kdaToken:                     kdaToken,
+				ethToken:                     ethToken,
+			}
+			result := validatorTester(cfg)
+			assert.ErrorIs(t, result.error, clients.ErrMissingConvertedAmount)
+			assert.Contains(t, result.error.Error(), "deposit nonce 0")
 		})
 	})
 	t.Run("invalid setup", func(t *testing.T) {
@@ -1967,12 +1994,16 @@ func applyDummyFromKlvDepositsToBatch(cfg testConfiguration, batch *bridgeCore.T
 			depositCounter := uint64(0)
 
 			for _, deposit := range values {
-				batch.Deposits = append(batch.Deposits, &bridgeCore.DepositTransfer{
+				deposit := &bridgeCore.DepositTransfer{
 					Nonce:            depositCounter,
 					Amount:           big.NewInt(0).Set(deposit),
-					ConvertedAmount:  big.NewInt(0).Set(deposit),
 					SourceTokenBytes: kdaToken,
-				})
+				}
+				// Only set ConvertedAmount if not simulating nil case
+				if !cfg.nilConvertedAmountOnKlvBatch {
+					deposit.ConvertedAmount = big.NewInt(0).Set(deposit.Amount)
+				}
+				batch.Deposits = append(batch.Deposits, deposit)
 			}
 		}
 	}

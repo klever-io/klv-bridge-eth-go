@@ -279,15 +279,19 @@ func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big
 }
 
 // getConvertedTotalAmountFromBatch uses ConvertedAmount (KDA decimals) for KC-originated batches
-func getConvertedTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big.Int {
+func getConvertedTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) (*big.Int, error) {
 	amount := big.NewInt(0)
 	for _, deposit := range batch.Deposits {
+		if deposit.ConvertedAmount == nil {
+			return nil, fmt.Errorf("%w for deposit nonce %d", clients.ErrMissingConvertedAmount, deposit.Nonce)
+		}
+
 		if bytes.Equal(deposit.SourceTokenBytes, token) {
 			amount.Add(amount, deposit.ConvertedAmount)
 		}
 	}
 
-	return amount
+	return amount, nil
 }
 
 func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx context.Context, kdaToken []byte) (*big.Int, error) {
@@ -316,7 +320,11 @@ func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx
 		}
 
 		// Use ConvertedAmount (KDA decimals) to match KC balances which are also in KDA decimals
-		amountFromBatch := getConvertedTotalAmountFromBatch(batch, kdaToken)
+		amountFromBatch, err := getConvertedTotalAmountFromBatch(batch, kdaToken)
+		if err != nil {
+			return nil, err
+		}
+
 		amount.Add(amount, amountFromBatch)
 		batchID-- // go to the previous batch
 	}
