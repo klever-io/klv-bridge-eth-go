@@ -393,6 +393,194 @@ func testRelayersShouldExecuteTransferFromEthToKCHavingTxsWithSCcalls(t *testing
 	assert.Equal(t, args.expectedScCallData, transfer.Transfers[2].Data)
 }
 
+// TestRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion tests the ETH→KC flow
+// when tokens have different decimal configurations. Ethereum tokens commonly use 18 decimals,
+// while Klever has a maximum of 8 decimals. The smart contracts handle the conversion at proposal time.
+func TestRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion(t *testing.T) {
+	if testing.Short() {
+		t.Skip("this is not a short test")
+	}
+
+	t.Run("18 to 8 decimals conversion", func(t *testing.T) {
+		// ETH 18 decimals → KDA 8 decimals (scale down by 10^10)
+		// Example: 1.5 ETH = 1,500,000,000,000,000,000 wei → 150,000,000 (KDA 8 decimals)
+		testRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion(t, decimalConversionTestArgs{
+			ethDecimals:    18,
+			kdaDecimals:    8,
+			ethAmount:      big.NewInt(0).Mul(big.NewInt(15), big.NewInt(1e17)), // 1.5 ETH in wei
+			expectedKdaAmt: big.NewInt(150_000_000),                             // 1.5 in KDA 8 decimals
+		})
+	})
+	t.Run("18 to 6 decimals conversion", func(t *testing.T) {
+		// ETH 18 decimals → KDA 6 decimals (scale down by 10^12)
+		// Example: 2.5 tokens = 2,500,000,000,000,000,000 → 2,500,000 (KDA 6 decimals)
+		testRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion(t, decimalConversionTestArgs{
+			ethDecimals:    18,
+			kdaDecimals:    6,
+			ethAmount:      big.NewInt(0).Mul(big.NewInt(25), big.NewInt(1e17)), // 2.5 tokens in ETH 18 decimals
+			expectedKdaAmt: big.NewInt(2_500_000),                               // 2.5 in KDA 6 decimals
+		})
+	})
+	t.Run("same decimals no conversion", func(t *testing.T) {
+		// 8 decimals → 8 decimals (no conversion needed)
+		// Example: WKLV already has 8 decimals on both sides
+		testRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion(t, decimalConversionTestArgs{
+			ethDecimals:    8,
+			kdaDecimals:    8,
+			ethAmount:      big.NewInt(100_000_000), // 1.0 token in 8 decimals
+			expectedKdaAmt: big.NewInt(100_000_000), // same amount
+		})
+	})
+	t.Run("6 to 6 decimals no conversion USDC style", func(t *testing.T) {
+		// USDC: 6 decimals on both chains
+		testRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion(t, decimalConversionTestArgs{
+			ethDecimals:    6,
+			kdaDecimals:    6,
+			ethAmount:      big.NewInt(1_000_000), // 1.0 USDC
+			expectedKdaAmt: big.NewInt(1_000_000), // same amount
+		})
+	})
+}
+
+type decimalConversionTestArgs struct {
+	ethDecimals    uint8
+	kdaDecimals    uint8
+	ethAmount      *big.Int
+	expectedKdaAmt *big.Int
+}
+
+func testRelayersShouldExecuteTransfersFromEthToKCWithDecimalConversion(t *testing.T, args decimalConversionTestArgs) {
+	safeContractEthAddress := testsCommon.CreateRandomEthereumAddress()
+
+	tokenErc20 := testsCommon.CreateRandomEthereumAddress()
+	ticker := "tck-dec001"
+
+	destination := testsCommon.CreateRandomKCAddress()
+	depositor := testsCommon.CreateRandomEthereumAddress()
+
+	tokens := []common.Address{tokenErc20}
+	availableBalances := []*big.Int{args.ethAmount}
+
+	erc20ContractsHolder := createMockErc20ContractsHolder(tokens, safeContractEthAddress, availableBalances)
+
+	batchNonceOnEthereum := uint64(100)
+	txNonceOnEthereum := uint64(500)
+	batch := contract.Batch{
+		Nonce:                  big.NewInt(int64(batchNonceOnEthereum) + 1),
+		BlockNumber:            0,
+		LastUpdatedBlockNumber: 0,
+		DepositsCount:          1,
+	}
+
+	numRelayers := 3
+	ethereumChainMock := mock.NewEthereumChainMock()
+	ethereumChainMock.AddBatch(batch)
+	ethereumChainMock.AddDepositToBatch(batchNonceOnEthereum+1, contract.Deposit{
+		Nonce:        big.NewInt(int64(txNonceOnEthereum) + 1),
+		TokenAddress: tokenErc20,
+		Amount:       args.ethAmount,
+		Depositor:    depositor,
+		Recipient:    destination.AddressSlice(),
+		Status:       0,
+	})
+	ethereumChainMock.AddBatch(batch)
+	ethereumChainMock.SetQuorum(numRelayers)
+	ethereumChainMock.SetFinalNonce(batchNonceOnEthereum + 1)
+
+	// Configure as native token on Ethereum (not mint/burn)
+	ethereumChainMock.UpdateNativeTokens(tokenErc20, true)
+	ethereumChainMock.UpdateMintBurnTokens(tokenErc20, false)
+	ethereumChainMock.UpdateTotalBalances(tokenErc20, args.ethAmount)
+
+	kcChainMock := mock.NewKleverBlockchainMock()
+	kcChainMock.AddTokensPair(tokenErc20, ticker, false, true, zero, zero, zero)
+
+	// Set up decimal conversion: convertedAmount = (amount * multiplier) / divisor
+	// For 18→8: multiplier=1, divisor=10^10
+	// For 18→6: multiplier=1, divisor=10^12
+	// For same decimals: multiplier=1, divisor=1
+	var multiplier, divisor *big.Int
+	if args.ethDecimals > args.kdaDecimals {
+		multiplier = big.NewInt(1)
+		decimalDiff := args.ethDecimals - args.kdaDecimals
+		divisor = new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimalDiff)), nil)
+	} else if args.ethDecimals < args.kdaDecimals {
+		decimalDiff := args.kdaDecimals - args.ethDecimals
+		multiplier = new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimalDiff)), nil)
+		divisor = big.NewInt(1)
+	} else {
+		multiplier = big.NewInt(1)
+		divisor = big.NewInt(1)
+	}
+	kcChainMock.SetDecimalConversion(ticker, multiplier, divisor)
+
+	kcChainMock.SetLastExecutedEthBatchID(batchNonceOnEthereum)
+	kcChainMock.SetLastExecutedEthTxId(txNonceOnEthereum)
+	kcChainMock.GetStatusesAfterExecutionHandler = func() []byte {
+		return []byte{bridgeCore.Executed}
+	}
+	kcChainMock.SetQuorum(numRelayers)
+
+	relayers := make([]bridgeComponents, 0, numRelayers)
+	defer closeRelayers(relayers)
+
+	messengers := integrationTests.CreateLinkedMessengers(numRelayers)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
+	defer cancel()
+	kcChainMock.ProcessFinishedHandler = func() {
+		log.Info("kcChainMock.ProcessFinishedHandler called - decimal conversion test")
+		asyncCancelCall(cancel, time.Second*5)
+	}
+
+	for i := 0; i < numRelayers; i++ {
+		argsBridgeComponents := createMockBridgeComponentsArgs(i, messengers[i], kcChainMock, ethereumChainMock)
+		argsBridgeComponents.Configs.GeneralConfig.Eth.SafeContractAddress = safeContractEthAddress.Hex()
+		argsBridgeComponents.Erc20ContractsHolder = erc20ContractsHolder
+
+		relayer, err := factory.NewEthKleverBridgeComponents(argsBridgeComponents)
+		require.NoError(t, err)
+
+		kcChainMock.AddRelayer(relayer.KleverRelayerAddress())
+		ethereumChainMock.AddRelayer(relayer.EthereumRelayerAddress())
+
+		relayers = append(relayers, relayer)
+		go func(r bridgeComponents) {
+			if err := r.Start(); err != nil {
+				integrationTests.Log.LogIfError(err)
+				assert.NoError(t, err)
+			}
+		}(relayer)
+	}
+
+	<-ctx.Done()
+	time.Sleep(time.Second * 5)
+
+	// Verify the transfer was proposed and executed
+	assert.NotNil(t, kcChainMock.PerformedActionID())
+	transfer := kcChainMock.ProposedTransfer()
+	require.NotNil(t, transfer)
+	require.Equal(t, 1, len(transfer.Transfers))
+	assert.Equal(t, batchNonceOnEthereum+1, transfer.BatchId.Uint64())
+
+	// Verify transfer details
+	assert.Equal(t, destination.Bytes(), transfer.Transfers[0].To)
+	assert.Equal(t, hex.EncodeToString([]byte(ticker)), transfer.Transfers[0].Token)
+	assert.Equal(t, depositor, common.BytesToAddress(transfer.Transfers[0].From))
+	assert.Equal(t, txNonceOnEthereum+1, transfer.Transfers[0].Nonce.Uint64())
+	assert.Equal(t, []byte{bridgeCore.MissingDataProtocolMarker}, transfer.Transfers[0].Data)
+
+	// Verify amount fields - this is the key validation for decimal conversion
+	// Amount should be the original ETH amount (in ETH decimals)
+	assert.Equal(t, args.ethAmount, transfer.Transfers[0].Amount,
+		"Amount should be the original ETH amount in ETH decimals")
+
+	// ConvertedAmount should be the converted KDA amount (in KDA decimals)
+	assert.Equal(t, args.expectedKdaAmt, transfer.Transfers[0].ConvertedAmount,
+		"ConvertedAmount should be the converted amount in KDA decimals (ETH %d → KDA %d decimals)",
+		args.ethDecimals, args.kdaDecimals)
+}
+
 func createMockBridgeComponentsArgs(
 	index int,
 	messenger p2p.Messenger,
