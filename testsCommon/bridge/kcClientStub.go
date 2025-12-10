@@ -25,6 +25,7 @@ type KCClientStub struct {
 	GetLastExecutedEthBatchIDCalled                func(ctx context.Context) (uint64, error)
 	GetLastExecutedEthTxIDCalled                   func(ctx context.Context) (uint64, error)
 	GetCurrentNonceCalled                          func(ctx context.Context) (uint64, error)
+	ConvertEthToKdaAmountCalled                    func(ctx context.Context, token []byte, amount *big.Int) (*big.Int, error)
 	ProposeSetStatusCalled                         func(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error)
 	ResolveNewDepositsCalled                       func(ctx context.Context, batch *bridgeCore.TransferBatch) error
 	ProposeTransferCalled                          func(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error)
@@ -157,6 +158,15 @@ func (stub *KCClientStub) GetCurrentNonce(ctx context.Context) (uint64, error) {
 	}
 
 	return 0, nil
+}
+
+// ConvertEthToKdaAmount -
+func (stub *KCClientStub) ConvertEthToKdaAmount(ctx context.Context, token []byte, amount *big.Int) (*big.Int, error) {
+	if stub.ConvertEthToKdaAmountCalled != nil {
+		return stub.ConvertEthToKdaAmountCalled(ctx, token, amount)
+	}
+
+	return amount, nil
 }
 
 // ProposeSetStatus -

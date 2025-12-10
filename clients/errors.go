@@ -38,4 +38,7 @@ var (
 
 	// ErrNilCryptoHandler signals that a nil crypto handler was provided
 	ErrNilCryptoHandler = errors.New("nil crypto handler")
+
+	// ErrMissingConvertedAmount signals that the converted amount for a batch deposit is missing
+	ErrMissingConvertedAmount = errors.New("nil converted amount in batch deposit")
 )

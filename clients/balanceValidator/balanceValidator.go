@@ -104,17 +104,26 @@ func (validator *balanceValidator) CheckToken(ctx context.Context, ethToken comm
 		return err
 	}
 
+	// Convert ethAmount (ETH decimals) to KDA decimals for comparison
+	// Since KC balances are tracked in KDA decimals, we need to convert ETH amount to match
+	ethAmountInKdaDecimals, err := validator.kcClient.ConvertEthToKdaAmount(ctx, kdaToken, ethAmount)
+	if err != nil {
+		return err
+	}
+
 	validator.log.Debug("balanceValidator.CheckToken",
 		"ERC20 token", ethToken.String(),
-		"ERC20 balance", ethAmount.String(),
+		"ERC20 balance (ETH decimals)", ethAmount.String(),
+		"ERC20 balance (KDA decimals)", ethAmountInKdaDecimals.String(),
 		"KDA token", kdaToken,
 		"KDA balance", kdaAmount.String(),
 		"amount", amount.String(),
 	)
 
-	if ethAmount.Cmp(kdaAmount) != 0 {
-		return fmt.Errorf("%w, balance for ERC20 token %s is %s and the balance for KDA token %s is %s, direction %s",
-			ErrBalanceMismatch, ethToken.String(), ethAmount.String(), kdaToken, kdaAmount.String(), direction)
+	// Compare both amounts in KDA decimals
+	if ethAmountInKdaDecimals.Cmp(kdaAmount) != 0 {
+		return fmt.Errorf("%w, balance for ERC20 token %s is %s (converted: %s) and the balance for KDA token %s is %s, direction %s",
+			ErrBalanceMismatch, ethToken.String(), ethAmount.String(), ethAmountInKdaDecimals.String(), kdaToken, kdaAmount.String(), direction)
 	}
 	return nil
 }
@@ -216,6 +225,7 @@ func (validator *balanceValidator) computeKdaAmount(
 	isMintBurn bool,
 	isNative bool,
 ) (*big.Int, error) {
+	// kdaAmountInPendingBatches is already in KDA decimals (uses ConvertedAmount from batch)
 	kdaAmountInPendingBatches, err := validator.getTotalTransferAmountInPendingKlvBatches(ctx, token)
 	if err != nil {
 		return nil, err
@@ -268,6 +278,22 @@ func getTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) *big
 	return amount
 }
 
+// getConvertedTotalAmountFromBatch uses ConvertedAmount (KDA decimals) for KC-originated batches
+func getConvertedTotalAmountFromBatch(batch *bridgeCore.TransferBatch, token []byte) (*big.Int, error) {
+	amount := big.NewInt(0)
+	for _, deposit := range batch.Deposits {
+		if deposit.ConvertedAmount == nil {
+			return nil, fmt.Errorf("%w for deposit nonce %d", clients.ErrMissingConvertedAmount, deposit.Nonce)
+		}
+
+		if bytes.Equal(deposit.SourceTokenBytes, token) {
+			amount.Add(amount, deposit.ConvertedAmount)
+		}
+	}
+
+	return amount, nil
+}
+
 func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx context.Context, kdaToken []byte) (*big.Int, error) {
 	batchID, err := validator.kcClient.GetLastKCBatchID(ctx)
 	if err != nil {
@@ -293,7 +319,12 @@ func (validator *balanceValidator) getTotalTransferAmountInPendingKlvBatches(ctx
 			return amount, nil
 		}
 
-		amountFromBatch := getTotalAmountFromBatch(batch, kdaToken)
+		// Use ConvertedAmount (KDA decimals) to match KC balances which are also in KDA decimals
+		amountFromBatch, err := getConvertedTotalAmountFromBatch(batch, kdaToken)
+		if err != nil {
+			return nil, err
+		}
+
 		amount.Add(amount, amountFromBatch)
 		batchID-- // go to the previous batch
 	}

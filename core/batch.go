@@ -75,6 +75,7 @@ type DepositTransfer struct {
 	DestinationTokenBytes []byte   `json:"-"`
 	DisplayableToken      string   `json:"token"`
 	Amount                *big.Int `json:"amount"`
+	ConvertedAmount       *big.Int `json:"convertedAmount"`
 	Data                  []byte   `json:"-"`
 	DisplayableData       string   `json:"data"`
 }
@@ -97,6 +98,7 @@ func (dt *DepositTransfer) Clone() *DepositTransfer {
 		DestinationTokenBytes: make([]byte, len(dt.DestinationTokenBytes)),
 		DisplayableToken:      dt.DisplayableToken,
 		Amount:                big.NewInt(0),
+		ConvertedAmount:       big.NewInt(0),
 		Data:                  make([]byte, len(dt.Data)),
 		DisplayableData:       dt.DisplayableData,
 	}
@@ -108,6 +110,9 @@ func (dt *DepositTransfer) Clone() *DepositTransfer {
 	copy(cloned.Data, dt.Data)
 	if dt.Amount != nil {
 		cloned.Amount.Set(dt.Amount)
+	}
+	if dt.ConvertedAmount != nil {
+		cloned.ConvertedAmount.Set(dt.ConvertedAmount)
 	}
 
 	return cloned

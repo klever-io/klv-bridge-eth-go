@@ -26,6 +26,7 @@ type KCClient interface {
 	GetLastExecutedEthTxID(ctx context.Context) (uint64, error)
 	GetLastKCBatchID(ctx context.Context) (uint64, error)
 	GetCurrentNonce(ctx context.Context) (uint64, error)
+	ConvertEthToKdaAmount(ctx context.Context, token []byte, amount *big.Int) (*big.Int, error)
 
 	ProposeSetStatus(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error)
 	ProposeTransfer(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error)

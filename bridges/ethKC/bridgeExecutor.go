@@ -456,9 +456,32 @@ func (executor *bridgeExecutor) GetAndStoreBatchFromEthereum(ctx context.Context
 	if err != nil {
 		return err
 	}
+
+	batch, err = executor.convertDepositAmountsToKda(ctx, batch)
+	if err != nil {
+		return err
+	}
+
 	executor.batch = batch
 
 	return nil
+}
+
+// convertDepositAmountsToKda converts the deposit amounts from Ethereum decimals to KDA decimals
+func (executor *bridgeExecutor) convertDepositAmountsToKda(ctx context.Context, batch *bridgeCore.TransferBatch) (*bridgeCore.TransferBatch, error) {
+	if batch == nil {
+		return nil, ErrNilBatch
+	}
+
+	for i, deposit := range batch.Deposits {
+		convertedAmount, err := executor.kcClient.ConvertEthToKdaAmount(ctx, deposit.DestinationTokenBytes, deposit.Amount)
+		if err != nil {
+			return nil, fmt.Errorf("%w while converting deposit amount for deposit index %d", err, i)
+		}
+		batch.Deposits[i].ConvertedAmount = convertedAmount
+	}
+
+	return batch, nil
 }
 
 // addBatchSCMetadata fetches the logs containing sc calls metadata for the current batch

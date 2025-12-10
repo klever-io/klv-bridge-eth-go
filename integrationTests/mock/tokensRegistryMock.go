@@ -8,15 +8,22 @@ import (
 	"github.com/klever-io/klv-bridge-eth-go/integrationTests"
 )
 
+// DecimalConversionConfig holds the multiplier and divisor for decimal conversion
+type DecimalConversionConfig struct {
+	Multiplier *big.Int
+	Divisor    *big.Int
+}
+
 // tokensRegistryMock is not concurrent safe
 type tokensRegistryMock struct {
-	ethToKC        map[common.Address]string
-	kcToEth        map[string]common.Address
-	mintBurnTokens map[string]bool
-	nativeTokens   map[string]bool
-	totalBalances  map[string]*big.Int
-	mintBalances   map[string]*big.Int
-	burnBalances   map[string]*big.Int
+	ethToKC           map[common.Address]string
+	kcToEth           map[string]common.Address
+	mintBurnTokens    map[string]bool
+	nativeTokens      map[string]bool
+	totalBalances     map[string]*big.Int
+	mintBalances      map[string]*big.Int
+	burnBalances      map[string]*big.Int
+	decimalConversion map[string]*DecimalConversionConfig // key is hex-encoded ticker
 }
 
 func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticker string, isNativeToken, isMintBurnToken bool, totalBalance, mintBalances, burnBalances *big.Int) {
@@ -41,6 +48,34 @@ func (mock *tokensRegistryMock) addTokensPair(erc20Address common.Address, ticke
 	}
 }
 
+// setDecimalConversion sets the decimal conversion configuration for a token
+// The conversion is calculated as: convertedAmount = (amount * multiplier) / divisor
+// For example, ETH 18 decimals to KDA 6 decimals: multiplier=1, divisor=10^12
+func (mock *tokensRegistryMock) setDecimalConversion(ticker string, multiplier, divisor *big.Int) {
+	hexedTicker := hex.EncodeToString([]byte(ticker))
+	mock.decimalConversion[hexedTicker] = &DecimalConversionConfig{
+		Multiplier: multiplier,
+		Divisor:    divisor,
+	}
+}
+
+// getConvertedAmount converts an amount using the decimal conversion config for the token
+// If no conversion is configured, returns the same amount
+func (mock *tokensRegistryMock) getConvertedAmount(hexedTicker string, amount *big.Int) *big.Int {
+	config, exists := mock.decimalConversion[hexedTicker]
+	if !exists || config == nil {
+		return amount
+	}
+	// Defensive guards to avoid panics
+	if config.Multiplier == nil || config.Divisor == nil || config.Divisor.Sign() == 0 {
+		return amount
+	}
+	// convertedAmount = (amount * multiplier) / divisor
+	result := new(big.Int).Mul(amount, config.Multiplier)
+	result.Div(result, config.Divisor)
+	return result
+}
+
 func (mock *tokensRegistryMock) clearTokens() {
 	mock.ethToKC = make(map[common.Address]string)
 	mock.kcToEth = make(map[string]common.Address)
@@ -49,6 +84,7 @@ func (mock *tokensRegistryMock) clearTokens() {
 	mock.totalBalances = make(map[string]*big.Int)
 	mock.mintBalances = make(map[string]*big.Int)
 	mock.burnBalances = make(map[string]*big.Int)
+	mock.decimalConversion = make(map[string]*DecimalConversionConfig)
 }
 
 func (mock *tokensRegistryMock) getTicker(erc20Address common.Address) string {

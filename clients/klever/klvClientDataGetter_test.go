@@ -76,6 +76,7 @@ func createMockBatch() *bridgeCore.TransferBatch {
 				DestinationTokenBytes: []byte("converted_token1"),
 				DisplayableToken:      "token1",
 				Amount:                big.NewInt(2),
+				ConvertedAmount:       big.NewInt(200),
 				Data:                  []byte{0x00},
 				DisplayableData:       "00",
 			},
@@ -89,6 +90,7 @@ func createMockBatch() *bridgeCore.TransferBatch {
 				DestinationTokenBytes: []byte("converted_token2"),
 				DisplayableToken:      "token2",
 				Amount:                big.NewInt(4),
+				ConvertedAmount:       big.NewInt(400),
 				Data:                  []byte{0x00},
 				DisplayableData:       "00",
 			},
@@ -599,6 +601,7 @@ func TestKlvClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to1")),
 					hex.EncodeToString([]byte("converted_token1")),
 					hex.EncodeToString(big.NewInt(2).Bytes()),
+					hex.EncodeToString(big.NewInt(200).Bytes()),
 					hex.EncodeToString(big.NewInt(1).Bytes()),
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 
@@ -606,6 +609,7 @@ func TestKlvClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to2")),
 					hex.EncodeToString([]byte("converted_token2")),
 					hex.EncodeToString(big.NewInt(4).Bytes()),
+					hex.EncodeToString(big.NewInt(400).Bytes()),
 					hex.EncodeToString(big.NewInt(3).Bytes()),
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
@@ -651,6 +655,7 @@ func TestKlvClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to1")),
 					hex.EncodeToString([]byte("converted_token1")),
 					hex.EncodeToString(big.NewInt(2).Bytes()),
+					hex.EncodeToString(big.NewInt(200).Bytes()),
 					hex.EncodeToString(big.NewInt(1).Bytes()),
 					hex.EncodeToString(bridgeTests.CallDataMock),
 
@@ -658,6 +663,7 @@ func TestKlvClientDataGetter_WasProposedTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to2")),
 					hex.EncodeToString([]byte("converted_token2")),
 					hex.EncodeToString(big.NewInt(4).Bytes()),
+					hex.EncodeToString(big.NewInt(400).Bytes()),
 					hex.EncodeToString(big.NewInt(3).Bytes()),
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
@@ -773,6 +779,7 @@ func TestKlvClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to1")),
 					hex.EncodeToString([]byte("converted_token1")),
 					hex.EncodeToString(big.NewInt(2).Bytes()),
+					hex.EncodeToString(big.NewInt(200).Bytes()),
 					hex.EncodeToString(big.NewInt(1).Bytes()),
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 
@@ -780,6 +787,7 @@ func TestKlvClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to2")),
 					hex.EncodeToString([]byte("converted_token2")),
 					hex.EncodeToString(big.NewInt(4).Bytes()),
+					hex.EncodeToString(big.NewInt(400).Bytes()),
 					hex.EncodeToString(big.NewInt(3).Bytes()),
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
@@ -824,6 +832,7 @@ func TestKlvClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to1")),
 					hex.EncodeToString([]byte("converted_token1")),
 					hex.EncodeToString(big.NewInt(2).Bytes()),
+					hex.EncodeToString(big.NewInt(200).Bytes()),
 					hex.EncodeToString(big.NewInt(1).Bytes()),
 					hex.EncodeToString(bridgeTests.CallDataMock),
 
@@ -831,6 +840,7 @@ func TestKlvClientDataGetter_GetActionIDForProposeTransfer(t *testing.T) {
 					hex.EncodeToString([]byte("to2")),
 					hex.EncodeToString([]byte("converted_token2")),
 					hex.EncodeToString(big.NewInt(4).Bytes()),
+					hex.EncodeToString(big.NewInt(400).Bytes()),
 					hex.EncodeToString(big.NewInt(3).Bytes()),
 					hex.EncodeToString([]byte{bridgeCore.MissingDataProtocolMarker}),
 				}
