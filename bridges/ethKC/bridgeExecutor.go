@@ -5,7 +5,9 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"math"
 	"math/big"
+	"strconv"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -147,11 +149,7 @@ func (executor *bridgeExecutor) setExecutionMessageInStatusHandler(level logger.
 // MyTurnAsLeader returns true if the current relayer node is the leader
 func (executor *bridgeExecutor) MyTurnAsLeader() bool {
 	isLeader := executor.topologyProvider.MyTurnAsLeader()
-	if isLeader {
-		executor.statusHandler.SetStringMetric(bridgeCore.MetricIsLeader, "true")
-	} else {
-		executor.statusHandler.SetStringMetric(bridgeCore.MetricIsLeader, "false")
-	}
+	executor.statusHandler.SetStringMetric(bridgeCore.MetricIsLeader, strconv.FormatBool(isLeader))
 	return isLeader
 }
 
@@ -159,9 +157,10 @@ func (executor *bridgeExecutor) MyTurnAsLeader() bool {
 func (executor *bridgeExecutor) GetBatchFromKC(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 	batch, err := executor.kcClient.GetPendingBatch(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, int(batch.ID)-1)
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, safeUint64ToInt(batch.ID)-1)
 		if len(batch.Deposits) > 0 {
-			executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, int(batch.Deposits[0].Nonce))
+			lastDeposit := batch.Deposits[len(batch.Deposits)-1]
+			executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, safeUint64ToInt(lastDeposit.Nonce))
 		}
 	}
 	return batch, err
@@ -174,7 +173,7 @@ func (executor *bridgeExecutor) StoreBatchFromKC(batch *bridgeCore.TransferBatch
 	}
 
 	executor.batch = batch
-	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, int(batch.ID))
+	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, safeUint64ToInt(batch.ID))
 	return nil
 }
 
@@ -187,7 +186,7 @@ func (executor *bridgeExecutor) GetStoredBatch() *bridgeCore.TransferBatch {
 func (executor *bridgeExecutor) GetLastExecutedEthBatchIDFromKC(ctx context.Context) (uint64, error) {
 	batchID, err := executor.kcClient.GetLastExecutedEthBatchID(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, int(batchID))
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, safeUint64ToInt(batchID))
 	}
 	return batchID, err
 }
@@ -472,7 +471,7 @@ func (executor *bridgeExecutor) GetAndStoreBatchFromEthereum(ctx context.Context
 	}
 
 	executor.batch = batch
-	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, int(batch.ID))
+	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, safeUint64ToInt(batch.ID))
 
 	return nil
 }
@@ -682,6 +681,13 @@ func (executor *bridgeExecutor) CheckKCClientAvailability(ctx context.Context) e
 // CheckEthereumClientAvailability trigger a self availability check for the Ethereum client
 func (executor *bridgeExecutor) CheckEthereumClientAvailability(ctx context.Context) error {
 	return executor.ethereumClient.CheckClientAvailability(ctx)
+}
+
+func safeUint64ToInt(v uint64) int {
+	if v > uint64(math.MaxInt) {
+		return math.MaxInt
+	}
+	return int(v)
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

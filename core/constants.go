@@ -93,9 +93,6 @@ const (
 	// MetricIsLeader represents the metric used to store if the relayer is a leader
 	MetricIsLeader = "is leader"
 
-	// MetricLeaderRotationRound represents the metric used to store the leader rotation round
-	MetricLeaderRotationRound = "leader rotation round"
-
 	// MetricRelayerStartTime represents the metric used to store the relayer start time
 	MetricRelayerStartTime = "relayer start time"
 

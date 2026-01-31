@@ -1027,6 +1027,8 @@ func TestKCToEthBridgeExecutor_GetAndStoreBatchFromKC(t *testing.T) {
 		batchWithDeposits := &bridgeCore.TransferBatch{
 			ID: 5,
 			Deposits: []*bridgeCore.DepositTransfer{
+				{Nonce: 40},
+				{Nonce: 41},
 				{Nonce: 42},
 			},
 		}
