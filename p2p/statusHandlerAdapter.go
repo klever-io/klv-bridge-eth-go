@@ -3,6 +3,7 @@ package p2p
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -17,6 +18,7 @@ type ArgsStatusHandlerAdapter struct {
 type statusHandlerAdapter struct {
 	core.StatusHandler
 	messenger NetMessenger
+	startTime time.Time
 }
 
 // NewStatusHandlerAdapter creates a new instance of statusHandlerAdapter able to gather p2p status metrics
@@ -31,6 +33,7 @@ func NewStatusHandlerAdapter(args ArgsStatusHandlerAdapter) (*statusHandlerAdapt
 	return &statusHandlerAdapter{
 		StatusHandler: args.StatusHandler,
 		messenger:     args.Messenger,
+		startTime:     time.Now(),
 	}, nil
 }
 
@@ -41,6 +44,9 @@ func (adapter *statusHandlerAdapter) Execute(_ context.Context) error {
 
 	connectedAddresses := adapter.messenger.ConnectedAddresses()
 	adapter.SetStringMetric(core.MetricConnectedP2PAddresses, strings.Join(connectedAddresses, " "))
+
+	adapter.SetIntMetric(core.MetricConnectedP2PPeerCount, len(connectedAddresses))
+	adapter.SetIntMetric(core.MetricRelayerUptimeSeconds, int(time.Since(adapter.startTime).Seconds()))
 
 	return nil
 }

@@ -67,11 +67,11 @@ func TestStatusHandlerAdapter_Execute(t *testing.T) {
 	err := adapter.Execute(context.TODO())
 	assert.Nil(t, err)
 
-	expectedMetric := make(core.GeneralMetrics)
-	expectedMetric[core.MetricConnectedP2PAddresses] = strings.Join(connectedAddresses, " ")
-	expectedMetric[core.MetricRelayerP2PAddresses] = strings.Join(hostAddresses, " ")
-
 	metrics := adapter.GetAllMetrics()
-	assert.Equal(t, 2, len(metrics))
-	assert.Equal(t, expectedMetric, metrics)
+	assert.Equal(t, strings.Join(connectedAddresses, " "), metrics[core.MetricConnectedP2PAddresses])
+	assert.Equal(t, strings.Join(hostAddresses, " "), metrics[core.MetricRelayerP2PAddresses])
+	assert.Equal(t, len(connectedAddresses), metrics[core.MetricConnectedP2PPeerCount])
+	uptimeVal, ok := metrics[core.MetricRelayerUptimeSeconds]
+	assert.True(t, ok)
+	assert.GreaterOrEqual(t, uptimeVal, 0)
 }

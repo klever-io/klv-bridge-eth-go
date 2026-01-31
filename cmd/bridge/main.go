@@ -145,6 +145,8 @@ func startRelay(ctx *cli.Context, version string) error {
 		return err
 	}
 
+	ethClientStatusHandler.SetIntMetric(core.MetricRelayerStartTime, int(time.Now().Unix()))
+
 	kleverClientStatusHandler, err := status.NewStatusHandler(core.KleverClientStatusHandlerName, statusStorer)
 	if err != nil {
 		return err

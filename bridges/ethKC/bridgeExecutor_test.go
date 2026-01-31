@@ -208,18 +208,41 @@ func testPrintInfo(t *testing.T, logLevel logger.LogLevel, shouldOutputToStatusH
 func TestEthToKCBridgeExecutor_MyTurnAsLeader(t *testing.T) {
 	t.Parallel()
 
-	args := createMockExecutorArgs()
-	wasCalled := false
-	args.TopologyProvider = &bridgeTests.TopologyProviderStub{
-		MyTurnAsLeaderCalled: func() bool {
-			wasCalled = true
-			return true
-		},
-	}
+	t.Run("is leader", func(t *testing.T) {
+		t.Parallel()
 
-	executor, _ := NewBridgeExecutor(args)
-	assert.True(t, executor.MyTurnAsLeader())
-	assert.True(t, wasCalled)
+		args := createMockExecutorArgs()
+		statusHandler := testsCommon.NewStatusHandlerMock("test")
+		args.StatusHandler = statusHandler
+		wasCalled := false
+		args.TopologyProvider = &bridgeTests.TopologyProviderStub{
+			MyTurnAsLeaderCalled: func() bool {
+				wasCalled = true
+				return true
+			},
+		}
+
+		executor, _ := NewBridgeExecutor(args)
+		assert.True(t, executor.MyTurnAsLeader())
+		assert.True(t, wasCalled)
+		assert.Equal(t, "true", statusHandler.GetStringMetric(bridgeCore.MetricIsLeader))
+	})
+	t.Run("is not leader", func(t *testing.T) {
+		t.Parallel()
+
+		args := createMockExecutorArgs()
+		statusHandler := testsCommon.NewStatusHandlerMock("test")
+		args.StatusHandler = statusHandler
+		args.TopologyProvider = &bridgeTests.TopologyProviderStub{
+			MyTurnAsLeaderCalled: func() bool {
+				return false
+			},
+		}
+
+		executor, _ := NewBridgeExecutor(args)
+		assert.False(t, executor.MyTurnAsLeader())
+		assert.Equal(t, "false", statusHandler.GetStringMetric(bridgeCore.MetricIsLeader))
+	})
 }
 
 func TestEthToKCBridgeExecutor_GetAndStoreActionIDForProposeTransferOnKC(t *testing.T) {
@@ -372,6 +395,8 @@ func TestEthToKCBridgeExecutor_GetAndStoreBatchFromEthereum(t *testing.T) {
 		t.Parallel()
 
 		args := createMockExecutorArgs()
+		statusHandler := testsCommon.NewStatusHandlerMock("test")
+		args.StatusHandler = statusHandler
 		providedNonce := uint64(8346)
 		expectedBatch := &bridgeCore.TransferBatch{
 			ID: providedNonce,
@@ -394,6 +419,7 @@ func TestEthToKCBridgeExecutor_GetAndStoreBatchFromEthereum(t *testing.T) {
 		assert.Nil(t, err)
 		assert.True(t, expectedBatch == executor.GetStoredBatch()) // pointer testing
 		assert.True(t, expectedBatch == executor.batch)
+		assert.Equal(t, int(providedNonce), statusHandler.GetIntMetric(bridgeCore.MetricCurrentBatchID))
 	})
 	t.Run("should add deposits metadata for sc calls", func(t *testing.T) {
 		t.Parallel()
@@ -996,22 +1022,32 @@ func TestKCToEthBridgeExecutor_GetAndStoreBatchFromKC(t *testing.T) {
 
 		wasCalled := false
 		args := createMockExecutorArgs()
+		statusHandler := testsCommon.NewStatusHandlerMock("test")
+		args.StatusHandler = statusHandler
+		batchWithDeposits := &bridgeCore.TransferBatch{
+			ID: 5,
+			Deposits: []*bridgeCore.DepositTransfer{
+				{Nonce: 42},
+			},
+		}
 		args.KCClient = &bridgeTests.KCClientStub{
 			GetPendingBatchCalled: func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 				wasCalled = true
-				return providedBatch, nil
+				return batchWithDeposits, nil
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		batch, err := executor.GetBatchFromKC(context.Background())
 		assert.True(t, wasCalled)
-		assert.Equal(t, providedBatch, batch)
+		assert.Equal(t, batchWithDeposits, batch)
 		assert.Nil(t, err)
+		assert.Equal(t, 42, statusHandler.GetIntMetric(bridgeCore.MetricCurrentDepositNonce))
 
 		err = executor.StoreBatchFromKC(batch)
-		assert.Equal(t, providedBatch, executor.batch)
+		assert.Equal(t, batchWithDeposits, executor.batch)
 		assert.Nil(t, err)
+		assert.Equal(t, 5, statusHandler.GetIntMetric(bridgeCore.MetricCurrentBatchID))
 	})
 }
 
@@ -1172,6 +1208,8 @@ func TestKCToEthBridgeExecutor_MyTurnAsLeader(t *testing.T) {
 	t.Parallel()
 
 	args := createMockExecutorArgs()
+	statusHandler := testsCommon.NewStatusHandlerMock("test")
+	args.StatusHandler = statusHandler
 	wasCalled := false
 	args.TopologyProvider = &bridgeTests.TopologyProviderStub{
 		MyTurnAsLeaderCalled: func() bool {
@@ -1183,6 +1221,7 @@ func TestKCToEthBridgeExecutor_MyTurnAsLeader(t *testing.T) {
 	executor, _ := NewBridgeExecutor(args)
 	assert.True(t, executor.MyTurnAsLeader())
 	assert.True(t, wasCalled)
+	assert.Equal(t, "true", statusHandler.GetStringMetric(bridgeCore.MetricIsLeader))
 }
 
 func TestKCToEthBridgeExecutor_WasTransferPerformedOnEthereum(t *testing.T) {

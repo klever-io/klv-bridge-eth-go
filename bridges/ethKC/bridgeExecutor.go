@@ -147,7 +147,13 @@ func (executor *bridgeExecutor) setExecutionMessageInStatusHandler(level logger.
 
 // MyTurnAsLeader returns true if the current relayer node is the leader
 func (executor *bridgeExecutor) MyTurnAsLeader() bool {
-	return executor.topologyProvider.MyTurnAsLeader()
+	isLeader := executor.topologyProvider.MyTurnAsLeader()
+	if isLeader {
+		executor.statusHandler.SetStringMetric(core.MetricIsLeader, "true")
+	} else {
+		executor.statusHandler.SetStringMetric(core.MetricIsLeader, "false")
+	}
+	return isLeader
 }
 
 // GetBatchFromKC fetches the pending batch from KC
@@ -155,6 +161,9 @@ func (executor *bridgeExecutor) GetBatchFromKC(ctx context.Context) (*bridgeCore
 	batch, err := executor.kcClient.GetPendingBatch(ctx)
 	if err == nil {
 		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batch.ID)-1)
+		if len(batch.Deposits) > 0 {
+			executor.statusHandler.SetIntMetric(core.MetricCurrentDepositNonce, int(batch.Deposits[0].Nonce))
+		}
 	}
 	return batch, err
 }
@@ -166,6 +175,7 @@ func (executor *bridgeExecutor) StoreBatchFromKC(batch *bridgeCore.TransferBatch
 	}
 
 	executor.batch = batch
+	executor.statusHandler.SetIntMetric(core.MetricCurrentBatchID, int(batch.ID))
 	return nil
 }
 
@@ -463,6 +473,7 @@ func (executor *bridgeExecutor) GetAndStoreBatchFromEthereum(ctx context.Context
 	}
 
 	executor.batch = batch
+	executor.statusHandler.SetIntMetric(core.MetricCurrentBatchID, int(batch.ID))
 
 	return nil
 }

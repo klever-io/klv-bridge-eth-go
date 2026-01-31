@@ -519,6 +519,8 @@ func (components *ethKleverBridgeComponents) createEthereumToKleverBlockchainBri
 		return err
 	}
 
+	components.ethtoKleverStatusHandler.SetStringMetric(core.MetricBridgeDirection, "ETH->KC")
+
 	timeForTransferExecution := time.Second * time.Duration(args.Configs.GeneralConfig.Eth.IntervalToWaitForTransferInSeconds)
 
 	balanceValidator, err := components.createBalanceValidator()
@@ -586,6 +588,8 @@ func (components *ethKleverBridgeComponents) createKCToEthereumBridge(args ArgsE
 	if err != nil {
 		return err
 	}
+
+	components.kcToEthStatusHandler.SetStringMetric(core.MetricBridgeDirection, "KC->ETH")
 
 	timeForWaitOnEthereum := time.Second * time.Duration(args.Configs.GeneralConfig.Eth.IntervalToWaitForTransferInSeconds)
 
