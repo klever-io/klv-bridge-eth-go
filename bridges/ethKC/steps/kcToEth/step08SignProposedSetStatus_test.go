@@ -32,7 +32,7 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
 		bridgeStub.GetAndStoreActionIDForProposeSetStatusFromKCCalled = func(ctx context.Context) (uint64, error) {
-			return ethKC.InvalidActionID, expectedError
+			return ethKC.InvalidActionID, errExpected
 		}
 
 		step := signProposedSetStatusStep{
@@ -60,7 +60,7 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
 		bridgeStub.WasActionSignedOnKCCalled = func(ctx context.Context) (bool, error) {
-			return false, expectedError
+			return false, errExpected
 		}
 
 		step := signProposedSetStatusStep{
@@ -74,7 +74,7 @@ func TestExecute_SignProposedSetStatus(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorSignProposedSetStatus()
 		bridgeStub.SignActionOnKCCalled = func(ctx context.Context) error {
-			return expectedError
+			return errExpected
 		}
 
 		step := signProposedSetStatusStep{

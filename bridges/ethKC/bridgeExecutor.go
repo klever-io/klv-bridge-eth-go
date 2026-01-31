@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
-	"github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -30,7 +29,7 @@ type ArgsBridgeExecutor struct {
 	KCClient                   KCClient
 	EthereumClient             EthereumClient
 	TimeForWaitOnEthereum      time.Duration
-	StatusHandler              core.StatusHandler
+	StatusHandler              bridgeCore.StatusHandler
 	SignaturesHolder           SignaturesHolder
 	BalanceValidator           BalanceValidator
 	MaxQuorumRetriesOnEthereum uint64
@@ -44,7 +43,7 @@ type bridgeExecutor struct {
 	kcClient                   KCClient
 	ethereumClient             EthereumClient
 	timeForWaitOnEthereum      time.Duration
-	statusHandler              core.StatusHandler
+	statusHandler              bridgeCore.StatusHandler
 	sigsHolder                 SignaturesHolder
 	balanceValidator           BalanceValidator
 	maxQuorumRetriesOnEthereum uint64
@@ -142,16 +141,16 @@ func (executor *bridgeExecutor) setExecutionMessageInStatusHandler(level logger.
 		msg += fmt.Sprintf(" %s = %s", convertObjectToString(extras[i]), convertObjectToString(extras[i+1]))
 	}
 
-	executor.statusHandler.SetStringMetric(core.MetricLastError, msg)
+	executor.statusHandler.SetStringMetric(bridgeCore.MetricLastError, msg)
 }
 
 // MyTurnAsLeader returns true if the current relayer node is the leader
 func (executor *bridgeExecutor) MyTurnAsLeader() bool {
 	isLeader := executor.topologyProvider.MyTurnAsLeader()
 	if isLeader {
-		executor.statusHandler.SetStringMetric(core.MetricIsLeader, "true")
+		executor.statusHandler.SetStringMetric(bridgeCore.MetricIsLeader, "true")
 	} else {
-		executor.statusHandler.SetStringMetric(core.MetricIsLeader, "false")
+		executor.statusHandler.SetStringMetric(bridgeCore.MetricIsLeader, "false")
 	}
 	return isLeader
 }
@@ -160,9 +159,9 @@ func (executor *bridgeExecutor) MyTurnAsLeader() bool {
 func (executor *bridgeExecutor) GetBatchFromKC(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 	batch, err := executor.kcClient.GetPendingBatch(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batch.ID)-1)
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, int(batch.ID)-1)
 		if len(batch.Deposits) > 0 {
-			executor.statusHandler.SetIntMetric(core.MetricCurrentDepositNonce, int(batch.Deposits[0].Nonce))
+			executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, int(batch.Deposits[0].Nonce))
 		}
 	}
 	return batch, err
@@ -175,7 +174,7 @@ func (executor *bridgeExecutor) StoreBatchFromKC(batch *bridgeCore.TransferBatch
 	}
 
 	executor.batch = batch
-	executor.statusHandler.SetIntMetric(core.MetricCurrentBatchID, int(batch.ID))
+	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, int(batch.ID))
 	return nil
 }
 
@@ -188,7 +187,7 @@ func (executor *bridgeExecutor) GetStoredBatch() *bridgeCore.TransferBatch {
 func (executor *bridgeExecutor) GetLastExecutedEthBatchIDFromKC(ctx context.Context) (uint64, error) {
 	batchID, err := executor.kcClient.GetLastExecutedEthBatchID(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batchID))
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, int(batchID))
 	}
 	return batchID, err
 }
@@ -473,7 +472,7 @@ func (executor *bridgeExecutor) GetAndStoreBatchFromEthereum(ctx context.Context
 	}
 
 	executor.batch = batch
-	executor.statusHandler.SetIntMetric(core.MetricCurrentBatchID, int(batch.ID))
+	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, int(batch.ID))
 
 	return nil
 }

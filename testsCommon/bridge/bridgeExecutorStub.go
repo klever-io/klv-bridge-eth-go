@@ -91,7 +91,7 @@ func (stub *BridgeExecutorStub) GetBatchFromKC(ctx context.Context) (*bridgeCore
 	if stub.GetBatchFromKCCalled != nil {
 		return stub.GetBatchFromKCCalled(ctx)
 	}
-	return nil, notImplemented
+	return nil, errNotImplemented
 }
 
 // StoreBatchFromKC -
@@ -100,7 +100,7 @@ func (stub *BridgeExecutorStub) StoreBatchFromKC(batch *bridgeCore.TransferBatch
 	if stub.StoreBatchFromKCCalled != nil {
 		return stub.StoreBatchFromKCCalled(batch)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // GetStoredBatch -
@@ -118,7 +118,7 @@ func (stub *BridgeExecutorStub) GetLastExecutedEthBatchIDFromKC(ctx context.Cont
 	if stub.GetLastExecutedEthBatchIDFromKCCalled != nil {
 		return stub.GetLastExecutedEthBatchIDFromKCCalled(ctx)
 	}
-	return 0, notImplemented
+	return 0, errNotImplemented
 }
 
 // VerifyLastDepositNonceExecutedOnEthereumBatch -
@@ -127,7 +127,7 @@ func (stub *BridgeExecutorStub) VerifyLastDepositNonceExecutedOnEthereumBatch(ct
 	if stub.VerifyLastDepositNonceExecutedOnEthereumBatchCalled != nil {
 		return stub.VerifyLastDepositNonceExecutedOnEthereumBatchCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // GetAndStoreActionIDForProposeTransferOnKC -
@@ -136,7 +136,7 @@ func (stub *BridgeExecutorStub) GetAndStoreActionIDForProposeTransferOnKC(ctx co
 	if stub.GetAndStoreActionIDForProposeTransferOnKCCalled != nil {
 		return stub.GetAndStoreActionIDForProposeTransferOnKCCalled(ctx)
 	}
-	return 0, notImplemented
+	return 0, errNotImplemented
 }
 
 // GetAndStoreActionIDForProposeSetStatusFromKC -
@@ -145,7 +145,7 @@ func (stub *BridgeExecutorStub) GetAndStoreActionIDForProposeSetStatusFromKC(ctx
 	if stub.GetAndStoreActionIDForProposeSetStatusFromKCCalled != nil {
 		return stub.GetAndStoreActionIDForProposeSetStatusFromKCCalled(ctx)
 	}
-	return 0, notImplemented
+	return 0, errNotImplemented
 }
 
 // GetStoredActionID -
@@ -163,7 +163,7 @@ func (stub *BridgeExecutorStub) WasTransferProposedOnKC(ctx context.Context) (bo
 	if stub.WasTransferProposedOnKCCalled != nil {
 		return stub.WasTransferProposedOnKCCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // ProposeTransferOnKC -
@@ -172,7 +172,7 @@ func (stub *BridgeExecutorStub) ProposeTransferOnKC(ctx context.Context) error {
 	if stub.ProposeTransferOnKCCalled != nil {
 		return stub.ProposeTransferOnKCCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // ProcessMaxRetriesOnWasTransferProposedOnKC -
@@ -198,7 +198,7 @@ func (stub *BridgeExecutorStub) WasSetStatusProposedOnKC(ctx context.Context) (b
 	if stub.WasSetStatusProposedOnKCCalled != nil {
 		return stub.WasSetStatusProposedOnKCCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // ProposeSetStatusOnKC -
@@ -207,7 +207,7 @@ func (stub *BridgeExecutorStub) ProposeSetStatusOnKC(ctx context.Context) error 
 	if stub.ProposeSetStatusOnKCCalled != nil {
 		return stub.ProposeSetStatusOnKCCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // WasActionSignedOnKC -
@@ -216,7 +216,7 @@ func (stub *BridgeExecutorStub) WasActionSignedOnKC(ctx context.Context) (bool, 
 	if stub.WasActionSignedOnKCCalled != nil {
 		return stub.WasActionSignedOnKCCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // SignActionOnKC -
@@ -225,7 +225,7 @@ func (stub *BridgeExecutorStub) SignActionOnKC(ctx context.Context) error {
 	if stub.SignActionOnKCCalled != nil {
 		return stub.SignActionOnKCCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // ProcessQuorumReachedOnKC -
@@ -234,7 +234,7 @@ func (stub *BridgeExecutorStub) ProcessQuorumReachedOnKC(ctx context.Context) (b
 	if stub.ProcessQuorumReachedOnKCCalled != nil {
 		return stub.ProcessQuorumReachedOnKCCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // WasActionPerformedOnKC -
@@ -243,7 +243,7 @@ func (stub *BridgeExecutorStub) WasActionPerformedOnKC(ctx context.Context) (boo
 	if stub.WasActionPerformedOnKCCalled != nil {
 		return stub.WasActionPerformedOnKCCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // PerformActionOnKC -
@@ -252,7 +252,7 @@ func (stub *BridgeExecutorStub) PerformActionOnKC(ctx context.Context) error {
 	if stub.PerformActionOnKCCalled != nil {
 		return stub.PerformActionOnKCCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // ResolveNewDepositsStatuses -
@@ -286,7 +286,7 @@ func (stub *BridgeExecutorStub) GetAndStoreBatchFromEthereum(ctx context.Context
 	if stub.GetAndStoreBatchFromEthereumCalled != nil {
 		return stub.GetAndStoreBatchFromEthereumCalled(ctx, nonce)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // WasTransferPerformedOnEthereum -
@@ -295,7 +295,7 @@ func (stub *BridgeExecutorStub) WasTransferPerformedOnEthereum(ctx context.Conte
 	if stub.WasTransferPerformedOnEthereumCalled != nil {
 		return stub.WasTransferPerformedOnEthereumCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // SignTransferOnEthereum -
@@ -304,7 +304,7 @@ func (stub *BridgeExecutorStub) SignTransferOnEthereum() error {
 	if stub.SignTransferOnEthereumCalled != nil {
 		return stub.SignTransferOnEthereumCalled()
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // PerformTransferOnEthereum -
@@ -313,7 +313,7 @@ func (stub *BridgeExecutorStub) PerformTransferOnEthereum(ctx context.Context) e
 	if stub.PerformTransferOnEthereumCalled != nil {
 		return stub.PerformTransferOnEthereumCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // ProcessQuorumReachedOnEthereum -
@@ -322,7 +322,7 @@ func (stub *BridgeExecutorStub) ProcessQuorumReachedOnEthereum(ctx context.Conte
 	if stub.ProcessQuorumReachedOnEthereumCalled != nil {
 		return stub.ProcessQuorumReachedOnEthereumCalled(ctx)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // WaitForTransferConfirmation -
@@ -348,7 +348,7 @@ func (stub *BridgeExecutorStub) GetBatchStatusesFromEthereum(ctx context.Context
 	if stub.GetBatchStatusesFromEthereumCalled != nil {
 		return stub.GetBatchStatusesFromEthereumCalled(ctx)
 	}
-	return nil, notImplemented
+	return nil, errNotImplemented
 }
 
 // ProcessMaxQuorumRetriesOnEthereum -
@@ -381,7 +381,7 @@ func (stub *BridgeExecutorStub) CheckKCClientAvailability(ctx context.Context) e
 	if stub.CheckKCClientAvailabilityCalled != nil {
 		return stub.CheckKCClientAvailabilityCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // CheckEthereumClientAvailability -
@@ -389,7 +389,7 @@ func (stub *BridgeExecutorStub) CheckEthereumClientAvailability(ctx context.Cont
 	if stub.CheckEthereumClientAvailabilityCalled != nil {
 		return stub.CheckEthereumClientAvailabilityCalled(ctx)
 	}
-	return notImplemented
+	return errNotImplemented
 }
 
 // IsInterfaceNil -

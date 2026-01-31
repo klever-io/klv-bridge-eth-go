@@ -7,14 +7,13 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	bridgeTests "github.com/klever-io/klv-bridge-eth-go/testsCommon/bridge"
 	"github.com/stretchr/testify/assert"
 )
 
-var expectedError = errors.New("expected error")
+var errExpected = errors.New("expected error")
 var testBatch = &bridgeCore.TransferBatch{
 	ID: 112233,
 	Deposits: []*bridgeCore.DepositTransfer{
@@ -37,7 +36,7 @@ func TestExecuteGetPending(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutor()
 		bridgeStub.GetLastExecutedEthBatchIDFromKCCalled = func(ctx context.Context) (uint64, error) {
-			return 1122, expectedError
+			return 1122, errExpected
 		}
 
 		step := getPendingStep{
@@ -55,7 +54,7 @@ func TestExecuteGetPending(t *testing.T) {
 			return 1122, nil
 		}
 		bridgeStub.GetAndStoreBatchFromEthereumCalled = func(ctx context.Context, nonce uint64) error {
-			return expectedError
+			return errExpected
 		}
 
 		step := getPendingStep{
@@ -99,7 +98,7 @@ func TestExecuteGetPending(t *testing.T) {
 			return testBatch
 		}
 		bridgeStub.VerifyLastDepositNonceExecutedOnEthereumBatchCalled = func(ctx context.Context) error {
-			return expectedError
+			return errExpected
 		}
 
 		step := getPendingStep{
@@ -114,7 +113,7 @@ func TestExecuteGetPending(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutor()
 		bridgeStub.CheckAvailableTokensCalled = func(ctx context.Context, ethTokens []common.Address, kdaTokens [][]byte, amounts []*big.Int, direction batchProcessor.Direction) error {
-			return expectedError
+			return errExpected
 		}
 		bridgeStub.GetLastExecutedEthBatchIDFromKCCalled = func(ctx context.Context) (uint64, error) {
 			return 1122, nil
@@ -162,7 +161,7 @@ func TestExecuteGetPending(t *testing.T) {
 			bridge: bridgeStub,
 		}
 		// Test Identifier()
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		assert.Equal(t, expectedStepIdentifier, step.Identifier())
 		// Test IsInterfaceNil()
 		assert.False(t, step.IsInterfaceNil())

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	ethKC "github.com/klever-io/klv-bridge-eth-go/bridges/ethKC"
-	"github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +24,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -37,14 +36,14 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			return testBatch
 		}
 		bridgeStub.WasActionSignedOnKCCalled = func(ctx context.Context) (bool, error) {
-			return false, expectedError
+			return false, errExpected
 		}
 
 		step := signProposedTransferStep{
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -59,14 +58,14 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			return false, nil
 		}
 		bridgeStub.SignActionOnKCCalled = func(ctx context.Context) error {
-			return expectedError
+			return errExpected
 		}
 
 		step := signProposedTransferStep{
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -89,7 +88,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -111,7 +110,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -123,7 +122,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			return testBatch
 		}
 		bridgeStub.WasActionSignedOnKCCalled = func(ctx context.Context) (bool, error) {
-			return false, expectedError
+			return false, errExpected
 		}
 		bridgeStub.GetAndStoreActionIDForProposeTransferOnKCCalled = func(ctx context.Context) (uint64, error) {
 			return ethKC.InvalidActionID, nil
@@ -133,7 +132,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(GettingPendingBatchFromEthereum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(GettingPendingBatchFromEthereum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -155,7 +154,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 
-		expectedStepIdentifier := core.StepIdentifier(WaitingForQuorum)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(WaitingForQuorum)
 		stepIdentifier := step.Execute(context.Background())
 		assert.Equal(t, expectedStepIdentifier, stepIdentifier)
 	})
@@ -180,7 +179,7 @@ func TestExecuteSignProposedTransferStep(t *testing.T) {
 			bridge: bridgeStub,
 		}
 		// Test Identifier()
-		expectedStepIdentifier := core.StepIdentifier(SigningProposedTransferOnKC)
+		expectedStepIdentifier := bridgeCore.StepIdentifier(SigningProposedTransferOnKC)
 		assert.Equal(t, expectedStepIdentifier, step.Identifier())
 		// Test IsInterfaceNil
 		assert.False(t, step.IsInterfaceNil())

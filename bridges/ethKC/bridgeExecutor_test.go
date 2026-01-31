@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var expectedErr = errors.New("expected error")
+var errExpected = errors.New("expected error")
 var providedBatch = &bridgeCore.TransferBatch{}
 var expectedMaxRetries = uint64(3)
 
@@ -265,7 +265,7 @@ func TestEthToKCBridgeExecutor_GetAndStoreActionIDForProposeTransferOnKC(t *test
 		args.KCClient = &bridgeTests.KCClientStub{
 			GetActionIDForProposeTransferCalled: func(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error) {
 				assert.True(t, providedBatch == batch)
-				return 0, expectedErr
+				return 0, errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
@@ -273,7 +273,7 @@ func TestEthToKCBridgeExecutor_GetAndStoreActionIDForProposeTransferOnKC(t *test
 
 		actionID, err := executor.GetAndStoreActionIDForProposeTransferOnKC(context.Background())
 		assert.Zero(t, actionID)
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -311,13 +311,13 @@ func TestEthToKCBridgeExecutor_GetAndStoreBatchFromEthereum(t *testing.T) {
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			GetBatchCalled: func(ctx context.Context, nonce uint64) (*bridgeCore.TransferBatch, bool, error) {
 				assert.Equal(t, providedNonce, nonce)
-				return nil, false, expectedErr
+				return nil, false, errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
 		err := executor.GetAndStoreBatchFromEthereum(context.Background(), providedNonce)
 
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("batch nonce mismatch should error", func(t *testing.T) {
 		t.Parallel()
@@ -603,14 +603,14 @@ func TestEthToKCBridgeExecutor_VerifyLastDepositNonceExecutedOnEthereumBatch(t *
 		args := createMockExecutorArgs()
 		args.KCClient = &bridgeTests.KCClientStub{
 			GetLastExecutedEthTxIDCalled: func(ctx context.Context) (uint64, error) {
-				return 0, expectedErr
+				return 0, errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = &bridgeCore.TransferBatch{}
 
 		err := executor.VerifyLastDepositNonceExecutedOnEthereumBatch(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 
 	args := createMockExecutorArgs()
@@ -759,14 +759,14 @@ func TestEthToKCBridgeExecutor_ProposeTransferOnKC(t *testing.T) {
 			ProposeTransferCalled: func(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
 				assert.True(t, providedBatch == batch)
 
-				return "", expectedErr
+				return "", errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 
 		err := executor.ProposeTransferOnKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -823,7 +823,7 @@ func TestEthToKCBridgeExecutor_SignActionOnKC(t *testing.T) {
 		args.KCClient = &bridgeTests.KCClientStub{
 			SignCalled: func(ctx context.Context, actionID uint64) (string, error) {
 				assert.Equal(t, providedActionID, actionID)
-				return "", expectedErr
+				return "", errExpected
 			},
 		}
 
@@ -831,7 +831,7 @@ func TestEthToKCBridgeExecutor_SignActionOnKC(t *testing.T) {
 		executor.actionID = providedActionID
 
 		err := executor.SignActionOnKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -921,7 +921,7 @@ func TestEthToKCBridgeExecutor_PerformActionOnKC(t *testing.T) {
 			PerformActionCalled: func(ctx context.Context, actionID uint64, batch *bridgeCore.TransferBatch) (string, error) {
 				assert.Equal(t, providedActionID, actionID)
 				assert.True(t, providedBatch == batch)
-				return "", expectedErr
+				return "", errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
@@ -929,7 +929,7 @@ func TestEthToKCBridgeExecutor_PerformActionOnKC(t *testing.T) {
 		executor.actionID = providedActionID
 
 		err := executor.PerformActionOnKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -996,13 +996,13 @@ func TestKCToEthBridgeExecutor_GetAndStoreBatchFromKC(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.KCClient = &bridgeTests.KCClientStub{
 			GetPendingBatchCalled: func(ctx context.Context) (*bridgeCore.TransferBatch, error) {
-				return nil, expectedErr
+				return nil, errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		_, err := executor.GetBatchFromKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 
 		batch := executor.GetStoredBatch()
 		assert.Nil(t, batch)
@@ -1070,14 +1070,14 @@ func TestKCToEthBridgeExecutor_GetAndStoreActionIDForProposeSetStatusFromKC(t *t
 		args := createMockExecutorArgs()
 		args.KCClient = &bridgeTests.KCClientStub{
 			GetActionIDForSetStatusOnPendingTransferCalled: func(ctx context.Context, batch *bridgeCore.TransferBatch) (uint64, error) {
-				return uint64(0), expectedErr
+				return uint64(0), errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		_, err := executor.GetAndStoreActionIDForProposeSetStatusFromKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1123,14 +1123,14 @@ func TestKCToEthBridgeExecutor_WasSetStatusProposedOnKC(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.KCClient = &bridgeTests.KCClientStub{
 			WasProposedSetStatusCalled: func(ctx context.Context, batch *bridgeCore.TransferBatch) (bool, error) {
-				return false, expectedErr
+				return false, errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		_, err := executor.WasSetStatusProposedOnKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1172,14 +1172,14 @@ func TestEthToKCBridgeExecutor_ProposeSetStatusOnKC(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.KCClient = &bridgeTests.KCClientStub{
 			ProposeSetStatusCalled: func(ctx context.Context, batch *bridgeCore.TransferBatch) (string, error) {
-				return "", expectedErr
+				return "", errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		err := executor.ProposeSetStatusOnKC(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1242,14 +1242,14 @@ func TestKCToEthBridgeExecutor_WasTransferPerformedOnEthereum(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			WasExecutedCalled: func(ctx context.Context, batchID uint64) (bool, error) {
-				return false, expectedErr
+				return false, errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		_, err := executor.WasTransferPerformedOnEthereum(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1293,14 +1293,14 @@ func TestKCToEthBridgeExecutor_SignTransferOnEthereum(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			GenerateMessageHashCalled: func(batch *batchProcessor.ArgListsBatch, batchID uint64) (common.Hash, error) {
-				return common.Hash{}, expectedErr
+				return common.Hash{}, errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		err := executor.SignTransferOnEthereum()
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1345,14 +1345,14 @@ func TestKCToEthBridgeExecutor_PerformTransferOnEthereum(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			GetQuorumSizeCalled: func(ctx context.Context) (*big.Int, error) {
-				return big.NewInt(0), expectedErr
+				return big.NewInt(0), errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		err := executor.PerformTransferOnEthereum(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("ExecuteTransfer fails", func(t *testing.T) {
 		t.Parallel()
@@ -1363,14 +1363,14 @@ func TestKCToEthBridgeExecutor_PerformTransferOnEthereum(t *testing.T) {
 				return big.NewInt(0), nil
 			},
 			ExecuteTransferCalled: func(ctx context.Context, msgHash common.Hash, batch *batchProcessor.ArgListsBatch, batchId uint64, quorum int) (string, error) {
-				return "", expectedErr
+				return "", errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		err := executor.PerformTransferOnEthereum(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1421,14 +1421,14 @@ func TestKCToEthBridgeExecutor_IsQuorumReachedOnEthereum(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			IsQuorumReachedCalled: func(ctx context.Context, msgHash common.Hash) (bool, error) {
-				return false, expectedErr
+				return false, errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 
 		_, err := executor.ProcessQuorumReachedOnEthereum(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1571,14 +1571,14 @@ func TestGetBatchStatusesFromEthereum(t *testing.T) {
 		args := createMockExecutorArgs()
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			GetTransactionsStatusesCalled: func(ctx context.Context, batchId uint64) ([]byte, error) {
-				return nil, expectedErr
+				return nil, errExpected
 			},
 		}
 
 		executor, _ := NewBridgeExecutor(args)
 		executor.batch = providedBatch
 		_, err := executor.GetBatchStatusesFromEthereum(context.Background())
-		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, errExpected, err)
 	})
 	t.Run("should work", func(t *testing.T) {
 		t.Parallel()
@@ -1645,7 +1645,7 @@ func TestWaitAndReturnFinalBatchStatuses(t *testing.T) {
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
 			GetTransactionsStatusesCalled: func(ctx context.Context, batchId uint64) ([]byte, error) {
 				counter++
-				return nil, expectedErr
+				return nil, errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
@@ -1672,7 +1672,7 @@ func TestWaitAndReturnFinalBatchStatuses(t *testing.T) {
 				if counter >= 5 {
 					return providedStatuses, nil
 				}
-				return nil, expectedErr
+				return nil, errExpected
 			},
 		}
 		executor, _ := NewBridgeExecutor(args)
