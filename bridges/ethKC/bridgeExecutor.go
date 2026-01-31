@@ -157,7 +157,8 @@ func (executor *bridgeExecutor) MyTurnAsLeader() bool {
 func (executor *bridgeExecutor) GetBatchFromKC(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 	batch, err := executor.kcClient.GetPendingBatch(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, safeUint64ToInt(batch.ID)-1)
+		n := max(safeUint64ToInt(batch.ID)-1, 0)
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, n)
 		if len(batch.Deposits) > 0 {
 			lastDeposit := batch.Deposits[len(batch.Deposits)-1]
 			executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, safeUint64ToInt(lastDeposit.Nonce))
