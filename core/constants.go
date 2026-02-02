@@ -77,12 +77,34 @@ const (
 
 	// MetricLastBlockNonce represents the last block nonce queried
 	MetricLastBlockNonce = "last block nonce"
+
+	// MetricConnectedP2PPeerCount represents the metric used to store the connected P2P peer count
+	MetricConnectedP2PPeerCount = "connected P2P peer count"
+
+	// MetricBridgeDirection represents the metric used to store the bridge direction
+	MetricBridgeDirection = "bridge direction"
+
+	// MetricCurrentBatchID represents the metric used to store the current batch ID
+	MetricCurrentBatchID = "current batch id"
+
+	// MetricCurrentDepositNonce represents the metric used to store the current deposit nonce
+	MetricCurrentDepositNonce = "current deposit nonce"
+
+	// MetricIsLeader represents the metric used to store if the relayer is a leader
+	MetricIsLeader = "is leader"
+
+	// MetricRelayerStartTime represents the metric used to store the relayer start time
+	MetricRelayerStartTime = "relayer start time"
+
+	// MetricRelayerUptimeSeconds represents the metric used to store the relayer uptime in seconds
+	MetricRelayerUptimeSeconds = "relayer uptime seconds"
 )
 
 // PersistedMetrics represents the array of metrics that should be persisted
 var PersistedMetrics = []string{MetricNumBatches, MetricNumEthClientRequests, MetricNumEthClientTransactions,
 	MetricLastQueriedEthereumBlockNumber, MetricLastQueriedKCBlockNumber, MetricEthereumClientStatus,
-	MetricKCClientStatus, MetricLastEthereumClientError, MetricLastKCClientError, MetricLastBlockNonce}
+	MetricKCClientStatus, MetricLastEthereumClientError, MetricLastKCClientError, MetricLastBlockNonce,
+	MetricRelayerStartTime}
 
 const (
 	// EthClientStatusHandlerName is the Ethereum client status handler name

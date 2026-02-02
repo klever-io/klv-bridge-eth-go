@@ -53,15 +53,6 @@ type GenericAPIResponse struct {
 	Code  string      `json:"code"`
 }
 
-func createHTTPStatusError(httpStatusCode int, err error) error {
-	if err == nil {
-		err = ErrHTTPStatusCodeIsNotOK
-	}
-
-	return fmt.Errorf("%w, returned http status: %d, %s",
-		err, httpStatusCode, http.StatusText(httpStatusCode))
-}
-
 func createHTTPStatusErrorWithBody(httpStatusCode int, err error, responseBody []byte) error {
 	if err == nil {
 		err = ErrHTTPStatusCodeIsNotOK

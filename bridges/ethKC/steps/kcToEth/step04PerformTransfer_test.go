@@ -16,7 +16,7 @@ func TestExecute_PerformTransfer(t *testing.T) {
 		t.Parallel()
 		bridgeStub := createStubExecutorPerformTransfer()
 		bridgeStub.WasTransferPerformedOnEthereumCalled = func(ctx context.Context) (bool, error) {
-			return false, expectedError
+			return false, errExpected
 		}
 
 		step := performTransferStep{
@@ -34,7 +34,7 @@ func TestExecute_PerformTransfer(t *testing.T) {
 			return true
 		}
 		bridgeStub.PerformTransferOnEthereumCalled = func(ctx context.Context) error {
-			return expectedError
+			return errExpected
 		}
 
 		step := performTransferStep{

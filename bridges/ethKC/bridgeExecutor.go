@@ -5,13 +5,14 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"math"
 	"math/big"
+	"strconv"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
-	"github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	"github.com/multiversx/mx-chain-core-go/core/check"
@@ -30,7 +31,7 @@ type ArgsBridgeExecutor struct {
 	KCClient                   KCClient
 	EthereumClient             EthereumClient
 	TimeForWaitOnEthereum      time.Duration
-	StatusHandler              core.StatusHandler
+	StatusHandler              bridgeCore.StatusHandler
 	SignaturesHolder           SignaturesHolder
 	BalanceValidator           BalanceValidator
 	MaxQuorumRetriesOnEthereum uint64
@@ -44,7 +45,7 @@ type bridgeExecutor struct {
 	kcClient                   KCClient
 	ethereumClient             EthereumClient
 	timeForWaitOnEthereum      time.Duration
-	statusHandler              core.StatusHandler
+	statusHandler              bridgeCore.StatusHandler
 	sigsHolder                 SignaturesHolder
 	balanceValidator           BalanceValidator
 	maxQuorumRetriesOnEthereum uint64
@@ -142,19 +143,26 @@ func (executor *bridgeExecutor) setExecutionMessageInStatusHandler(level logger.
 		msg += fmt.Sprintf(" %s = %s", convertObjectToString(extras[i]), convertObjectToString(extras[i+1]))
 	}
 
-	executor.statusHandler.SetStringMetric(core.MetricLastError, msg)
+	executor.statusHandler.SetStringMetric(bridgeCore.MetricLastError, msg)
 }
 
 // MyTurnAsLeader returns true if the current relayer node is the leader
 func (executor *bridgeExecutor) MyTurnAsLeader() bool {
-	return executor.topologyProvider.MyTurnAsLeader()
+	isLeader := executor.topologyProvider.MyTurnAsLeader()
+	executor.statusHandler.SetStringMetric(bridgeCore.MetricIsLeader, strconv.FormatBool(isLeader))
+	return isLeader
 }
 
 // GetBatchFromKC fetches the pending batch from KC
 func (executor *bridgeExecutor) GetBatchFromKC(ctx context.Context) (*bridgeCore.TransferBatch, error) {
 	batch, err := executor.kcClient.GetPendingBatch(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batch.ID)-1)
+		n := max(safeUint64ToInt(batch.ID)-1, 0)
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, n)
+		if len(batch.Deposits) > 0 {
+			lastDeposit := batch.Deposits[len(batch.Deposits)-1]
+			executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, safeUint64ToInt(lastDeposit.Nonce))
+		}
 	}
 	return batch, err
 }
@@ -166,6 +174,7 @@ func (executor *bridgeExecutor) StoreBatchFromKC(batch *bridgeCore.TransferBatch
 	}
 
 	executor.batch = batch
+	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, safeUint64ToInt(batch.ID))
 	return nil
 }
 
@@ -178,7 +187,7 @@ func (executor *bridgeExecutor) GetStoredBatch() *bridgeCore.TransferBatch {
 func (executor *bridgeExecutor) GetLastExecutedEthBatchIDFromKC(ctx context.Context) (uint64, error) {
 	batchID, err := executor.kcClient.GetLastExecutedEthBatchID(ctx)
 	if err == nil {
-		executor.statusHandler.SetIntMetric(core.MetricNumBatches, int(batchID))
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricNumBatches, safeUint64ToInt(batchID))
 	}
 	return batchID, err
 }
@@ -463,6 +472,11 @@ func (executor *bridgeExecutor) GetAndStoreBatchFromEthereum(ctx context.Context
 	}
 
 	executor.batch = batch
+	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, safeUint64ToInt(batch.ID))
+	if len(batch.Deposits) > 0 {
+		lastDeposit := batch.Deposits[len(batch.Deposits)-1]
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, safeUint64ToInt(lastDeposit.Nonce))
+	}
 
 	return nil
 }
@@ -672,6 +686,13 @@ func (executor *bridgeExecutor) CheckKCClientAvailability(ctx context.Context) e
 // CheckEthereumClientAvailability trigger a self availability check for the Ethereum client
 func (executor *bridgeExecutor) CheckEthereumClientAvailability(ctx context.Context) error {
 	return executor.ethereumClient.CheckClientAvailability(ctx)
+}
+
+func safeUint64ToInt(v uint64) int {
+	if v > uint64(math.MaxInt) {
+		return math.MaxInt
+	}
+	return int(v)
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

@@ -2,13 +2,10 @@ package bridge
 
 import (
 	"context"
-	"errors"
 	"math/big"
 
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 )
-
-var errNotImplemented = errors.New("not implemented")
 
 // KCClientStub -
 type KCClientStub struct {
@@ -228,7 +225,7 @@ func (stub *KCClientStub) IsMintBurnToken(ctx context.Context, token []byte) (bo
 	if stub.IsMintBurnTokenCalled != nil {
 		return stub.IsMintBurnTokenCalled(ctx, token)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // IsNativeToken -
@@ -236,7 +233,7 @@ func (stub *KCClientStub) IsNativeToken(ctx context.Context, token []byte) (bool
 	if stub.IsNativeTokenCalled != nil {
 		return stub.IsNativeTokenCalled(ctx, token)
 	}
-	return false, notImplemented
+	return false, errNotImplemented
 }
 
 // TotalBalances -
@@ -244,7 +241,7 @@ func (stub *KCClientStub) TotalBalances(ctx context.Context, token []byte) (*big
 	if stub.TotalBalancesCalled != nil {
 		return stub.TotalBalancesCalled(ctx, token)
 	}
-	return nil, notImplemented
+	return nil, errNotImplemented
 }
 
 // MintBalances -
@@ -252,7 +249,7 @@ func (stub *KCClientStub) MintBalances(ctx context.Context, token []byte) (*big.
 	if stub.MintBalancesCalled != nil {
 		return stub.MintBalancesCalled(ctx, token)
 	}
-	return nil, notImplemented
+	return nil, errNotImplemented
 }
 
 // BurnBalances -
@@ -260,7 +257,7 @@ func (stub *KCClientStub) BurnBalances(ctx context.Context, token []byte) (*big.
 	if stub.BurnBalancesCalled != nil {
 		return stub.BurnBalancesCalled(ctx, token)
 	}
-	return nil, notImplemented
+	return nil, errNotImplemented
 }
 
 // CheckRequiredBalance -

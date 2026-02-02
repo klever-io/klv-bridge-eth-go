@@ -12,7 +12,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/klever-io/klv-bridge-eth-go/clients"
 	"github.com/klever-io/klv-bridge-eth-go/clients/ethereum/contract"
-	"github.com/klever-io/klv-bridge-eth-go/core"
 	bridgeCore "github.com/klever-io/klv-bridge-eth-go/core"
 	"github.com/klever-io/klv-bridge-eth-go/core/batchProcessor"
 	chainCore "github.com/multiversx/mx-chain-core-go/core"
@@ -30,7 +29,7 @@ type ArgsEthereumClient struct {
 	ClientWrapper                ClientWrapper
 	Erc20ContractsHandler        Erc20ContractsHolder
 	Log                          chainCore.Logger
-	AddressConverter             core.AddressConverter
+	AddressConverter             bridgeCore.AddressConverter
 	Broadcaster                  Broadcaster
 	CryptoHandler                CryptoHandler
 	TokensMapper                 TokensMapper
@@ -48,7 +47,7 @@ type client struct {
 	clientWrapper                ClientWrapper
 	erc20ContractsHandler        Erc20ContractsHolder
 	log                          chainCore.Logger
-	addressConverter             core.AddressConverter
+	addressConverter             bridgeCore.AddressConverter
 	broadcaster                  Broadcaster
 	cryptoHandler                CryptoHandler
 	tokensMapper                 TokensMapper
@@ -423,9 +422,9 @@ func (c *client) incrementRetriesAvailabilityCheck() {
 }
 
 func (c *client) setStatusForAvailabilityCheck(status bridgeCore.ClientStatus, message string, nonce uint64) {
-	c.clientWrapper.SetStringMetric(core.MetricKCClientStatus, status.String())
-	c.clientWrapper.SetStringMetric(core.MetricLastKCClientError, message)
-	c.clientWrapper.SetIntMetric(core.MetricLastBlockNonce, int(nonce))
+	c.clientWrapper.SetStringMetric(bridgeCore.MetricKCClientStatus, status.String())
+	c.clientWrapper.SetStringMetric(bridgeCore.MetricLastKCClientError, message)
+	c.clientWrapper.SetIntMetric(bridgeCore.MetricLastBlockNonce, int(nonce))
 }
 
 // CheckRequiredBalance will check if the safe has enough balance for the transfer

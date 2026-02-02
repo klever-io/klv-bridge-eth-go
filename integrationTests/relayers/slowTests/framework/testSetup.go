@@ -355,7 +355,7 @@ func (setup *TestSetup) sendFromKCToEthereumForToken(params TestTokenParams) *bi
 // TestWithdrawTotalFeesOnEthereumForTokens will test the withdrawal functionality for the provided test tokens
 func (setup *TestSetup) TestWithdrawTotalFeesOnEthereumForTokens(tokensParams ...TestTokenParams) {
 	for _, param := range tokensParams {
-		token := setup.TokensRegistry.GetTokenData(param.AbstractTokenIdentifier)
+		token := setup.GetTokenData(param.AbstractTokenIdentifier)
 
 		expectedAccumulated := big.NewInt(0)
 		for _, operation := range param.TestOperations {
