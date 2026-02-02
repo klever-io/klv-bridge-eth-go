@@ -473,6 +473,10 @@ func (executor *bridgeExecutor) GetAndStoreBatchFromEthereum(ctx context.Context
 
 	executor.batch = batch
 	executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentBatchID, safeUint64ToInt(batch.ID))
+	if len(batch.Deposits) > 0 {
+		lastDeposit := batch.Deposits[len(batch.Deposits)-1]
+		executor.statusHandler.SetIntMetric(bridgeCore.MetricCurrentDepositNonce, safeUint64ToInt(lastDeposit.Nonce))
+	}
 
 	return nil
 }

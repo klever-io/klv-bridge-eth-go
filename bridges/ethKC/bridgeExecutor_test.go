@@ -401,7 +401,8 @@ func TestEthToKCBridgeExecutor_GetAndStoreBatchFromEthereum(t *testing.T) {
 		expectedBatch := &bridgeCore.TransferBatch{
 			ID: providedNonce,
 			Deposits: []*bridgeCore.DepositTransfer{
-				{},
+				{Nonce: 100},
+				{Nonce: 101},
 			},
 		}
 		args.EthereumClient = &bridgeTests.EthereumClientStub{
@@ -420,6 +421,7 @@ func TestEthToKCBridgeExecutor_GetAndStoreBatchFromEthereum(t *testing.T) {
 		assert.True(t, expectedBatch == executor.GetStoredBatch()) // pointer testing
 		assert.True(t, expectedBatch == executor.batch)
 		assert.Equal(t, int(providedNonce), statusHandler.GetIntMetric(bridgeCore.MetricCurrentBatchID))
+		assert.Equal(t, 101, statusHandler.GetIntMetric(bridgeCore.MetricCurrentDepositNonce))
 	})
 	t.Run("should add deposits metadata for sc calls", func(t *testing.T) {
 		t.Parallel()
