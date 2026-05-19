@@ -32,6 +32,9 @@ const (
 
 	// Polygon is the string representation of the Polygon chain
 	Polygon Chain = "Polygon"
+
+	// Tron is the string representation of the TRON chain
+	Tron Chain = "Tron"
 )
 
 // ToLower returns the lowercase string of chain
