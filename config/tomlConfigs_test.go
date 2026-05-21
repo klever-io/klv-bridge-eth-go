@@ -14,6 +14,7 @@ func TestConfigs(t *testing.T) {
 	t.Parallel()
 
 	expectedConfig := Config{
+		ActiveChain: "Eth",
 		Eth: EthereumConfig{
 			Chain:                              "Ethereum",
 			NetworkAddress:                     "http://127.0.0.1:8545",
@@ -217,6 +218,8 @@ func TestConfigs(t *testing.T) {
 	}
 
 	testString := `
+ActiveChain = "Eth"
+
 [Eth]
     Chain = "Ethereum"
     NetworkAddress = "http://127.0.0.1:8545" # a network address
@@ -391,6 +394,153 @@ func TestConfigs(t *testing.T) {
     TopRatedCacheCapacity = 5000
     BadRatedCacheCapacity = 5000
 
+`
+
+	cfg := Config{}
+
+	err := toml.Unmarshal([]byte(testString), &cfg)
+
+	require.Nil(t, err)
+	require.Equal(t, expectedConfig, cfg)
+}
+
+func TestConfigs_Tron(t *testing.T) {
+	t.Parallel()
+
+	expectedConfig := Config{
+		ActiveChain: "Tron",
+		Eth:         EthereumConfig{},
+		Tron: TronConfig{
+			Chain:                              "Tron",
+			NetworkAddress:                     "http://127.0.0.1:16667",
+			MultisigContractAddress:            "TQZcHJsNHK5sNqg2b2hK3h5e7a8f9g0h1i",
+			SafeContractAddress:                "TR7HnwvQz3h4e5f6g7h8i9j0k1l2m3n4o",
+			PrivateKeyFile:                     "keys/tron.sk",
+			FeeLimit:                           150000000,
+			ResourcePollingIntervalInSeconds:   60,
+			IntervalToWaitForTransferInSeconds: 600,
+			MaxRetriesOnQuorumReached:          3,
+			ClientAvailabilityAllowDelta:       10,
+			EventsBlockStart:                   0,
+		},
+		Klever: KleverConfig{
+			NetworkAddress:               "https://api.devnet.klever.finance",
+			MultisigContractAddress:      "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0",
+			SafeContractAddress:          "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc",
+			PrivateKeyFile:               "keys/walletKey.pem",
+			IntervalToResendTxsInSeconds: 60,
+			GasMap: KleverGasMapConfig{
+				Sign:                   8000000,
+				ProposeTransferBase:    11000000,
+				ProposeTransferForEach: 5500000,
+				ProposeStatusBase:      10000000,
+				ProposeStatusForEach:   7000000,
+				PerformActionBase:      40000000,
+				PerformActionForEach:   5500000,
+			},
+			MaxRetriesOnQuorumReached:       3,
+			MaxRetriesOnWasTransferProposed: 3,
+			ClientAvailabilityAllowDelta:    10,
+			Proxy: ProxyConfig{
+				CacherExpirationSeconds: 600,
+				RestAPIEntityType:       "observer",
+				MaxNoncesDelta:          7,
+				FinalityCheck:           true,
+			},
+		},
+		P2P: ConfigP2P{
+			Port:            "10010",
+			InitialPeerList: make([]string, 0),
+			ProtocolID:      "/klv/relay/1.0.0",
+		},
+		StateMachine: map[string]ConfigStateMachine{
+			"TronToKC": {
+				StepDurationInMillis:       12000,
+				IntervalForLeaderInSeconds: 120,
+			},
+			"KCToTron": {
+				StepDurationInMillis:       12000,
+				IntervalForLeaderInSeconds: 720,
+			},
+		},
+		Relayer: ConfigRelayer{
+			Marshalizer: chainConfig.MarshalizerConfig{
+				Type:           "gogo protobuf",
+				SizeCheckDelta: 10,
+			},
+			RoleProvider: RoleProviderConfig{
+				PollingIntervalInMillis: 60000,
+			},
+		},
+		Logs: LogsConfig{
+			LogFileLifeSpanInSec: 86400,
+			LogFileLifeSpanInMB:  1024,
+		},
+	}
+
+	testString := `
+ActiveChain = "Tron"
+
+[Tron]
+    Chain = "Tron"
+    NetworkAddress = "http://127.0.0.1:16667"
+    MultisigContractAddress = "TQZcHJsNHK5sNqg2b2hK3h5e7a8f9g0h1i"
+    SafeContractAddress = "TR7HnwvQz3h4e5f6g7h8i9j0k1l2m3n4o"
+    PrivateKeyFile = "keys/tron.sk"
+    FeeLimit = 150000000
+    ResourcePollingIntervalInSeconds = 60
+    IntervalToWaitForTransferInSeconds = 600
+    MaxRetriesOnQuorumReached = 3
+    ClientAvailabilityAllowDelta = 10
+    EventsBlockStart = 0
+
+[Klever]
+    NetworkAddress = "https://api.devnet.klever.finance"
+    MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0"
+    SafeContractAddress = "klv1qqqqqqqqqqqqqpgqxjgmvqe9kvvr4xvvxflue3a7cjjeyvx9sg8snh0ljc"
+    PrivateKeyFile = "keys/walletKey.pem"
+    IntervalToResendTxsInSeconds = 60
+    MaxRetriesOnQuorumReached = 3
+    MaxRetriesOnWasTransferProposed = 3
+    ClientAvailabilityAllowDelta = 10
+    [Klever.Proxy]
+        CacherExpirationSeconds = 600
+        RestAPIEntityType = "observer"
+        FinalityCheck = true
+        MaxNoncesDelta = 7
+    [Klever.GasMap]
+        Sign = 8000000
+        ProposeTransferBase = 11000000
+        ProposeTransferForEach = 5500000
+        ProposeStatusBase = 10000000
+        ProposeStatusForEach = 7000000
+        PerformActionBase = 40000000
+        PerformActionForEach = 5500000
+
+[P2P]
+    Port = "10010"
+    InitialPeerList = []
+    ProtocolID = "/klv/relay/1.0.0"
+
+[StateMachine]
+    [StateMachine.TronToKC]
+        StepDurationInMillis = 12000
+        IntervalForLeaderInSeconds = 120
+
+    [StateMachine.KCToTron]
+        StepDurationInMillis = 12000
+        IntervalForLeaderInSeconds = 720
+
+[Logs]
+    LogFileLifeSpanInSec = 86400
+    LogFileLifeSpanInMB = 1024
+
+[Relayer]
+    [Relayer.Marshalizer]
+        Type = "gogo protobuf"
+        SizeCheckDelta = 10
+    [Relayer.RoleProvider]
+        PollingIntervalInMillis = 60000
 `
 
 	cfg := Config{}
