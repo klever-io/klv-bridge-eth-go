@@ -3,11 +3,11 @@ package relayers
 import (
 	"context"
 	"fmt"
+	"math"
 	"math/big"
 	"path"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/klever-io/klv-bridge-eth-go/clients/chain"
 	"github.com/klever-io/klv-bridge-eth-go/config"
 	"github.com/klever-io/klv-bridge-eth-go/testsCommon"
