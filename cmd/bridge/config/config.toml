@@ -1,3 +1,24 @@
+# ============================================================================
+# Bridge Configuration File
+# ============================================================================
+# 
+# ActiveChain selector: Choose the EVM-side bridge target
+#   - "Eth"  : Ethereum bridge (default)*
+#   - "Tron" : TRON blockchain bridge
+# 
+# Set ActiveChain to match one of the blocks below. Klever is always required
+# on the other side. Both EVM blocks may be present as templates; the factory
+# uses ActiveChain to determine which one is active.
+# 
+# To switch chains:
+#   1. Set ActiveChain = "Tron" (or "Eth")
+#   2. Comment/uncomment the corresponding [Tron] (or [Eth]) block
+#   3. Restart the relayer
+# ============================================================================
+
+# The active EVM-side chain
+ActiveChain = "Eth"
+
 [Eth]
     Chain = "Ethereum"
     NetworkAddress = "http://127.0.0.1:8545" # a network address
@@ -20,7 +41,25 @@
         MaximumAllowedGasPrice = 300 # maximum value allowed for the fetched gas price value
         # GasPriceSelector available options: "SafeGasPrice", "ProposeGasPrice", "FastGasPrice"
         GasPriceSelector = "SafeGasPrice" # selector used to provide the gas price
-
+# ============================================================================
+# TRON Bridge Configuration (Alternative to [Eth])
+# ============================================================================
+# Uncomment this block and set ActiveChain = \"Tron\" to use TRON instead of Ethereum.
+# Leave commented while ActiveChain = \"Eth\".
+# ============================================================================
+#
+# [Tron]
+#     Chain = \"Tron\"
+#     NetworkAddress = \"http://localhost:16667\" # TRON full node RPC address
+#     MultisigContractAddress = \"TQZcHJ...\" # TRON base58 address for the bridge contract
+#     SafeContractAddress = \"TR7Hnw...\" # TRON base58 address for the safe contract
+#     PrivateKeyFile = \"keys/tron.sk\" # path to the TRON private key file (hex format)
+#     FeeLimit = 150000000 # fee limit in sun (1 TRX = 1,000,000 sun). For ~150 TRX
+#     ResourcePollingIntervalInSeconds = 60 # polling interval for bandwidth/energy availability
+#     IntervalToWaitForTransferInSeconds = 600 # 10 minutes
+#     MaxRetriesOnQuorumReached = 3
+#     ClientAvailabilityAllowDelta = 10
+#     EventsBlockStart = 0 # starting block for event polling
 [Klever]
     NetworkAddress = "http://localhost:8080" # the network address
     MultisigContractAddress = "klv1qqqqqqqqqqqqqpgqh46r9zh78lry2py8tq723fpjdr4pp0zgsg8syf6mq0" # the Klever Blockchain address for the bridge contract

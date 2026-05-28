@@ -15,7 +15,9 @@ type Configs struct {
 
 // Config general configuration struct
 type Config struct {
+	ActiveChain       string
 	Eth               EthereumConfig
+	Tron              TronConfig
 	Klever            KleverConfig
 	P2P               ConfigP2P
 	StateMachine      map[string]ConfigStateMachine
@@ -54,6 +56,22 @@ type GasStationConfig struct {
 	MaximumAllowedGasPrice     int
 	GasPriceSelector           string
 	GasPriceMultiplier         int
+}
+
+// TronConfig represents the TRON Config parameters
+type TronConfig struct {
+	Chain                              chain.Chain
+	NetworkAddress                     string
+	MultisigContractAddress            string
+	SafeContractAddress                string
+	PrivateKeyFile                     string
+	IntervalToResendTxsInSeconds       uint64
+	FeeLimit                           uint64
+	ResourcePollingIntervalInSeconds   uint64
+	MaxRetriesOnQuorumReached          uint64
+	IntervalToWaitForTransferInSeconds uint64
+	ClientAvailabilityAllowDelta       uint64
+	EventsBlockStart                   int64
 }
 
 // ConfigP2P configuration for the P2P communication
